@@ -161,6 +161,14 @@ export function ProgramPlaceholder({ visual }: { visual: ProgramVisualId }) {
       return <PathPlaceholder />;
     case "ripple":
       return <RipplePlaceholder />;
+    case "moon":
+      return <MoonPlaceholder />;
+    case "calm":
+      return <CalmPlaceholder />;
+    case "glow":
+      return <GlowPlaceholder />;
+    case "journal":
+      return <JournalPlaceholder />;
   }
 }
 
@@ -299,6 +307,213 @@ function RipplePlaceholder() {
         <ellipse cx="210" cy="150" rx="104" ry="46" strokeWidth="1.1" />
         <ellipse cx="210" cy="150" rx="142" ry="64" strokeWidth="1" />
         <ellipse cx="210" cy="150" rx="184" ry="84" strokeWidth="0.9" />
+      </g>
+    </svg>
+  );
+}
+
+function MoonPlaceholder() {
+  const id = useId().replace(/:/g, "");
+  const sky = uid(id, "sky");
+  const moonGlow = uid(id, "moon-glow");
+  const hill = uid(id, "hill");
+
+  return (
+    <svg
+      className="h-full w-full"
+      viewBox="0 0 480 270"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden
+    >
+      <defs>
+        <linearGradient id={sky} x1="0" y1="0" x2="0.2" y2="1">
+          <stop offset="0%" stopColor="#3a2a22" />
+          <stop offset="48%" stopColor="#241910" />
+          <stop offset="100%" stopColor="#16100c" />
+        </linearGradient>
+        <radialGradient id={moonGlow} cx="74%" cy="30%" r="42%">
+          <stop offset="0%" stopColor="#f4e0b8" stopOpacity="0.7" />
+          <stop offset="36%" stopColor="#c4a07a" stopOpacity="0.28" />
+          <stop offset="100%" stopColor="#c4a07a" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id={hill} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#2a1c14" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="#120e0a" stopOpacity="0.92" />
+        </linearGradient>
+      </defs>
+      <rect width="480" height="270" fill={`url(#${sky})`} />
+      <rect width="480" height="270" fill={`url(#${moonGlow})`} />
+      <circle cx="352" cy="78" r="38" fill="#f6ead0" opacity="0.92" />
+      <circle cx="338" cy="70" r="12" fill="#e8d2a8" opacity="0.28" />
+      <g fill="#f4e6c8" opacity="0.42">
+        <circle cx="56" cy="42" r="1.4" />
+        <circle cx="98" cy="68" r="1.1" />
+        <circle cx="148" cy="32" r="1.3" />
+        <circle cx="206" cy="86" r="0.9" />
+        <circle cx="248" cy="48" r="1.15" />
+        <circle cx="430" cy="36" r="1.2" />
+        <circle cx="412" cy="118" r="1" />
+      </g>
+      <path
+        d="M0 270 C54 214 118 230 176 204 C248 172 304 210 368 188 C420 172 452 196 480 186 V270 Z"
+        fill={`url(#${hill})`}
+      />
+      <path
+        d="M0 270 C80 236 140 248 210 228 C286 206 340 242 480 224 V270 Z"
+        fill="#120e0a"
+        opacity="0.72"
+      />
+    </svg>
+  );
+}
+
+function CalmPlaceholder() {
+  const id = useId().replace(/:/g, "");
+  const water = uid(id, "water");
+  const bloom = uid(id, "bloom");
+
+  return (
+    <svg
+      className="h-full w-full"
+      viewBox="0 0 480 270"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden
+    >
+      <defs>
+        <linearGradient id={water} x1="0" y1="0" x2="0.12" y2="1">
+          <stop offset="0%" stopColor="#d8e6ea" />
+          <stop offset="42%" stopColor="#7ea3b0" />
+          <stop offset="100%" stopColor="#3d5f68" />
+        </linearGradient>
+        <radialGradient id={bloom} cx="50%" cy="46%" r="34%">
+          <stop offset="0%" stopColor="#f7f2ea" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="#f7f2ea" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="480" height="270" fill={`url(#${water})`} />
+      <rect width="480" height="270" fill={`url(#${bloom})`} />
+      <g fill="none" stroke="#f4eee4" strokeOpacity="0.38">
+        <ellipse cx="240" cy="168" rx="42" ry="12" strokeWidth="1.2" />
+        <ellipse cx="240" cy="168" rx="78" ry="22" strokeWidth="1.1" />
+        <ellipse cx="240" cy="168" rx="122" ry="34" strokeWidth="1" />
+        <ellipse cx="240" cy="168" rx="172" ry="48" strokeWidth="0.9" />
+      </g>
+      <g transform="translate(240 118)" fill="#efe4d4" opacity="0.9">
+        <ellipse cx="0" cy="-22" rx="16" ry="28" />
+        <ellipse cx="-22" cy="-8" rx="15" ry="26" transform="rotate(-36)" />
+        <ellipse cx="22" cy="-8" rx="15" ry="26" transform="rotate(36)" />
+        <ellipse cx="-18" cy="12" rx="14" ry="24" transform="rotate(-70)" />
+        <ellipse cx="18" cy="12" rx="14" ry="24" transform="rotate(70)" />
+        <circle cx="0" cy="2" r="9" fill="#c4a07a" />
+      </g>
+      <path
+        d="M240 128 C238 150 236 168 236 186"
+        fill="none"
+        stroke="#d7c4aa"
+        strokeWidth="1.4"
+        opacity="0.55"
+      />
+    </svg>
+  );
+}
+
+function GlowPlaceholder() {
+  const id = useId().replace(/:/g, "");
+  const sky = uid(id, "sky");
+  const bloom = uid(id, "bloom");
+
+  return (
+    <svg
+      className="h-full w-full"
+      viewBox="0 0 480 270"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden
+    >
+      <defs>
+        <linearGradient id={sky} x1="0" y1="0" x2="0.1" y2="1">
+          <stop offset="0%" stopColor="#f8edd8" />
+          <stop offset="42%" stopColor="#e8c08a" />
+          <stop offset="100%" stopColor="#c48a58" />
+        </linearGradient>
+        <radialGradient id={bloom} cx="58%" cy="38%" r="46%">
+          <stop offset="0%" stopColor="#fff6e4" stopOpacity="0.95" />
+          <stop offset="40%" stopColor="#f0d0a0" stopOpacity="0.42" />
+          <stop offset="100%" stopColor="#f0d0a0" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="480" height="270" fill={`url(#${sky})`} />
+      <rect width="480" height="270" fill={`url(#${bloom})`} />
+      <circle cx="278" cy="96" r="34" fill="#fff3d2" opacity="0.55" />
+      <g
+        fill="none"
+        stroke="#a67c52"
+        strokeWidth="1.45"
+        opacity="0.78"
+        transform="translate(214 28) rotate(16)"
+      >
+        <path d="M0 8 C18 40 22 90 8 176 C2 208 -6 228 0 248" />
+        <path d="M0 32 C-28 64 -36 102 -18 140" />
+        <path d="M2 64 C32 90 40 124 22 158" />
+        <path d="M0 98 C-24 122 -26 150 -10 176" />
+        <path d="M2 128 C24 146 26 170 12 192" />
+        <path d="M1 160 C-16 176 -14 196 -4 212" />
+      </g>
+    </svg>
+  );
+}
+
+function JournalPlaceholder() {
+  const id = useId().replace(/:/g, "");
+  const room = uid(id, "room");
+  const table = uid(id, "table");
+  const flame = uid(id, "flame");
+  const page = uid(id, "page");
+
+  return (
+    <svg
+      className="h-full w-full"
+      viewBox="0 0 480 270"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden
+    >
+      <defs>
+        <linearGradient id={room} x1="0" y1="0" x2="0.2" y2="1">
+          <stop offset="0%" stopColor="#3a2a20" />
+          <stop offset="100%" stopColor="#1c1410" />
+        </linearGradient>
+        <linearGradient id={table} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#6a4a32" />
+          <stop offset="100%" stopColor="#3d2a1c" />
+        </linearGradient>
+        <radialGradient id={flame} cx="70%" cy="38%" r="34%">
+          <stop offset="0%" stopColor="#ffe7b0" stopOpacity="0.85" />
+          <stop offset="46%" stopColor="#c4a07a" stopOpacity="0.22" />
+          <stop offset="100%" stopColor="#c4a07a" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id={page} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#f7f1e4" />
+          <stop offset="100%" stopColor="#e4d4bc" />
+        </linearGradient>
+      </defs>
+      <rect width="480" height="270" fill={`url(#${room})`} />
+      <rect width="480" height="270" fill={`url(#${flame})`} />
+      <path d="M0 176 L480 148 V270 H0 Z" fill={`url(#${table})`} />
+      <g transform="translate(92 112) rotate(-8)">
+        <rect width="168" height="108" rx="4" fill={`url(#${page})`} />
+        <rect x="84" width="84" height="108" rx="3" fill="#efe4d0" />
+        <g stroke="#cbbca8" strokeWidth="1.2" opacity="0.7">
+          <line x1="18" y1="28" x2="72" y2="28" />
+          <line x1="18" y1="44" x2="68" y2="44" />
+          <line x1="18" y1="60" x2="70" y2="60" />
+          <line x1="98" y1="28" x2="150" y2="28" />
+          <line x1="98" y1="44" x2="146" y2="44" />
+          <line x1="98" y1="60" x2="142" y2="60" />
+        </g>
+      </g>
+      <g transform="translate(318 86)">
+        <rect x="10" y="52" width="28" height="46" rx="3" fill="#d8c4a4" />
+        <path d="M24 18 C16 34 18 46 24 54 C30 46 32 34 24 18 Z" fill="#f3c56a" />
+        <ellipse cx="24" cy="20" rx="5" ry="8" fill="#fff4d2" opacity="0.9" />
       </g>
     </svg>
   );

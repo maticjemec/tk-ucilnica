@@ -1,4 +1,12 @@
-export type ProgramVisualId = "feather" | "silhouette" | "path" | "ripple";
+export type ProgramVisualId =
+  | "feather"
+  | "silhouette"
+  | "path"
+  | "ripple"
+  | "moon"
+  | "calm"
+  | "glow"
+  | "journal";
 
 export type DashboardProgram = {
   slug: string;

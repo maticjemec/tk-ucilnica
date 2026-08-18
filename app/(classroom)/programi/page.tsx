@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import { PageHeader } from "@/components/ui/PageHeader";
+import { CatalogClient } from "@/components/catalog/CatalogClient";
+import { SupportCard } from "@/components/my-programs/SupportCard";
+import { catalogPrograms } from "@/lib/content/catalog";
 
 export const metadata: Metadata = {
   title: "Vsi programi",
@@ -7,9 +9,14 @@ export const metadata: Metadata = {
 
 export default function ProgramiPage() {
   return (
-    <PageHeader
-      title="Vsi programi"
-      subtitle="Stran bo izdelana v naslednji nalogi."
-    />
+    <>
+      <CatalogClient programs={catalogPrograms} />
+      <div className="pt-2">
+        <SupportCard
+          title="Ne najdeš programa zase?"
+          description="Piši nam in pomagali ti bomo izbrati pravega zate."
+        />
+      </div>
+    </>
   );
 }
