@@ -151,12 +151,22 @@ export function HeroPlaceholder() {
   );
 }
 
-export function ProgramPlaceholder({ visual }: { visual: ProgramVisualId }) {
+export function ProgramPlaceholder({
+  visual,
+  variant = "default",
+}: {
+  visual: ProgramVisualId;
+  variant?: "default" | "hero";
+}) {
   switch (visual) {
     case "feather":
       return <FeatherPlaceholder />;
     case "silhouette":
-      return <SilhouettePlaceholder />;
+      return variant === "hero" ? (
+        <SilhouetteHeroPlaceholder />
+      ) : (
+        <SilhouettePlaceholder />
+      );
     case "path":
       return <PathPlaceholder />;
     case "ripple":
@@ -204,6 +214,129 @@ function FeatherPlaceholder() {
         <path d="M0 108 C-24 132 -26 162 -10 190" />
         <path d="M2 140 C24 158 26 184 12 208" />
         <path d="M1 176 C-16 192 -14 214 -4 230" />
+      </g>
+    </svg>
+  );
+}
+
+function SilhouetteHeroPlaceholder() {
+  const id = useId().replace(/:/g, "");
+  const sky = uid(id, "sky");
+  const sun = uid(id, "sun");
+  const bloom = uid(id, "bloom");
+  const far = uid(id, "far");
+  const mid = uid(id, "mid");
+  const near = uid(id, "near");
+  const ground = uid(id, "ground");
+  const mist = uid(id, "mist");
+  const blurFar = uid(id, "blur-far");
+  const blurMid = uid(id, "blur-mid");
+  const blurFigure = uid(id, "blur-figure");
+
+  return (
+    <svg
+      className="h-full w-full"
+      viewBox="0 0 960 420"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden
+    >
+      <defs>
+        <linearGradient id={sky} x1="0" y1="0" x2="0.18" y2="1">
+          <stop offset="0%" stopColor="#f8ecd8" />
+          <stop offset="28%" stopColor="#f3d4ae" />
+          <stop offset="58%" stopColor="#e8a56a" />
+          <stop offset="82%" stopColor="#d07848" />
+          <stop offset="100%" stopColor="#b45d3a" />
+        </linearGradient>
+        <radialGradient id={sun} cx="72%" cy="38%" r="36%">
+          <stop offset="0%" stopColor="#fff6e4" stopOpacity="0.95" />
+          <stop offset="32%" stopColor="#f4d09a" stopOpacity="0.5" />
+          <stop offset="68%" stopColor="#e0a468" stopOpacity="0.16" />
+          <stop offset="100%" stopColor="#e0a468" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id={bloom} cx="70%" cy="46%" r="48%">
+          <stop offset="0%" stopColor="#f7c989" stopOpacity="0.38" />
+          <stop offset="100%" stopColor="#f7c989" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id={far} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#e8c8a4" stopOpacity="0.32" />
+          <stop offset="100%" stopColor="#d4ae86" stopOpacity="0.48" />
+        </linearGradient>
+        <linearGradient id={mid} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#c9a07a" stopOpacity="0.4" />
+          <stop offset="100%" stopColor="#a87b58" stopOpacity="0.58" />
+        </linearGradient>
+        <linearGradient id={near} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#8d684c" stopOpacity="0.42" />
+          <stop offset="100%" stopColor="#6a4a36" stopOpacity="0.62" />
+        </linearGradient>
+        <linearGradient id={ground} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#5c4030" stopOpacity="0.28" />
+          <stop offset="100%" stopColor="#3f2c22" stopOpacity="0.55" />
+        </linearGradient>
+        <linearGradient id={mist} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#f4e6d4" stopOpacity="0.22" />
+          <stop offset="100%" stopColor="#f4e6d4" stopOpacity="0" />
+        </linearGradient>
+        <filter id={blurFar} x="-8%" y="-8%" width="116%" height="116%">
+          <feGaussianBlur stdDeviation="6.5" />
+        </filter>
+        <filter id={blurMid} x="-6%" y="-6%" width="112%" height="112%">
+          <feGaussianBlur stdDeviation="3.2" />
+        </filter>
+        <filter id={blurFigure} x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="0.45" />
+        </filter>
+      </defs>
+
+      <rect width="960" height="420" fill={`url(#${sky})`} />
+      <rect width="960" height="420" fill={`url(#${sun})`} />
+      <rect width="960" height="420" fill={`url(#${bloom})`} />
+      <circle cx="692" cy="148" r="38" fill="#fff6e4" opacity="0.42" />
+
+      <path
+        d="M0 272 C120 238 210 252 320 228 C430 204 520 236 640 214 C760 192 860 218 960 204 V420 H0 Z"
+        fill={`url(#${far})`}
+        filter={`url(#${blurFar})`}
+      />
+      <path
+        d="M0 304 C110 268 220 286 330 262 C460 232 560 270 690 248 C800 230 890 258 960 246 V420 H0 Z"
+        fill={`url(#${mid})`}
+        filter={`url(#${blurMid})`}
+      />
+      <path
+        d="M0 338 C90 308 200 322 310 300 C430 274 540 312 660 294 C780 276 880 308 960 296 V420 H0 Z"
+        fill={`url(#${near})`}
+      />
+      <path
+        d="M0 378 C140 352 280 366 430 354 C590 340 740 368 960 352 V420 H0 Z"
+        fill={`url(#${ground})`}
+      />
+      <rect width="960" height="420" fill={`url(#${mist})`} />
+
+      <g
+        fill="#1a1410"
+        opacity="0.7"
+        filter={`url(#${blurFigure})`}
+        transform="translate(706 286)"
+      >
+        <ellipse cx="16" cy="9" rx="6.2" ry="7.2" />
+        <path
+          d="M10 20 C3 10 -4 0 3 -12"
+          fill="none"
+          stroke="#1a1410"
+          strokeWidth="3.1"
+          strokeLinecap="round"
+        />
+        <path
+          d="M22 20 C29 10 36 0 29 -12"
+          fill="none"
+          stroke="#1a1410"
+          strokeWidth="3.1"
+          strokeLinecap="round"
+        />
+        <path d="M9 20 C10 34 11 44 16 50 C21 44 22 34 23 20 C20 22 18 23 16 23 C14 23 11 22 9 20 Z" />
+        <path d="M11 46 C10 60 11 72 13 80 H19 C21 72 22 60 21 46 C19 50 16 52 14 50 Z" />
       </g>
     </svg>
   );

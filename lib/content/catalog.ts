@@ -223,3 +223,7 @@ export function formatCatalogPrice(price: number) {
 export function formatCatalogLessons(lessons: number) {
   return `${lessons} lekcij`;
 }
+
+export function getCatalogProgramBySlug(slug: string) {
+  return catalogPrograms.find((program) => program.slug === slug);
+}
