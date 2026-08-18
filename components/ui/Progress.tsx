@@ -1,12 +1,25 @@
 import { cn } from "@/lib/cn";
 
+type ProgressVariant = "accent" | "success";
+
 type ProgressProps = {
   value: number;
   className?: string;
   label?: string;
+  variant?: ProgressVariant;
 };
 
-export function Progress({ value, className, label }: ProgressProps) {
+const fillClasses: Record<ProgressVariant, string> = {
+  accent: "bg-accent",
+  success: "bg-success",
+};
+
+export function Progress({
+  value,
+  className,
+  label,
+  variant = "accent",
+}: ProgressProps) {
   const clamped = Math.min(100, Math.max(0, value));
 
   return (
@@ -19,7 +32,10 @@ export function Progress({ value, className, label }: ProgressProps) {
       className={cn("h-1 w-full overflow-hidden rounded-full bg-border", className)}
     >
       <div
-        className="h-full rounded-full bg-accent transition-[width] duration-300"
+        className={cn(
+          "h-full rounded-full transition-[width] duration-300",
+          fillClasses[variant],
+        )}
         style={{ width: `${clamped}%` }}
       />
     </div>

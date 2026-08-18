@@ -13,7 +13,9 @@ export function PageHeader({ title, subtitle, actions }: PageHeaderProps) {
         <h1 className="page-title">{title}</h1>
         {subtitle ? <p className="page-subtitle">{subtitle}</p> : null}
       </div>
-      {actions ? <div className="shrink-0">{actions}</div> : null}
+      {actions ? (
+        <div className="w-full shrink-0 sm:w-auto">{actions}</div>
+      ) : null}
     </div>
   );
 }
