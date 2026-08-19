@@ -129,3 +129,55 @@ export function getVisibleLessonCount(program: OwnedProgram) {
   const ids = new Set(program.sections.flatMap((section) => section.lessonIds));
   return ids.size;
 }
+
+export function getCurrentOwnedLesson(program: OwnedProgram) {
+  return program.lessons.find(
+    (lesson) => lesson.slug === program.currentLessonSlug,
+  );
+}
+
+export function isOwnedProgramCompleted(progressPercent: number) {
+  return progressPercent >= 100;
+}
+
+export function getOwnedPrimaryCtaLabel(progressPercent: number) {
+  return isOwnedProgramCompleted(progressPercent)
+    ? "Ponovi program"
+    : "Nadaljuj program";
+}
+
+export function formatSectionProgress(completed: number, total: number) {
+  return `${completed} od ${total} opravljenih`;
+}
+
+export function getSectionProgress(
+  program: OwnedProgram,
+  completedIds: ReadonlySet<string>,
+) {
+  const knownIds = new Set(program.lessons.map((lesson) => lesson.id));
+
+  return program.sections.map((section) => {
+    const lessonIds = section.lessonIds.filter((id) => knownIds.has(id));
+    const completed = lessonIds.filter((id) => completedIds.has(id)).length;
+
+    return {
+      sectionId: section.id,
+      completed,
+      total: lessonIds.length,
+      label: formatSectionProgress(completed, lessonIds.length),
+    };
+  });
+}
+
+export function getLessonAccessLabel(state: LessonAccessState) {
+  switch (state) {
+    case "completed":
+      return "opravljeno";
+    case "current":
+      return "trenutna lekcija";
+    case "available":
+      return "na voljo";
+    case "locked":
+      return "zaklenjeno";
+  }
+}

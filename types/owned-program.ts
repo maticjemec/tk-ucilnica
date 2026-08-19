@@ -32,6 +32,18 @@ export type LessonResource = {
   href?: string;
 };
 
+export type OwnedProgramMaterial = LessonResource & {
+  subtitle: string;
+  downloadLabel: string;
+};
+
+export type OwnedProgramHighlight = {
+  id: string;
+  icon: "calendar" | "play" | "file" | "infinity";
+  title: string;
+  description: string;
+};
+
 /**
  * Prepared for drip unlock. TASK 007 does not compute calendar dates.
  */
@@ -85,6 +97,8 @@ export type OwnedProgram = {
   initialCompletedLessonIds: string[];
   sections: ProgramSection[];
   lessons: ProgramLesson[];
+  /** Program-level files. Future URLs live on each material's href. */
+  materials: OwnedProgramMaterial[];
 };
 
 export type ResolvedLesson = ProgramLesson & {

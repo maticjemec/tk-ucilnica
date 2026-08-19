@@ -1,4 +1,5 @@
-import Link from "next/link";
+"use client";
+
 import { BookOpen, CirclePlay, Clock, RotateCcw } from "lucide-react";
 import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { CoverMedia } from "@/components/dashboard/CoverMedia";
@@ -15,8 +16,9 @@ type PurchasedProgramCardProps = {
 
 export function PurchasedProgramCard({ program }: PurchasedProgramCardProps) {
   const completed = program.status === "completed";
-  const detailsHref = `/programi/${program.slug}`;
-  const href = getOwnedProgramContinueHref(program.slug) ?? detailsHref;
+  const ownedOverviewHref = `/moji-programi/${program.slug}`;
+  const continueHref =
+    getOwnedProgramContinueHref(program.slug) ?? ownedOverviewHref;
   const titleId = `program-title-${program.slug}`;
 
   return (
@@ -76,10 +78,10 @@ export function PurchasedProgramCard({ program }: PurchasedProgramCardProps) {
             </div>
           </div>
 
-          <div className="flex flex-col items-start justify-center gap-2.5 px-5 pt-1 pb-5 md:px-5 md:pt-2 md:pb-5 lg:w-[11.5rem] lg:shrink-0 lg:items-center lg:px-4 lg:py-5">
+          <div className="relative z-10 flex flex-col items-start justify-center gap-2.5 px-5 pt-1 pb-5 md:px-5 md:pt-2 md:pb-5 lg:w-[11.5rem] lg:shrink-0 lg:items-center lg:px-4 lg:py-5">
             {completed ? (
               <ButtonLink
-                href={href}
+                href={continueHref}
                 variant="success-outline"
                 className="w-full md:w-auto md:min-w-[10.5rem] lg:w-full"
               >
@@ -88,19 +90,19 @@ export function PurchasedProgramCard({ program }: PurchasedProgramCardProps) {
               </ButtonLink>
             ) : (
               <ButtonLink
-                href={href}
+                href={continueHref}
                 className="w-full md:w-auto md:min-w-[10.5rem] lg:w-full"
               >
                 <CirclePlay className="h-4 w-4" strokeWidth={1.6} aria-hidden />
                 Nadaljuj
               </ButtonLink>
             )}
-            <Link
-              href={detailsHref}
-              className="text-sm text-foreground/80 transition-colors hover:text-foreground lg:text-center"
+            <a
+              href={ownedOverviewHref}
+              className="relative z-10 text-sm text-foreground/80 transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent lg:text-center"
             >
               Poglej podrobnosti →
-            </Link>
+            </a>
           </div>
         </div>
       </article>

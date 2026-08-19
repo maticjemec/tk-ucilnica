@@ -7,6 +7,7 @@ import { getOwnedLessonPath } from "@/lib/owned-program/paths";
 import type {
   LessonResource,
   OwnedProgram,
+  OwnedProgramMaterial,
   ProgramLesson,
 } from "@/types/owned-program";
 
@@ -159,6 +160,36 @@ function fromCatalogIdentity(slug: string) {
 const confidenceIdentity = fromCatalogIdentity("21-dni-do-boljse-samozavesti");
 const confidenceLessons = [...demonstratedLessons, ...extraLessons];
 
+const confidenceMaterials: OwnedProgramMaterial[] = [
+  {
+    id: "confidence-workbook",
+    title: "Delovni zvezek – 21 dni do boljše samozavesti",
+    subtitle: "Praktične vaje za vsak dan.",
+    kind: "pdf",
+    formatLabel: "PDF",
+    sizeLabel: "2.4 MB",
+    downloadLabel: "Prenesi vse",
+  },
+  {
+    id: "confidence-reminders",
+    title: "Dnevni opomniki",
+    subtitle: "Pozitivne misli za vsak dan programa.",
+    kind: "pdf",
+    formatLabel: "PDF",
+    sizeLabel: "0.8 MB",
+    downloadLabel: "Prenesi",
+  },
+  {
+    id: "confidence-guide",
+    title: "Vodnik programa",
+    subtitle: "Pregled celotnega 21-dnevnega programa.",
+    kind: "pdf",
+    formatLabel: "PDF",
+    sizeLabel: "1.1 MB",
+    downloadLabel: "Prenesi",
+  },
+];
+
 const confidenceProgram: OwnedProgram = {
   id: confidenceIdentity.slug,
   slug: confidenceIdentity.slug,
@@ -197,6 +228,7 @@ const confidenceProgram: OwnedProgram = {
       lessonIds: demonstratedLessons.slice(7, 10).map((lesson) => lesson.id),
     },
   ],
+  materials: confidenceMaterials,
 };
 
 export const ownedPrograms: OwnedProgram[] = [confidenceProgram];
@@ -218,6 +250,10 @@ export function getOwnedProgramContinueHref(slug: string) {
   return getOwnedLessonPath(program.slug, program.currentLessonSlug);
 }
 
+export function getOwnedProgramStaticParams() {
+  return ownedPrograms.map((program) => ({ slug: program.slug }));
+}
+
 export function getOwnedLessonStaticParams() {
   return ownedPrograms.flatMap((program) =>
     program.lessons.map((lesson) => ({
@@ -225,6 +261,24 @@ export function getOwnedLessonStaticParams() {
       lessonSlug: lesson.slug,
     })),
   );
+}
+
+export function getOwnedProgramMaterials(program: OwnedProgram) {
+  const featuredIds = new Set(program.materials.map((item) => item.id));
+  const visibleIds = new Set(
+    program.sections.flatMap((section) => section.lessonIds),
+  );
+  const extra = program.lessons
+    .filter((lesson) => visibleIds.has(lesson.id))
+    .flatMap((lesson) =>
+      lesson.resources.filter((resource) => !featuredIds.has(resource.id)),
+    );
+
+  return {
+    featured: program.materials,
+    extra,
+    total: program.materials.length + extra.length,
+  };
 }
 
 export function getOwnedLessonNav(program: OwnedProgram, lessonSlug: string) {

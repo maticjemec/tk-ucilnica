@@ -13,7 +13,7 @@ import {
 import { BrandLockup } from "@/components/branding/BrandLockup";
 import { SidebarQuote } from "@/components/layout/SidebarQuote";
 import { cn } from "@/lib/cn";
-import { primaryNav, type PrimaryNavId } from "@/lib/navigation";
+import { isNavItemActive, primaryNav, type PrimaryNavId } from "@/lib/navigation";
 
 const navIcons: Record<PrimaryNavId, LucideIcon> = {
   pregled: LayoutDashboard,
@@ -26,14 +26,6 @@ type SidebarProps = {
   onNavigate?: () => void;
 };
 
-function isActivePath(pathname: string, href: string) {
-  if (href === "/") {
-    return pathname === "/";
-  }
-
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
-
 export function Sidebar({ onNavigate }: SidebarProps) {
   const pathname = usePathname();
 
@@ -45,7 +37,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
         <ul className="flex flex-col gap-1">
           {primaryNav.map((item) => {
             const Icon = navIcons[item.id];
-            const active = isActivePath(pathname, item.href);
+            const active = isNavItemActive(pathname, item.href);
 
             return (
               <li key={item.href}>
