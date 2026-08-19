@@ -29,12 +29,15 @@ export function getOwnedProgramHighlights(
 ): OwnedProgramHighlight[] {
   const lessonCount = getVisibleLessonCount(program);
   const weekCount = program.sections.length;
+  const lengthTitle = program.durationLabel
+    ? program.durationLabel
+    : `${program.totalDays} dni programa`;
 
   return [
     {
       id: "length",
       icon: "calendar",
-      title: `${program.totalDays} dni programa`,
+      title: lengthTitle,
       description: `${weekCount} tedni, ${lessonCount} lekcij`,
     },
     {
@@ -92,7 +95,7 @@ export function getOwnedOverviewModel(program: OwnedProgram) {
     completedCount: completedIds.size,
     visibleLessonCount,
     lessonCountLabel: formatCatalogLessons(visibleLessonCount),
-    durationLabel: `${program.totalDays} dni`,
+    durationLabel: program.durationLabel ?? `${program.totalDays} dni`,
     difficulty: detail?.difficulty ?? "Vseh stopenj",
     categoryLabel: detail?.categoryLabel ?? program.label,
     benefits: detail?.benefits ?? [],

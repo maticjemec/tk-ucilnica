@@ -13,7 +13,7 @@ import type {
  * Change this single value to switch the default session without editing
  * other files:
  * - "guest" → public catalog / program detail only
- * - "authenticated" → Tina Korošec, owns 21-dni-do-boljse-samozavesti
+ * - "authenticated" → Tina Korošec, owns all four purchased programs
  *
  * Login and logout set a mock cookie (`tk-ucilnica-mock-auth`) that overrides
  * this default for the current browser. That cookie is not real authentication
@@ -33,7 +33,10 @@ export const MOCK_USER: UserSession = {
 };
 
 export const MOCK_OWNED_PROGRAM_SLUGS = [
+  "21-dni-do-manj-anksioznosti",
   "21-dni-do-boljse-samozavesti",
+  "najdi-sebe",
+  "samohipnoza-v-praksi",
 ] as const;
 
 const mockEntitlements: ProgramEntitlement[] = MOCK_OWNED_PROGRAM_SLUGS.map(

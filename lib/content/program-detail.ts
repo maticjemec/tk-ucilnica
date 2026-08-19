@@ -164,6 +164,15 @@ function defaultIncludes(program: CatalogProgram): ProgramDetailListItem[] {
 }
 
 const programDetailOverrides: Record<string, ProgramDetailOverride> = {
+  "21-dni-do-manj-anksioznosti": {
+    difficulty: "Vseh stopenj",
+    benefits: [
+      "Boljše razumevanje, kako se anksioznost pokaže v telesu in mislih",
+      "Orodja za umirjanje v trenutku, ko se napetost dvigne",
+      "Manj izogibanja in več mirnega soočenja",
+      "Občutek notranje varnosti, ki ostane tudi po programu",
+    ],
+  },
   "21-dni-do-boljse-samozavesti": {
     shortDescription:
       "Okrepi svojo samozavest in zgradi notranjo moč, ki te vodi naprej.",
@@ -188,6 +197,24 @@ const programDetailOverrides: Record<string, ProgramDetailOverride> = {
       "Dan 9: Pogum za nove korake",
       "Dan 10: Živi iz svoje moči",
     ]),
+  },
+  "najdi-sebe": {
+    difficulty: "Vseh stopenj",
+    benefits: [
+      "Jasnejši občutek, kdo si in kaj ti res daje smisel",
+      "Manj prilagajanja pričakovanjem, ki niso tvoja",
+      "Moč, da izbiraš v skladu s svojimi vrednotami",
+      "Konkretnejšo smer, v katero želiš iti",
+    ],
+  },
+  "samohipnoza-v-praksi": {
+    difficulty: "Vseh stopenj",
+    benefits: [
+      "Zanesljiv način, kako vstopiti v sproščeno stanje",
+      "Sugestije, ki jih lahko uporabljaš sam/a, kadar jih potrebuješ",
+      "Prakso za mir in samozavest v vsakdanu",
+      "Osebni ritual, ki ostane s tabo tudi po programu",
+    ],
   },
 };
 

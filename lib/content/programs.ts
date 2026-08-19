@@ -34,7 +34,7 @@ function toPurchasedProgram(
 export const purchasedPrograms: PurchasedProgram[] = [
   toPurchasedProgram("21-dni-do-manj-anksioznosti", {
     status: "in-progress",
-    lessons: "12 lekcij",
+    lessons: "21 lekcij",
     duration: "21 dni",
     description:
       "Program za pomiritev uma, zmanjšanje stresa in več notranjega miru.",
@@ -46,7 +46,7 @@ export const purchasedPrograms: PurchasedProgram[] = [
   }),
   toPurchasedProgram("najdi-sebe", {
     status: "in-progress",
-    lessons: "9 lekcij",
+    lessons: "21 lekcij",
     duration: "21 dni",
   }),
   toPurchasedProgram("samohipnoza-v-praksi", {

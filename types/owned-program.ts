@@ -91,6 +91,8 @@ export type OwnedProgram = {
   imageSrc?: string;
   imageAlt?: string;
   totalDays: number;
+  /** Display label when the program is not a fixed day-count, e.g. lifetime access. */
+  durationLabel?: string;
   unlockMode: ProgramUnlockMode;
   progress: number;
   currentLessonSlug: string;
