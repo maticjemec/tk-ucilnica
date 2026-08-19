@@ -6,6 +6,7 @@ import { ProgramPlaceholder } from "@/components/dashboard/visuals";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { Progress } from "@/components/ui/Progress";
+import { getOwnedProgramContinueHref } from "@/lib/content/owned-program";
 import type { PurchasedProgram } from "@/types/programs";
 
 type PurchasedProgramCardProps = {
@@ -14,7 +15,8 @@ type PurchasedProgramCardProps = {
 
 export function PurchasedProgramCard({ program }: PurchasedProgramCardProps) {
   const completed = program.status === "completed";
-  const href = `/programi/${program.slug}`;
+  const detailsHref = `/programi/${program.slug}`;
+  const href = getOwnedProgramContinueHref(program.slug) ?? detailsHref;
   const titleId = `program-title-${program.slug}`;
 
   return (
@@ -94,7 +96,7 @@ export function PurchasedProgramCard({ program }: PurchasedProgramCardProps) {
               </ButtonLink>
             )}
             <Link
-              href={href}
+              href={detailsHref}
               className="text-sm text-foreground/80 transition-colors hover:text-foreground lg:text-center"
             >
               Poglej podrobnosti →
