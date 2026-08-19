@@ -2,10 +2,13 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { Gift, X } from "lucide-react";
+import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { getLoginPath } from "@/lib/auth/redirects";
 import { cn } from "@/lib/cn";
 import { formatCatalogPrice } from "@/lib/content/catalog";
+import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
 import { programDetailIcons } from "@/components/program-detail/icons";
 import type { ProgramDetail } from "@/types/program-detail";
 
@@ -15,12 +18,18 @@ const giftMessage = "Darilni nakup bo omogočen kmalu.";
 
 type PurchaseCardProps = {
   program: ProgramDetail;
+  isAuthenticated: boolean;
   className?: string;
 };
 
-export function PurchaseCard({ program, className }: PurchaseCardProps) {
+export function PurchaseCard({
+  program,
+  isAuthenticated,
+  className,
+}: PurchaseCardProps) {
   const owned = program.accessState === "owned";
   const [notice, setNotice] = useState<string | null>(null);
+  const programPath = `/programi/${program.slug}`;
 
   return (
     <Card padding="none" className={cn("px-5 py-5", className)}>
@@ -33,19 +42,31 @@ export function PurchaseCard({ program, className }: PurchaseCardProps) {
       )}
 
       <div className="mt-5 flex flex-col gap-2.5">
-        <Button
-          className="w-full"
-          size="lg"
-          onClick={() => {
-            if (!owned) {
-              setNotice(purchaseMessage);
-            }
-          }}
-        >
-          {owned ? "Začni program" : "Vključi se v program"}
-        </Button>
+        {owned ? (
+          <ButtonLink
+            href={getOwnedProgramOverviewPath(program.slug)}
+            className="h-11 w-full px-5"
+          >
+            Odpri program
+          </ButtonLink>
+        ) : isAuthenticated ? (
+          <Button
+            className="w-full"
+            size="lg"
+            onClick={() => setNotice(purchaseMessage)}
+          >
+            Vključi se v program
+          </Button>
+        ) : (
+          <ButtonLink
+            href={getLoginPath(programPath)}
+            className="h-11 w-full px-5"
+          >
+            Prijavi se za nakup
+          </ButtonLink>
+        )}
 
-        {owned ? null : (
+        {owned || !isAuthenticated ? null : (
           <Button
             variant="outline"
             className="w-full"

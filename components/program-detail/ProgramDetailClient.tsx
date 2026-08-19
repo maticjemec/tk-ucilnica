@@ -15,9 +15,13 @@ import type { ProgramDetail } from "@/types/program-detail";
 
 type ProgramDetailClientProps = {
   program: ProgramDetail;
+  isAuthenticated: boolean;
 };
 
-export function ProgramDetailClient({ program }: ProgramDetailClientProps) {
+export function ProgramDetailClient({
+  program,
+  isAuthenticated,
+}: ProgramDetailClientProps) {
   const [isFavorite, setIsFavorite] = useState(program.isFavorite);
 
   return (
@@ -53,7 +57,11 @@ export function ProgramDetailClient({ program }: ProgramDetailClientProps) {
         </div>
 
         <aside className="contents md:flex md:flex-col md:gap-3.5 lg:sticky lg:top-6">
-          <PurchaseCard program={program} className="order-2 md:order-none" />
+          <PurchaseCard
+            program={program}
+            isAuthenticated={isAuthenticated}
+            className="order-2 md:order-none"
+          />
           <ProgramIncludesCard
             items={program.includes}
             className="order-5 md:order-none"

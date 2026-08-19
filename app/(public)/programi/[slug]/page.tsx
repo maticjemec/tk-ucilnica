@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProgramDetailClient } from "@/components/program-detail/ProgramDetailClient";
+import { getUserAccessContext, ownsProgram } from "@/lib/auth/access";
 import {
   getProgramBySlug,
   getProgramSlugs,
@@ -40,5 +41,16 @@ export default async function ProgramDetailPage({
     notFound();
   }
 
-  return <ProgramDetailClient program={program} />;
+  const access = await getUserAccessContext();
+  const owned = ownsProgram(access, slug);
+
+  return (
+    <ProgramDetailClient
+      program={{
+        ...program,
+        accessState: owned ? "owned" : "public",
+      }}
+      isAuthenticated={access.status === "authenticated"}
+    />
+  );
 }

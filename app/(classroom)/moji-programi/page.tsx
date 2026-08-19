@@ -4,13 +4,16 @@ import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { MyProgramsClient } from "@/components/my-programs/MyProgramsClient";
 import { SupportCard } from "@/components/my-programs/SupportCard";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { requireAuthenticatedUser } from "@/lib/auth/access";
 import { purchasedPrograms } from "@/lib/content/programs";
 
 export const metadata: Metadata = {
   title: "Moji programi",
 };
 
-export default function MojiProgramiPage() {
+export default async function MojiProgramiPage() {
+  await requireAuthenticatedUser("/moji-programi");
+
   return (
     <>
       <PageHeader

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BookOpen, Clock, Heart } from "lucide-react";
 import { CoverMedia } from "@/components/dashboard/CoverMedia";
 import { ProgramPlaceholder } from "@/components/dashboard/visuals";
+import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { cn } from "@/lib/cn";
 import {
@@ -24,6 +25,7 @@ type CatalogProgramCardProps = {
   program: CatalogProgram;
   variant: CatalogView;
   isFavorite: boolean;
+  owned?: boolean;
   onToggleFavorite: (id: string) => void;
 };
 
@@ -31,6 +33,7 @@ export function CatalogProgramCard({
   program,
   variant,
   isFavorite,
+  owned = false,
   onToggleFavorite,
 }: CatalogProgramCardProps) {
   const href = `/programi/${program.slug}`;
@@ -85,6 +88,15 @@ export function CatalogProgramCard({
             </CoverMedia>
 
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/15" />
+
+            {owned ? (
+              <Badge
+                variant="success"
+                className="absolute top-2.5 left-2.5 border-transparent bg-white/92 text-success-foreground shadow-sm"
+              >
+                Kupljeno
+              </Badge>
+            ) : null}
 
             <span
               className={cn(

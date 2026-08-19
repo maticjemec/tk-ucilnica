@@ -8,6 +8,7 @@ import { OwnedMaterials } from "@/components/owned-overview/OwnedMaterials";
 import { OwnedProgramHero } from "@/components/owned-overview/OwnedProgramHero";
 import { OwnedProgramHighlights } from "@/components/owned-overview/OwnedProgramHighlights";
 import { SupportCard } from "@/components/my-programs/SupportCard";
+import { requireProgramEntitlement } from "@/lib/auth/access";
 import {
   getOwnedProgramBySlug,
   getOwnedProgramStaticParams,
@@ -42,6 +43,7 @@ export default async function OwnedProgramOverviewPage({
   params,
 }: OwnedProgramOverviewPageProps) {
   const { slug } = await params;
+  await requireProgramEntitlement(slug);
   const program = getOwnedProgramBySlug(slug);
 
   if (!program) {

@@ -6,6 +6,7 @@ import { ProgressOverview } from "@/components/dashboard/ProgressOverview";
 import { SectionHeading } from "@/components/dashboard/SectionHeading";
 import { UpcomingLessonsCard } from "@/components/dashboard/UpcomingLessonsCard";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { requireAuthenticatedUser } from "@/lib/auth/access";
 import {
   continueLesson,
   dashboardHero,
@@ -18,7 +19,9 @@ export const metadata: Metadata = {
   title: "Pregled",
 };
 
-export default function PregledPage() {
+export default async function PregledPage() {
+  await requireAuthenticatedUser("/");
+
   return (
     <>
       <PageHeader

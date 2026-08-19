@@ -15,9 +15,13 @@ import type {
 
 type CatalogClientProps = {
   programs: CatalogProgram[];
+  ownedSlugs?: string[];
 };
 
-export function CatalogClient({ programs }: CatalogClientProps) {
+export function CatalogClient({
+  programs,
+  ownedSlugs = [],
+}: CatalogClientProps) {
   const [filter, setFilter] = useState<CatalogFilterId>("all");
   const [sort, setSort] = useState<CatalogSortId>("popularity");
   const [view, setView] = useState<CatalogView>("grid");
@@ -78,6 +82,7 @@ export function CatalogClient({ programs }: CatalogClientProps) {
                   program={program}
                   variant={view}
                   isFavorite={favorites.has(program.id)}
+                  owned={ownedSlugs.includes(program.slug)}
                   onToggleFavorite={toggleFavorite}
                 />
               </li>

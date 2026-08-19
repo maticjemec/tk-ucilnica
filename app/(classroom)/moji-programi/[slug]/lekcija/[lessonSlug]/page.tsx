@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LessonPlayerClient } from "@/components/lesson-player/LessonPlayerClient";
+import { requireProgramEntitlement } from "@/lib/auth/access";
 import {
   getOwnedLesson,
   getOwnedLessonStaticParams,
@@ -35,6 +36,7 @@ export async function generateMetadata({
 
 export default async function OwnedLessonPage({ params }: OwnedLessonPageProps) {
   const { slug, lessonSlug } = await params;
+  await requireProgramEntitlement(slug);
   const program = getOwnedProgramBySlug(slug);
   const lesson = program ? getOwnedLesson(program, lessonSlug) : undefined;
 
