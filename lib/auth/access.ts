@@ -1,10 +1,7 @@
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import {
-  buildMockAccessContext,
-  MOCK_AUTH_COOKIE,
-  resolveMockAuthStatus,
-} from "@/lib/auth/mock-session";
+import { getTemporaryEntitlements } from "@/lib/auth/temporary-entitlements";
+import { toUserSession } from "@/lib/auth/user";
 import {
   getLoginPath,
   getPublicCatalogPath,
@@ -13,20 +10,37 @@ import {
 } from "@/lib/auth/redirects";
 import type {
   AuthenticatedAccessContext,
+  GuestAccessContext,
   UserAccessContext,
 } from "@/lib/auth/types";
+import { createClient } from "@/lib/supabase/server";
+
+const guestContext: GuestAccessContext = {
+  status: "guest",
+  user: null,
+  entitlements: [],
+};
 
 /**
  * Single app-level access reader.
  *
- * Today: mock config + optional mock cookie.
- * Later: replace the body with Supabase Auth (`getUser`) and an entitlements query.
- * Callers (`requireAuthenticatedUser`, layouts, pages) should stay unchanged.
+ * Authentication is validated on the server with Supabase `getUser()`.
+ * Entitlements currently come from a temporary compatibility layer
+ * and will be replaced by a database query in TASK 011.
  */
 export async function getUserAccessContext(): Promise<UserAccessContext> {
-  const store = await cookies();
-  const status = resolveMockAuthStatus(store.get(MOCK_AUTH_COOKIE)?.value);
-  return buildMockAccessContext(status);
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.getUser();
+
+  if (error || !data.user) {
+    return guestContext;
+  }
+
+  return {
+    status: "authenticated",
+    user: toUserSession(data.user),
+    entitlements: getTemporaryEntitlements(),
+  };
 }
 
 export async function getRequestPath(fallback = "/") {

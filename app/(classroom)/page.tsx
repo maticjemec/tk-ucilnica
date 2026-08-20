@@ -20,12 +20,12 @@ export const metadata: Metadata = {
 };
 
 export default async function PregledPage() {
-  await requireAuthenticatedUser("/");
+  const access = await requireAuthenticatedUser("/");
 
   return (
     <>
       <PageHeader
-        title="Dobrodošel nazaj, Tina 👋"
+        title={`Dobrodošel nazaj, ${access.user.firstName} 👋`}
         subtitle="Nadaljuj svojo pot rasti in spremembe."
       />
 

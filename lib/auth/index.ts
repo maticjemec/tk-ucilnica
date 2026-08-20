@@ -16,13 +16,9 @@ export {
   requireProgramEntitlement,
 } from "@/lib/auth/access";
 
-export {
-  MOCK_AUTH_MODE,
-  MOCK_OWNED_PROGRAM_SLUGS,
-  MOCK_USER,
-  getUserDisplayName,
-  getUserInitial,
-} from "@/lib/auth/mock-session";
+export { MOCK_OWNED_PROGRAM_SLUGS } from "@/lib/auth/temporary-entitlements";
+
+export { getUserDisplayName, getUserInitials } from "@/lib/auth/user";
 
 export {
   getLoginPath,

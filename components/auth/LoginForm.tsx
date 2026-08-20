@@ -5,7 +5,7 @@ import { useState, useTransition, type FormEvent } from "react";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { AuthField } from "@/components/auth/AuthField";
 import { Button } from "@/components/ui/Button";
-import { signInMock } from "@/lib/auth/actions";
+import { signIn } from "@/lib/auth/actions";
 import { getRegisterPath } from "@/lib/auth/redirects";
 
 type LoginFormProps = {
@@ -26,6 +26,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<LoginErrors>({});
   const [status, setStatus] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   function validate() {
@@ -48,13 +49,22 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus(null);
+    setFormError(null);
 
     if (!validate()) {
       return;
     }
 
     startTransition(() => {
-      void signInMock(redirectTo);
+      void signIn({
+        email: email.trim(),
+        password,
+        redirectTo,
+      }).then((result) => {
+        if (result?.error) {
+          setFormError(result.error);
+        }
+      });
     });
   }
 
@@ -90,6 +100,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
           onChange={(event) => setEmail(event.target.value)}
           error={errors.email}
           required
+          disabled={pending}
         />
         <AuthField
           id="password"
@@ -101,6 +112,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
           onChange={(event) => setPassword(event.target.value)}
           error={errors.password}
           required
+          disabled={pending}
         />
 
         <div className="flex justify-end">
@@ -116,7 +128,11 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
         </div>
 
         <div aria-live="polite" className="min-h-[1.25rem]">
-          {status ? <p className="text-sm text-muted">{status}</p> : null}
+          {formError ? (
+            <p className="text-sm text-danger">{formError}</p>
+          ) : status ? (
+            <p className="text-sm text-muted">{status}</p>
+          ) : null}
           {Object.keys(errors).length > 0 ? (
             <p className="sr-only">Obrazec vsebuje napake.</p>
           ) : null}

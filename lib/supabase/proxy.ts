@@ -11,7 +11,7 @@ export async function updateSession(request: NextRequest) {
   const env = getSupabasePublicEnvOrNull();
 
   if (!env) {
-    return supabaseResponse;
+    return { response: supabaseResponse, isAuthenticated: false };
   }
 
   const supabase = createServerClient(env.url, env.publishableKey, {
@@ -36,7 +36,10 @@ export async function updateSession(request: NextRequest) {
 
   // Do not run code between createServerClient and supabase.auth.getClaims().
   // getClaims() refreshes expired auth tokens and writes them back to cookies.
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
 
-  return supabaseResponse;
+  return {
+    response: supabaseResponse,
+    isAuthenticated: Boolean(data?.claims),
+  };
 }

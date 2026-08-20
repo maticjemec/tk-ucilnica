@@ -5,7 +5,7 @@ import { useState, useTransition, type FormEvent } from "react";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { AuthField } from "@/components/auth/AuthField";
 import { Button } from "@/components/ui/Button";
-import { signInMock } from "@/lib/auth/actions";
+import { signUp } from "@/lib/auth/actions";
 import { getLoginPath } from "@/lib/auth/redirects";
 
 type RegisterFormProps = {
@@ -31,6 +31,8 @@ export function RegisterForm({ redirectTo }: RegisterFormProps) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<RegisterErrors>({});
+  const [formError, setFormError] = useState<string | null>(null);
+  const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
   const [pending, startTransition] = useTransition();
 
   function validate() {
@@ -68,14 +70,73 @@ export function RegisterForm({ redirectTo }: RegisterFormProps) {
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setFormError(null);
 
     if (!validate()) {
       return;
     }
 
     startTransition(() => {
-      void signInMock(redirectTo);
+      void signUp({
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
+        password,
+        confirmPassword,
+        redirectTo,
+      })
+        .then((result) => {
+          if (!result) {
+            return;
+          }
+
+          if ("needsEmailConfirmation" in result) {
+            setNeedsEmailConfirmation(true);
+            return;
+          }
+
+          if ("error" in result) {
+            setFormError(result.error);
+          }
+        })
+        .catch((error: unknown) => {
+          if (
+            typeof error === "object" &&
+            error !== null &&
+            "digest" in error &&
+            typeof error.digest === "string" &&
+            error.digest.startsWith("NEXT_REDIRECT")
+          ) {
+            throw error;
+          }
+
+          setFormError("Prišlo je do nepričakovane napake pri registraciji. Poskusi znova.");
+        });
     });
+  }
+
+  if (needsEmailConfirmation) {
+    return (
+      <AuthCard
+        title="Preveri e-pošto"
+        supporting="Poslali smo ti povezavo za potrditev računa. Ko jo potrdiš, se lahko prijaviš."
+        footer={
+          <p>
+            Že imaš račun?{" "}
+            <Link
+              href={getLoginPath(redirectTo)}
+              className="font-medium text-accent transition-colors hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              Prijavi se
+            </Link>
+          </p>
+        }
+      >
+        <p className="mt-8 text-center text-sm leading-relaxed text-muted">
+          Če e-pošte ne vidiš, preveri tudi mapo z neželeno pošto.
+        </p>
+      </AuthCard>
+    );
   }
 
   return (
@@ -110,6 +171,7 @@ export function RegisterForm({ redirectTo }: RegisterFormProps) {
             onChange={(event) => setFirstName(event.target.value)}
             error={errors.firstName}
             required
+            disabled={pending}
           />
           <AuthField
             id="lastName"
@@ -121,6 +183,7 @@ export function RegisterForm({ redirectTo }: RegisterFormProps) {
             onChange={(event) => setLastName(event.target.value)}
             error={errors.lastName}
             required
+            disabled={pending}
           />
         </div>
         <AuthField
@@ -134,6 +197,7 @@ export function RegisterForm({ redirectTo }: RegisterFormProps) {
           onChange={(event) => setEmail(event.target.value)}
           error={errors.email}
           required
+          disabled={pending}
         />
         <AuthField
           id="password"
@@ -145,6 +209,7 @@ export function RegisterForm({ redirectTo }: RegisterFormProps) {
           onChange={(event) => setPassword(event.target.value)}
           error={errors.password}
           required
+          disabled={pending}
         />
         <AuthField
           id="confirmPassword"
@@ -156,10 +221,13 @@ export function RegisterForm({ redirectTo }: RegisterFormProps) {
           onChange={(event) => setConfirmPassword(event.target.value)}
           error={errors.confirmPassword}
           required
+          disabled={pending}
         />
 
-        <div aria-live="polite">
-          {Object.keys(errors).length > 0 ? (
+        <div aria-live="polite" className="min-h-[1.25rem]">
+          {formError ? (
+            <p className="text-sm text-danger">{formError}</p>
+          ) : Object.keys(errors).length > 0 ? (
             <p className="sr-only">Obrazec vsebuje napake.</p>
           ) : null}
         </div>

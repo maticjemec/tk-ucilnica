@@ -10,15 +10,15 @@ export const settingsTabs: SettingsTab[] = [
 
 export const settingsContent: SettingsContent = {
   profile: {
-    firstName: "Tina",
-    lastName: "Korošec",
-    email: "tina.korosec@gmail.com",
-    username: "tina_hipnoza",
+    firstName: "",
+    lastName: "",
+    email: "",
+    username: "",
     gender: "female",
     birthDate: "2001-02-08",
     country: "SI",
     timezone: "Europe/Ljubljana",
-    initials: "TK",
+    initials: "",
   },
   contact: {
     language: "sl",

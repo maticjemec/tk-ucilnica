@@ -2,7 +2,7 @@
 
 import { Bell, ChevronDown, Menu, Search } from "lucide-react";
 import { IconButton } from "@/components/ui/IconButton";
-import { getUserInitial } from "@/lib/auth/mock-session";
+import { getUserInitials } from "@/lib/auth/user";
 import type { UserSession } from "@/lib/auth/types";
 
 type TopbarProps = {
@@ -35,7 +35,7 @@ export function Topbar({ user, onOpenNavigation }: TopbarProps) {
           aria-label="Račun"
         >
           <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-[linear-gradient(145deg,#c4a07a,#8d6b4a)] text-sm font-medium text-white">
-            {getUserInitial(user)}
+            {getUserInitials(user)}
           </span>
           <span className="hidden text-sm text-foreground sm:inline">
             {user.firstName}

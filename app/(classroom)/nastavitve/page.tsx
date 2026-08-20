@@ -3,6 +3,7 @@ import { SupportCard } from "@/components/my-programs/SupportCard";
 import { SettingsClient } from "@/components/settings/SettingsClient";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { requireAuthenticatedUser } from "@/lib/auth/access";
+import { getUserInitials } from "@/lib/auth/user";
 import { settingsContent } from "@/lib/content/settings";
 
 export const metadata: Metadata = {
@@ -10,7 +11,18 @@ export const metadata: Metadata = {
 };
 
 export default async function NastavitvePage() {
-  await requireAuthenticatedUser("/nastavitve");
+  const access = await requireAuthenticatedUser("/nastavitve");
+  const content = {
+    ...settingsContent,
+    profile: {
+      ...settingsContent.profile,
+      firstName: access.user.firstName,
+      lastName: access.user.lastName,
+      email: access.user.email,
+      username: access.user.email.split("@")[0] ?? access.user.firstName,
+      initials: getUserInitials(access.user),
+    },
+  };
 
   return (
     <>
@@ -19,7 +31,7 @@ export default async function NastavitvePage() {
         subtitle="Uredi svoje podatke, nastavitve računa in nastavitve učenja."
       />
 
-      <SettingsClient content={settingsContent} />
+      <SettingsClient content={content} />
       <SupportCard />
     </>
   );

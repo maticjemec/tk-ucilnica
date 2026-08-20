@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { BrandLockup } from "@/components/branding/BrandLockup";
 import { SidebarQuote } from "@/components/layout/SidebarQuote";
-import { signOutMock } from "@/lib/auth/actions";
+import { signOut } from "@/lib/auth/actions";
 import { cn } from "@/lib/cn";
 import { isNavItemActive, primaryNav, type PrimaryNavId } from "@/lib/navigation";
 
@@ -67,7 +67,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
             );
           })}
           <li>
-            <form action={signOutMock}>
+            <form action={signOut}>
               <button
                 type="submit"
                 className="nav-label flex w-full items-center gap-3 rounded-md px-3 py-[0.7rem] text-sidebar-foreground/88 transition-colors hover:bg-white/5 hover:text-sidebar-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"

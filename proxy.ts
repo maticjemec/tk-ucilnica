@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  MOCK_AUTH_COOKIE,
-  resolveMockAuthStatus,
-} from "@/lib/auth/mock-session";
 import { getLoginPath, isProtectedPath } from "@/lib/auth/redirects";
 import { updateSession } from "@/lib/supabase/proxy";
+
+const LEGACY_MOCK_AUTH_COOKIE = "tk-ucilnica-mock-auth";
 
 function copySupabaseCookies(from: NextResponse, to: NextResponse) {
   from.cookies.getAll().forEach((cookie) => {
@@ -21,19 +19,25 @@ function copySupabaseCookies(from: NextResponse, to: NextResponse) {
   return to;
 }
 
+function expireLegacyMockAuthCookie(response: NextResponse) {
+  response.cookies.set(LEGACY_MOCK_AUTH_COOKIE, "", {
+    path: "/",
+    maxAge: 0,
+  });
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-pathname", pathname);
 
   const proxiedRequest = new NextRequest(request, { headers: requestHeaders });
-  const supabaseResponse = await updateSession(proxiedRequest);
+  const { response: supabaseResponse, isAuthenticated } =
+    await updateSession(proxiedRequest);
 
-  const status = resolveMockAuthStatus(
-    proxiedRequest.cookies.get(MOCK_AUTH_COOKIE)?.value,
-  );
+  expireLegacyMockAuthCookie(supabaseResponse);
 
-  if (isProtectedPath(pathname) && status === "guest") {
+  if (isProtectedPath(pathname) && !isAuthenticated) {
     const redirectResponse = NextResponse.redirect(
       new URL(getLoginPath(pathname), request.url),
     );
