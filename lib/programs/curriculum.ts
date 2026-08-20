@@ -219,9 +219,12 @@ export function resolveLessonUnlockMode(
 
 function toProgramLesson(programSlug: string, row: LessonRow): ProgramLesson {
   const timing = lessonDuration(row.duration_minutes);
-  const src = row.video_url || row.audio_url || undefined;
+  const videoSrc = row.video_url?.trim() || undefined;
+  const audioSrc = row.audio_url?.trim() || undefined;
+  const worksheetSrc = row.worksheet_url?.trim() || undefined;
+  const src = videoSrc || audioSrc;
   const unlockMode = row.unlock_mode ?? undefined;
-  const resources = row.worksheet_url
+  const resources = worksheetSrc
     ? [
         {
           id: `${row.id}-worksheet`,
@@ -229,7 +232,7 @@ function toProgramLesson(programSlug: string, row: LessonRow): ProgramLesson {
           kind: "worksheet" as const,
           formatLabel: "PDF",
           sizeLabel: "—",
-          href: row.worksheet_url,
+          signedDownloadUrl: worksheetSrc,
         },
       ]
     : getLocalLessonWorksheet(programSlug, row.lesson_order, row.title);
@@ -243,11 +246,15 @@ function toProgramLesson(programSlug: string, row: LessonRow): ProgramLesson {
     description: row.description?.trim() || "",
     duration: timing.duration,
     durationSeconds: timing.durationSeconds,
+    contentType: row.content_type,
+    videoSrc,
+    audioSrc,
+    worksheetSrc,
     media: {
       kind: mediaKind(row.content_type),
       durationSeconds: timing.durationSeconds,
       src,
-      provider: "mock",
+      provider: src ? "hosted" : "mock",
     },
     resources,
     unlockMode,

@@ -3,10 +3,10 @@
 import { useMemo, useState, useTransition } from "react";
 import { LessonBreadcrumb } from "@/components/lesson-player/LessonBreadcrumb";
 import { LessonDetails } from "@/components/lesson-player/LessonDetails";
-import { LessonMediaPlayer } from "@/components/lesson-player/LessonMediaPlayer";
 import { LessonNavigation } from "@/components/lesson-player/LessonNavigation";
 import { LessonProgramHeader } from "@/components/lesson-player/LessonProgramHeader";
 import { ProgramCurriculumPanel } from "@/components/lesson-player/ProgramCurriculumPanel";
+import { LessonMedia } from "@/components/lesson-media/LessonMedia";
 import { SupportCard } from "@/components/my-programs/SupportCard";
 import { getOwnedLessonNav } from "@/lib/content/owned-program";
 import {
@@ -103,10 +103,9 @@ export function LessonPlayerClient({
             progressPercent={displayPercent}
           />
 
-          <LessonMediaPlayer
+          <LessonMedia
             key={lesson.id}
-            title={formatLessonHeading(lesson)}
-            media={lesson.media}
+            lesson={lesson}
             visual={program.visual}
             imageSrc={program.imageSrc}
             imageAlt={program.imageAlt ?? program.label}

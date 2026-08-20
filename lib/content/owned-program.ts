@@ -72,6 +72,7 @@ function createLesson(
     description,
     duration: extras?.duration ?? timing.duration,
     durationSeconds: extras?.durationSeconds ?? timing.durationSeconds,
+    contentType: "video",
     media: {
       kind: "video",
       durationSeconds: extras?.durationSeconds ?? timing.durationSeconds,

@@ -1,3 +1,4 @@
+import type { LessonContentType } from "@/lib/media/types";
 import type { ProgramVisualId } from "@/types/dashboard";
 
 export type ProgramUnlockMode = "all" | "sequential" | "drip";
@@ -33,7 +34,8 @@ export type LessonAccessResolution = {
 
 export type LessonMediaKind = "video" | "audio";
 
-export type LessonMediaProvider = "mock" | "mux" | "vimeo" | "youtube";
+/** @deprecated Prefer LessonVideoSource.provider from lib/media. */
+export type LessonMediaProvider = "mock" | "hosted" | "hls";
 
 export type LessonMedia = {
   kind: LessonMediaKind;
@@ -41,6 +43,7 @@ export type LessonMedia = {
   /** Future hosted source. Absent in the mock player. */
   src?: string;
   provider?: LessonMediaProvider;
+  playbackId?: string;
 };
 
 export type LessonResourceKind = "pdf" | "audio" | "worksheet";
@@ -51,8 +54,10 @@ export type LessonResource = {
   kind: LessonResourceKind;
   formatLabel: string;
   sizeLabel: string;
-  /** Future downloadable file URL. */
+  /** Legacy generic link. Prefer signedDownloadUrl for files. */
   href?: string;
+  /** Future Storage signed URL. Never a permanent private file URL. */
+  signedDownloadUrl?: string;
 };
 
 export type OwnedProgramMaterial = LessonResource & {
@@ -87,6 +92,13 @@ export type ProgramLesson = {
   description: string;
   duration: string;
   durationSeconds: number;
+  contentType?: LessonContentType;
+  /** Mapped from lessons.video_url. Hosted/HLS/signed URL later. */
+  videoSrc?: string;
+  /** Mapped from lessons.audio_url. Storage signed URL later. */
+  audioSrc?: string;
+  /** Mapped from lessons.worksheet_url. Storage signed URL later. */
+  worksheetSrc?: string;
   media: LessonMedia;
   resources: LessonResource[];
   unlockMode?: ProgramUnlockMode;

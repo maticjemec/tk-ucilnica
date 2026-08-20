@@ -9,6 +9,39 @@ type LessonMaterialsProps = {
   resources: LessonResource[];
 };
 
+function ResourceDownload({
+  resource,
+  onMockDownload,
+}: {
+  resource: LessonResource;
+  onMockDownload: () => void;
+}) {
+  const downloadUrl = resource.signedDownloadUrl ?? resource.href;
+
+  if (downloadUrl) {
+    return (
+      <a
+        href={downloadUrl}
+        className="inline-flex h-10 w-full shrink-0 items-center justify-center gap-2 rounded-sm border border-accent/50 bg-transparent px-4 text-sm font-medium whitespace-nowrap text-accent transition-colors hover:border-accent hover:bg-accent/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:w-auto"
+      >
+        <Download className="h-4 w-4" strokeWidth={1.6} aria-hidden />
+        Prenesi
+      </a>
+    );
+  }
+
+  return (
+    <Button
+      variant="outline"
+      className="w-full shrink-0 sm:w-auto"
+      onClick={onMockDownload}
+    >
+      <Download className="h-4 w-4" strokeWidth={1.6} aria-hidden />
+      Prenesi
+    </Button>
+  );
+}
+
 export function LessonMaterials({ resources }: LessonMaterialsProps) {
   const [messageById, setMessageById] = useState<Record<string, string>>({});
 
@@ -43,20 +76,16 @@ export function LessonMaterials({ resources }: LessonMaterialsProps) {
                 </div>
               </div>
 
-              <Button
-                variant="outline"
-                className="w-full shrink-0 sm:w-auto"
-                onClick={() => {
+              <ResourceDownload
+                resource={resource}
+                onMockDownload={() => {
                   setMessageById((current) => ({
                     ...current,
                     [resource.id]:
                       "Prenos bo na voljo, ko povežemo shrambo datotek.",
                   }));
                 }}
-              >
-                <Download className="h-4 w-4" strokeWidth={1.6} aria-hidden />
-                Prenesi
-              </Button>
+              />
             </div>
             {messageById[resource.id] ? (
               <p className="mt-1.5 text-xs text-muted" role="status">
