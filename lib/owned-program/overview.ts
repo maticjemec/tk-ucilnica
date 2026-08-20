@@ -1,7 +1,7 @@
 import {
   getOwnedProgramMaterials,
 } from "@/lib/content/owned-program";
-import { getProgramBySlug } from "@/lib/content/program-detail";
+import { getLocalProgramDetailExtras } from "@/lib/content/program-detail";
 import {
   formatCatalogLessons,
 } from "@/lib/content/catalog";
@@ -14,6 +14,7 @@ import {
 } from "@/lib/owned-program/access";
 import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
 import type { ProgramProgressView } from "@/lib/progress/helpers";
+import type { Program } from "@/lib/programs/types";
 import type {
   OwnedProgram,
   OwnedProgramHighlight,
@@ -59,6 +60,7 @@ export function getOwnedProgramHighlights(
 export function getOwnedOverviewModel(
   program: OwnedProgram,
   progress: ProgramProgressView,
+  identity: Program,
 ) {
   const currentLesson = progress.continueLesson;
   const lessons = resolveOwnedLessons(
@@ -66,7 +68,7 @@ export function getOwnedOverviewModel(
     currentLesson.id,
     progress.completedIds,
   );
-  const detail = getProgramBySlug(program.slug);
+  const extras = getLocalProgramDetailExtras(program.slug);
   const visibleLessonCount = getVisibleLessonCount(program);
   const materials = getOwnedProgramMaterials(program);
 
@@ -83,11 +85,11 @@ export function getOwnedOverviewModel(
     statusLabel: progress.isCompleted ? "Zaključen" : "V teku",
     completedCount: progress.completedCount,
     visibleLessonCount,
-    lessonCountLabel: formatCatalogLessons(visibleLessonCount),
-    durationLabel: program.durationLabel ?? `${program.totalDays} dni`,
-    difficulty: detail?.difficulty ?? "Vseh stopenj",
-    categoryLabel: detail?.categoryLabel ?? program.label,
-    benefits: detail?.benefits ?? [],
+    lessonCountLabel: formatCatalogLessons(identity.lessonCount),
+    durationLabel: identity.duration,
+    difficulty: identity.difficulty,
+    categoryLabel: identity.categoryLabel,
+    benefits: extras.benefits,
     highlights: getOwnedProgramHighlights(program),
     materials,
     sectionProgress: getSectionProgress(program, progress.completedIds),

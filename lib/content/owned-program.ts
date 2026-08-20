@@ -111,6 +111,11 @@ function createMaterials(
   }));
 }
 
+/**
+ * LEGACY local identity for owned curriculum objects.
+ * TASK 013B overlays public.programs onto overview hero/meta.
+ * Lesson player and curriculum still use this until TASK 013C.
+ */
 function fromCatalogIdentity(slug: string) {
   const program = dashboardPrograms.find((item) => item.slug === slug);
 

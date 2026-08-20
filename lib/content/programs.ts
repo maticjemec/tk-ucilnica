@@ -36,9 +36,12 @@ function toPurchasedProgram(
 }
 
 /**
- * Catalog metadata for owned-program cards.
+ * LEGACY local owned-card identity.
+ * TASK 013B: /moji-programi reads public.programs via lib/programs.
  * status/progress here are leftover demo values and are overwritten at
  * runtime from public.user_lesson_progress.
+ *
+ * @deprecated TASK 013B: program identity comes from public.programs.
  */
 export const purchasedPrograms: PurchasedProgramSeed[] = [
   toPurchasedProgram("21-dni-do-manj-anksioznosti", {
@@ -66,6 +69,7 @@ export const purchasedPrograms: PurchasedProgramSeed[] = [
   }),
 ];
 
+/** @deprecated TASK 013B: map owned DB programs with toPurchasedProgram. */
 export function getPurchasedProgramsForSlugs(
   ownedSlugs: readonly string[],
   progressBySlug: ReadonlyMap<string, ProgramProgressView> = new Map(),

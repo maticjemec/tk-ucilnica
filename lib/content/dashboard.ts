@@ -27,9 +27,13 @@ export const dashboardProgress: DashboardProgress = {
 };
 
 /**
- * Catalog identity for dashboard/catalog cards.
+ * LEGACY local dashboard identity.
+ * TASK 013B: Pregled program cards read public.programs via lib/programs.
  * `progress` on these objects is leftover demo metadata. Owned-program
  * cards overlay authenticated percent from public.user_lesson_progress.
+ * Continue/upcoming widgets below still use this list for mock slug lookup.
+ *
+ * @deprecated TASK 013B: program identity comes from public.programs.
  */
 export const dashboardPrograms: DashboardProgram[] = [
   {
@@ -104,6 +108,7 @@ function slugForDashboardProgramLabel(label: string) {
   return dashboardPrograms.find((program) => program.label === label)?.slug;
 }
 
+/** @deprecated TASK 013B: map owned DB programs with toDashboardProgram. */
 export function getOwnedDashboardPrograms(
   ownedSlugs: readonly string[],
   progressBySlug: ReadonlyMap<string, number> = new Map(),

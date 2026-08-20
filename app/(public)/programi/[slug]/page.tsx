@@ -2,24 +2,18 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProgramDetailClient } from "@/components/program-detail/ProgramDetailClient";
 import { getUserAccessContext, ownsProgram } from "@/lib/auth/access";
-import {
-  getProgramBySlug,
-  getProgramSlugs,
-} from "@/lib/content/program-detail";
+import { overlayLocalProgramDetailExtras } from "@/lib/content/program-detail";
+import { getProgramBySlug } from "@/lib/programs";
 
 type ProgramDetailPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return getProgramSlugs().map((slug) => ({ slug }));
-}
-
 export async function generateMetadata({
   params,
 }: ProgramDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const program = getProgramBySlug(slug);
+  const program = await getProgramBySlug(slug);
 
   if (!program) {
     return { title: "Program" };
@@ -35,14 +29,15 @@ export default async function ProgramDetailPage({
   params,
 }: ProgramDetailPageProps) {
   const { slug } = await params;
-  const program = getProgramBySlug(slug);
+  const identity = await getProgramBySlug(slug);
 
-  if (!program) {
+  if (!identity) {
     notFound();
   }
 
   const access = await getUserAccessContext();
   const owned = ownsProgram(access, slug);
+  const program = overlayLocalProgramDetailExtras(identity);
 
   return (
     <ProgramDetailClient

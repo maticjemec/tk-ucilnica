@@ -6,6 +6,14 @@ import type {
   ProgramCategory,
 } from "@/types/catalog";
 
+/**
+ * LEGACY local catalog identity.
+ * TASK 013B: /programi reads public.programs via lib/programs.
+ * Keep this file for client filter/sort helpers, formatters, and TASK 013C
+ * curriculum/content fallback. Do not treat catalogPrograms as canonical
+ * title/price/category/description once a DB row exists.
+ */
+
 type CatalogFields = Pick<
   CatalogProgram,
   | "category"
@@ -72,6 +80,7 @@ function fromDashboard(slug: string, fields: CatalogFields): CatalogProgram {
   };
 }
 
+/** @deprecated TASK 013B: catalog identity comes from public.programs. */
 export const catalogPrograms: CatalogProgram[] = [
   fromDashboard("21-dni-do-manj-anksioznosti", {
     category: "anxiety",
@@ -224,6 +233,7 @@ export function formatCatalogLessons(lessons: number) {
   return `${lessons} lekcij`;
 }
 
+/** @deprecated TASK 013B: use getProgramBySlug from lib/programs. */
 export function getCatalogProgramBySlug(slug: string) {
   return catalogPrograms.find((program) => program.slug === slug);
 }

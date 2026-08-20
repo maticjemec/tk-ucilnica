@@ -16,6 +16,7 @@ import {
 import { getOwnedOverviewModel } from "@/lib/owned-program/overview";
 import { buildProgramProgressView } from "@/lib/progress/helpers";
 import { getProgramLessonProgress } from "@/lib/progress/queries";
+import { applyProgramIdentity, getProgramBySlug } from "@/lib/programs";
 
 type OwnedProgramOverviewPageProps = {
   params: Promise<{ slug: string }>;
@@ -29,15 +30,15 @@ export async function generateMetadata({
   params,
 }: OwnedProgramOverviewPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const program = getOwnedProgramBySlug(slug);
+  const identity = await getProgramBySlug(slug);
 
-  if (!program) {
+  if (!identity) {
     return { title: "Moj program" };
   }
 
   return {
-    title: program.label,
-    description: program.description,
+    title: identity.subtitle,
+    description: identity.shortDescription,
   };
 }
 
@@ -46,12 +47,14 @@ export default async function OwnedProgramOverviewPage({
 }: OwnedProgramOverviewPageProps) {
   const { slug } = await params;
   await requireProgramEntitlement(slug);
-  const program = getOwnedProgramBySlug(slug);
+  const identity = await getProgramBySlug(slug);
+  const localProgram = getOwnedProgramBySlug(slug);
 
-  if (!program) {
+  if (!identity || !localProgram) {
     notFound();
   }
 
+  const program = applyProgramIdentity(localProgram, identity);
   const rows = await getProgramLessonProgress(slug);
   const progress = buildProgramProgressView(program, rows);
 
@@ -59,7 +62,7 @@ export default async function OwnedProgramOverviewPage({
     notFound();
   }
 
-  const model = getOwnedOverviewModel(program, progress);
+  const model = getOwnedOverviewModel(program, progress, identity);
 
   return (
     <>

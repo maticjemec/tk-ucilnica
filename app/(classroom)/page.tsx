@@ -12,13 +12,12 @@ import {
 } from "@/lib/auth/access";
 import {
   dashboardHero,
-  dashboardPrograms,
   getDashboardProgressSummary,
   getOwnedContinueLesson,
-  getOwnedDashboardPrograms,
   getOwnedUpcomingLessons,
 } from "@/lib/content/dashboard";
 import { getOwnedProgressBySlug } from "@/lib/progress/owned";
+import { getPublishedPrograms, toDashboardProgram } from "@/lib/programs";
 
 export const metadata: Metadata = {
   title: "Pregled",
@@ -27,14 +26,25 @@ export const metadata: Metadata = {
 export default async function PregledPage() {
   const access = await requireAuthenticatedUser("/");
   const ownedSlugs = getOwnedProgramSlugs(access);
-  const progressBySlug = await getOwnedProgressBySlug(ownedSlugs);
+  const owned = new Set(ownedSlugs);
+  const [progressBySlug, published] = await Promise.all([
+    getOwnedProgressBySlug(ownedSlugs),
+    getPublishedPrograms(),
+  ]);
   const percentBySlug = new Map(
     [...progressBySlug.entries()].map(([slug, progress]) => [
       slug,
       progress.progressPercent,
     ]),
   );
-  const ownedPrograms = getOwnedDashboardPrograms(ownedSlugs, percentBySlug);
+  const ownedPrograms = published
+    .filter((program) => owned.has(program.slug))
+    .map((program) =>
+      toDashboardProgram(program, percentBySlug.get(program.slug) ?? 0),
+    );
+  const catalogPrograms = published.map((program) =>
+    toDashboardProgram(program),
+  );
   const ownedContinueLesson = getOwnedContinueLesson(ownedSlugs);
   const ownedUpcomingLessons = getOwnedUpcomingLessons(ownedSlugs);
   const dashboardProgress = getDashboardProgressSummary(
@@ -66,7 +76,7 @@ export default async function PregledPage() {
 
           <section className="mt-10 pb-6 min-[1440px]:mt-11 min-[1440px]:pb-8">
             <SectionHeading title="Vsi programi" spacing="roomy" />
-            <ProgramGrid programs={dashboardPrograms} variant="catalog" />
+            <ProgramGrid programs={catalogPrograms} variant="catalog" />
           </section>
         </div>
 

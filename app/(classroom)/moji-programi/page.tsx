@@ -8,8 +8,8 @@ import {
   getOwnedProgramSlugs,
   requireAuthenticatedUser,
 } from "@/lib/auth/access";
-import { getPurchasedProgramsForSlugs } from "@/lib/content/programs";
 import { getOwnedProgressBySlug } from "@/lib/progress/owned";
+import { getProgramsBySlugs, toPurchasedProgram } from "@/lib/programs";
 
 export const metadata: Metadata = {
   title: "Moji programi",
@@ -18,8 +18,13 @@ export const metadata: Metadata = {
 export default async function MojiProgramiPage() {
   const access = await requireAuthenticatedUser("/moji-programi");
   const ownedSlugs = getOwnedProgramSlugs(access);
-  const progressBySlug = await getOwnedProgressBySlug(ownedSlugs);
-  const programs = getPurchasedProgramsForSlugs(ownedSlugs, progressBySlug);
+  const [progressBySlug, identities] = await Promise.all([
+    getOwnedProgressBySlug(ownedSlugs),
+    getProgramsBySlugs(ownedSlugs),
+  ]);
+  const programs = identities.map((program) =>
+    toPurchasedProgram(program, progressBySlug.get(program.slug)),
+  );
 
   return (
     <>

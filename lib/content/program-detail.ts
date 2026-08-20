@@ -2,6 +2,8 @@ import {
   catalogPrograms,
   getCatalogProgramBySlug,
 } from "@/lib/content/catalog";
+import { toCatalogProgram } from "@/lib/programs/mappers";
+import type { Program } from "@/lib/programs/types";
 import type { CatalogProgram, ProgramCategory } from "@/types/catalog";
 import type {
   ProgramAuthor,
@@ -9,6 +11,15 @@ import type {
   ProgramDetail,
   ProgramDetailListItem,
 } from "@/types/program-detail";
+
+/**
+ * Local extras for public program detail.
+ *
+ * TASK 013B: public.programs is canonical for identity (title, slug, price,
+ * category, descriptions, duration, lesson_count, difficulty).
+ * This file only overlays content that is not in the programs table yet:
+ * benefits, includes, purchase benefits, author, curriculum teaser.
+ */
 
 const defaultAuthor: ProgramAuthor = {
   name: "Tina Korošec",
@@ -239,6 +250,47 @@ function buildProgramDetail(program: CatalogProgram): ProgramDetail {
   };
 }
 
+/**
+ * Overlay local extras onto a DB program.
+ * Identity fields always come from `program` (Supabase). Local overrides
+ * never replace title, price, category, descriptions, duration, or lesson count.
+ */
+export function overlayLocalProgramDetailExtras(
+  program: Program,
+): ProgramDetail {
+  const catalog = toCatalogProgram(program);
+  const extras = programDetailOverrides[program.slug] ?? {};
+
+  return {
+    ...catalog,
+    shortDescription: program.shortDescription,
+    longDescription: program.longDescription,
+    difficulty: program.difficulty,
+    breadcrumbLabel:
+      extras.breadcrumbLabel ?? breadcrumbByCategory[program.category],
+    benefits: extras.benefits ?? defaultBenefits,
+    curriculum: extras.curriculum ?? fallbackCurriculum(catalog),
+    includes: extras.includes ?? defaultIncludes(catalog),
+    purchaseBenefits: extras.purchaseBenefits ?? defaultPurchaseBenefits,
+    author: extras.author ?? defaultAuthor,
+    accessState: extras.accessState ?? "public",
+  };
+}
+
+export function getLocalProgramDetailExtras(slug: string) {
+  const extras = programDetailOverrides[slug] ?? {};
+
+  return {
+    benefits: extras.benefits ?? defaultBenefits,
+    author: extras.author ?? defaultAuthor,
+    purchaseBenefits: extras.purchaseBenefits ?? defaultPurchaseBenefits,
+  };
+}
+
+/**
+ * @deprecated TASK 013B: not an identity source. Public detail uses
+ * overlayLocalProgramDetailExtras with a Supabase Program.
+ */
 export function getProgramBySlug(slug: string) {
   const program = getCatalogProgramBySlug(slug);
   if (!program) {
@@ -248,6 +300,7 @@ export function getProgramBySlug(slug: string) {
   return buildProgramDetail(program);
 }
 
+/** @deprecated TASK 013B: public slugs come from getPublishedPrograms. */
 export function getProgramSlugs() {
   return catalogPrograms.map((program) => program.slug);
 }

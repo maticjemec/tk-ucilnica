@@ -1,9 +1,9 @@
 /**
- * TASK 013A — Supabase row types for program content.
+ * TASK 013A/013B — Supabase row types for program content.
  *
  * These match public.programs / program_sections / lessons.
- * They are not used by pages yet. Runtime catalog, owned overview, and
- * lesson player still read local TypeScript in lib/content/.
+ * ProgramRow is the canonical DB shape. UI mapping lives in lib/programs/.
+ * Lesson/section rows are not yet read at runtime (TASK 013C).
  */
 
 export type ProgramContentType =
