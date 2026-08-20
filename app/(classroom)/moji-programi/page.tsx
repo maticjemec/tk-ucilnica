@@ -9,6 +9,7 @@ import {
   requireAuthenticatedUser,
 } from "@/lib/auth/access";
 import { getPurchasedProgramsForSlugs } from "@/lib/content/programs";
+import { getOwnedProgressBySlug } from "@/lib/progress/owned";
 
 export const metadata: Metadata = {
   title: "Moji programi",
@@ -16,7 +17,9 @@ export const metadata: Metadata = {
 
 export default async function MojiProgramiPage() {
   const access = await requireAuthenticatedUser("/moji-programi");
-  const programs = getPurchasedProgramsForSlugs(getOwnedProgramSlugs(access));
+  const ownedSlugs = getOwnedProgramSlugs(access);
+  const progressBySlug = await getOwnedProgressBySlug(ownedSlugs);
+  const programs = getPurchasedProgramsForSlugs(ownedSlugs, progressBySlug);
 
   return (
     <>

@@ -1,4 +1,6 @@
 import { dashboardPrograms } from "@/lib/content/dashboard";
+import { getFallbackContinueHref } from "@/lib/progress/helpers";
+import type { ProgramProgressView } from "@/lib/progress/helpers";
 import type {
   ProgramFilter,
   ProgramStatus,
@@ -13,10 +15,12 @@ type PurchasedFields = {
   description?: string;
 };
 
+type PurchasedProgramSeed = Omit<PurchasedProgram, "continueHref">;
+
 function toPurchasedProgram(
   slug: string,
   fields: PurchasedFields,
-): PurchasedProgram {
+): PurchasedProgramSeed {
   const program = dashboardPrograms.find((item) => item.slug === slug);
 
   if (!program) {
@@ -31,7 +35,12 @@ function toPurchasedProgram(
   };
 }
 
-export const purchasedPrograms: PurchasedProgram[] = [
+/**
+ * Catalog metadata for owned-program cards.
+ * status/progress here are leftover demo values and are overwritten at
+ * runtime from public.user_lesson_progress.
+ */
+export const purchasedPrograms: PurchasedProgramSeed[] = [
   toPurchasedProgram("21-dni-do-manj-anksioznosti", {
     status: "in-progress",
     lessons: "21 lekcij",
@@ -57,9 +66,27 @@ export const purchasedPrograms: PurchasedProgram[] = [
   }),
 ];
 
-export function getPurchasedProgramsForSlugs(ownedSlugs: readonly string[]) {
+export function getPurchasedProgramsForSlugs(
+  ownedSlugs: readonly string[],
+  progressBySlug: ReadonlyMap<string, ProgramProgressView> = new Map(),
+): PurchasedProgram[] {
   const owned = new Set(ownedSlugs);
-  return purchasedPrograms.filter((program) => owned.has(program.slug));
+
+  return purchasedPrograms
+    .filter((program) => owned.has(program.slug))
+    .map((program) => {
+      const progress = progressBySlug.get(program.slug);
+      const progressPercent = progress?.progressPercent ?? 0;
+      const isCompleted = progress?.isCompleted ?? false;
+
+      return {
+        ...program,
+        progress: progressPercent,
+        status: (isCompleted ? "completed" : "in-progress") as ProgramStatus,
+        continueHref:
+          progress?.continueHref ?? getFallbackContinueHref(program.slug),
+      };
+    });
 }
 
 export function filterPurchasedPrograms(

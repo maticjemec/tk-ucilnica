@@ -73,7 +73,8 @@ export type ProgramSection = {
 };
 
 /**
- * Local stand-in for user_lesson_progress. Not persisted.
+ * @deprecated Use UserLessonProgressRow from lib/progress/types.
+ * Left as a local view-model shape; not an authoritative data source.
  */
 export type LessonProgress = {
   lessonId: string;
@@ -94,8 +95,20 @@ export type OwnedProgram = {
   /** Display label when the program is not a fixed day-count, e.g. lifetime access. */
   durationLabel?: string;
   unlockMode: ProgramUnlockMode;
+  /**
+   * Demo-only catalog percent. TASK 012: not used as authenticated progress.
+   * Runtime percent comes from public.user_lesson_progress.
+   */
   progress: number;
+  /**
+   * Demo-only current lesson. TASK 012: not used as authenticated progress.
+   * Runtime continue lesson is the first incomplete accessible lesson.
+   */
   currentLessonSlug: string;
+  /**
+   * Demo-only completed lesson ids. TASK 012: never copied into the database
+   * and never used as authenticated progress. New users start at 0%.
+   */
   initialCompletedLessonIds: string[];
   sections: ProgramSection[];
   lessons: ProgramLesson[];

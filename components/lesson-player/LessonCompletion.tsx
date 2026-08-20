@@ -6,11 +6,15 @@ import { cn } from "@/lib/cn";
 
 type LessonCompletionProps = {
   completed: boolean;
+  pending?: boolean;
+  error?: string | null;
   onComplete: () => void;
 };
 
 export function LessonCompletion({
   completed,
+  pending = false,
+  error,
   onComplete,
 }: LessonCompletionProps) {
   return (
@@ -28,7 +32,7 @@ export function LessonCompletion({
         S tem shraniš svoj napredek.
       </p>
 
-      <div className="mt-4 flex flex-1 items-end">
+      <div className="mt-4 flex flex-1 flex-col justify-end gap-2">
         <Button
           variant={completed ? "outline" : "primary"}
           className={cn(
@@ -36,14 +40,20 @@ export function LessonCompletion({
             completed &&
               "border-success/45 text-success-foreground hover:border-success/45 hover:bg-transparent disabled:opacity-100",
           )}
-          disabled={completed}
+          disabled={completed || pending}
           aria-pressed={completed}
+          aria-busy={pending}
           aria-label={completed ? "Lekcija je opravljena" : "Označi kot opravljeno"}
-          onClick={completed ? undefined : onComplete}
+          onClick={completed || pending ? undefined : onComplete}
         >
           <Check className="h-4 w-4" strokeWidth={1.8} aria-hidden />
           {completed ? "Opravljeno" : "Označi kot opravljeno"}
         </Button>
+        {error ? (
+          <p className="text-sm leading-snug text-danger" role="alert">
+            {error}
+          </p>
+        ) : null}
       </div>
     </section>
   );

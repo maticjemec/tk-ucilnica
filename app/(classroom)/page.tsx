@@ -13,11 +13,12 @@ import {
 import {
   dashboardHero,
   dashboardPrograms,
-  dashboardProgress,
+  getDashboardProgressSummary,
   getOwnedContinueLesson,
   getOwnedDashboardPrograms,
   getOwnedUpcomingLessons,
 } from "@/lib/content/dashboard";
+import { getOwnedProgressBySlug } from "@/lib/progress/owned";
 
 export const metadata: Metadata = {
   title: "Pregled",
@@ -26,9 +27,19 @@ export const metadata: Metadata = {
 export default async function PregledPage() {
   const access = await requireAuthenticatedUser("/");
   const ownedSlugs = getOwnedProgramSlugs(access);
-  const ownedPrograms = getOwnedDashboardPrograms(ownedSlugs);
+  const progressBySlug = await getOwnedProgressBySlug(ownedSlugs);
+  const percentBySlug = new Map(
+    [...progressBySlug.entries()].map(([slug, progress]) => [
+      slug,
+      progress.progressPercent,
+    ]),
+  );
+  const ownedPrograms = getOwnedDashboardPrograms(ownedSlugs, percentBySlug);
   const ownedContinueLesson = getOwnedContinueLesson(ownedSlugs);
   const ownedUpcomingLessons = getOwnedUpcomingLessons(ownedSlugs);
+  const dashboardProgress = getDashboardProgressSummary(
+    ownedPrograms.map((program) => program.progress),
+  );
 
   return (
     <>

@@ -37,6 +37,22 @@ export function isLessonUnlocked(
   return previous.every((item) => completedIds.has(item.id));
 }
 
+export function canOpenLesson(
+  program: OwnedProgram,
+  lesson: ProgramLesson,
+  completedIds: ReadonlySet<string>,
+) {
+  return (
+    completedIds.has(lesson.id) ||
+    isLessonUnlocked(
+      lesson,
+      program.lessons,
+      completedIds,
+      program.unlockMode,
+    )
+  );
+}
+
 export function getLessonAccessState(options: {
   lesson: ProgramLesson;
   lessons: ProgramLesson[];
@@ -101,39 +117,26 @@ export function getAdjacentLessons(
   };
 }
 
-/**
- * Keep the seeded mock percent until the learner completes extra lessons.
- * Later this becomes completedCount / totalDays from user_lesson_progress.
- */
-export function getLocalProgressPercent(options: {
-  completedCount: number;
-  initialCompletedCount: number;
-  totalDays: number;
-  seedPercent: number;
-}) {
-  const { completedCount, initialCompletedCount, totalDays, seedPercent } =
-    options;
-  const added = completedCount - initialCompletedCount;
+export function getAccessibleAdjacentLessons(
+  program: OwnedProgram,
+  lessonSlug: string,
+  completedIds: ReadonlySet<string>,
+) {
+  const { previous, next } = getAdjacentLessons(program.lessons, lessonSlug);
 
-  if (added <= 0) {
-    return seedPercent;
-  }
-
-  return Math.min(
-    100,
-    seedPercent + Math.round((added / Math.max(totalDays, 1)) * 100),
-  );
+  return {
+    previous:
+      previous && canOpenLesson(program, previous, completedIds)
+        ? previous
+        : undefined,
+    next:
+      next && canOpenLesson(program, next, completedIds) ? next : undefined,
+  };
 }
 
 export function getVisibleLessonCount(program: OwnedProgram) {
   const ids = new Set(program.sections.flatMap((section) => section.lessonIds));
   return ids.size;
-}
-
-export function getCurrentOwnedLesson(program: OwnedProgram) {
-  return program.lessons.find(
-    (lesson) => lesson.slug === program.currentLessonSlug,
-  );
 }
 
 export function isOwnedProgramCompleted(progressPercent: number) {

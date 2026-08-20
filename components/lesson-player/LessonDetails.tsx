@@ -7,12 +7,16 @@ import type { ProgramLesson } from "@/types/owned-program";
 type LessonDetailsProps = {
   lesson: ProgramLesson;
   completed: boolean;
+  pending?: boolean;
+  error?: string | null;
   onComplete: () => void;
 };
 
 export function LessonDetails({
   lesson,
   completed,
+  pending,
+  error,
   onComplete,
 }: LessonDetailsProps) {
   return (
@@ -32,7 +36,12 @@ export function LessonDetails({
         }
       >
         <LessonMaterials resources={lesson.resources} />
-        <LessonCompletion completed={completed} onComplete={onComplete} />
+        <LessonCompletion
+          completed={completed}
+          pending={pending}
+          error={error}
+          onComplete={onComplete}
+        />
       </div>
     </Card>
   );

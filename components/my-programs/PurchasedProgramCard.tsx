@@ -7,7 +7,6 @@ import { ProgramPlaceholder } from "@/components/dashboard/visuals";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { Progress } from "@/components/ui/Progress";
-import { getOwnedProgramContinueHref } from "@/lib/content/owned-program";
 import type { PurchasedProgram } from "@/types/programs";
 
 type PurchasedProgramCardProps = {
@@ -17,8 +16,7 @@ type PurchasedProgramCardProps = {
 export function PurchasedProgramCard({ program }: PurchasedProgramCardProps) {
   const completed = program.status === "completed";
   const ownedOverviewHref = `/moji-programi/${program.slug}`;
-  const continueHref =
-    getOwnedProgramContinueHref(program.slug) ?? ownedOverviewHref;
+  const continueHref = program.continueHref || ownedOverviewHref;
   const titleId = `program-title-${program.slug}`;
 
   return (

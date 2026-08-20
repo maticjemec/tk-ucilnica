@@ -7,18 +7,13 @@ import {
 } from "@/lib/content/catalog";
 import {
   formatLessonPosition,
-  getCurrentOwnedLesson,
-  getLocalProgressPercent,
   getOwnedPrimaryCtaLabel,
   getSectionProgress,
   getVisibleLessonCount,
-  isOwnedProgramCompleted,
   resolveOwnedLessons,
 } from "@/lib/owned-program/access";
-import {
-  getOwnedLessonPath,
-  getOwnedProgramOverviewPath,
-} from "@/lib/owned-program/paths";
+import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
+import type { ProgramProgressView } from "@/lib/progress/helpers";
 import type {
   OwnedProgram,
   OwnedProgramHighlight,
@@ -61,38 +56,32 @@ export function getOwnedProgramHighlights(
   ];
 }
 
-export function getOwnedOverviewModel(program: OwnedProgram) {
-  const currentLesson = getCurrentOwnedLesson(program);
-
-  if (!currentLesson) {
-    return undefined;
-  }
-
-  const completedIds = new Set(program.initialCompletedLessonIds);
-  const lessons = resolveOwnedLessons(program, currentLesson.id, completedIds);
-  const progressPercent = getLocalProgressPercent({
-    completedCount: completedIds.size,
-    initialCompletedCount: program.initialCompletedLessonIds.length,
-    totalDays: program.totalDays,
-    seedPercent: program.progress,
-  });
+export function getOwnedOverviewModel(
+  program: OwnedProgram,
+  progress: ProgramProgressView,
+) {
+  const currentLesson = progress.continueLesson;
+  const lessons = resolveOwnedLessons(
+    program,
+    currentLesson.id,
+    progress.completedIds,
+  );
   const detail = getProgramBySlug(program.slug);
   const visibleLessonCount = getVisibleLessonCount(program);
   const materials = getOwnedProgramMaterials(program);
-  const completed = isOwnedProgramCompleted(progressPercent);
 
   return {
     program,
     currentLesson,
     lessons,
-    progressPercent,
+    progressPercent: progress.progressPercent,
     positionLabel: formatLessonPosition(currentLesson.day, program.totalDays),
-    continueHref: getOwnedLessonPath(program.slug, currentLesson.slug),
+    continueHref: progress.continueHref,
     overviewHref: getOwnedProgramOverviewPath(program.slug),
-    primaryCtaLabel: getOwnedPrimaryCtaLabel(progressPercent),
-    isCompleted: completed,
-    statusLabel: completed ? "Zaključen" : "V teku",
-    completedCount: completedIds.size,
+    primaryCtaLabel: getOwnedPrimaryCtaLabel(progress.progressPercent),
+    isCompleted: progress.isCompleted,
+    statusLabel: progress.isCompleted ? "Zaključen" : "V teku",
+    completedCount: progress.completedCount,
     visibleLessonCount,
     lessonCountLabel: formatCatalogLessons(visibleLessonCount),
     durationLabel: program.durationLabel ?? `${program.totalDays} dni`,
@@ -101,7 +90,7 @@ export function getOwnedOverviewModel(program: OwnedProgram) {
     benefits: detail?.benefits ?? [],
     highlights: getOwnedProgramHighlights(program),
     materials,
-    sectionProgress: getSectionProgress(program, completedIds),
+    sectionProgress: getSectionProgress(program, progress.completedIds),
   };
 }
 

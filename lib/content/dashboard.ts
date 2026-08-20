@@ -1,3 +1,4 @@
+import { getAverageOwnedProgressPercent } from "@/lib/progress/helpers";
 import type {
   ContinueLesson,
   DashboardHeroContent,
@@ -14,12 +15,22 @@ export const dashboardHero: DashboardHeroContent = {
   imageAlt: "Topla svetloba nad gorami ob sončnem vzhodu",
 };
 
+/**
+ * Leftover demo copy. Pregled uses getDashboardProgressSummary() from
+ * owned-program percents (average). Continue/upcoming widgets below are
+ * still mock content, filtered by entitlements.
+ */
 export const dashboardProgress: DashboardProgress = {
   percent: 42,
   headline: "Odlično delaš!",
   supporting: "Nadaljuj in bodi ponosen/a nase.",
 };
 
+/**
+ * Catalog identity for dashboard/catalog cards.
+ * `progress` on these objects is leftover demo metadata. Owned-program
+ * cards overlay authenticated percent from public.user_lesson_progress.
+ */
 export const dashboardPrograms: DashboardProgram[] = [
   {
     slug: "21-dni-do-manj-anksioznosti",
@@ -93,9 +104,36 @@ function slugForDashboardProgramLabel(label: string) {
   return dashboardPrograms.find((program) => program.label === label)?.slug;
 }
 
-export function getOwnedDashboardPrograms(ownedSlugs: readonly string[]) {
+export function getOwnedDashboardPrograms(
+  ownedSlugs: readonly string[],
+  progressBySlug: ReadonlyMap<string, number> = new Map(),
+) {
   const owned = new Set(ownedSlugs);
-  return dashboardPrograms.filter((program) => owned.has(program.slug));
+
+  return dashboardPrograms
+    .filter((program) => owned.has(program.slug))
+    .map((program) => ({
+      ...program,
+      progress: progressBySlug.get(program.slug) ?? 0,
+    }));
+}
+
+export function getDashboardProgressSummary(
+  percents: readonly number[],
+): DashboardProgress {
+  if (percents.length === 0) {
+    return {
+      percent: 0,
+      headline: "Tvoja pot te čaka.",
+      supporting: "Ko boš vstopil/a v program, se bo napredek prikazal tukaj.",
+    };
+  }
+
+  return {
+    percent: getAverageOwnedProgressPercent(percents),
+    headline: "Odlično delaš!",
+    supporting: "Nadaljuj in bodi ponosen/a nase.",
+  };
 }
 
 export function getOwnedContinueLesson(ownedSlugs: readonly string[]) {

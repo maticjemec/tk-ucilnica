@@ -14,6 +14,8 @@ import {
   getOwnedProgramStaticParams,
 } from "@/lib/content/owned-program";
 import { getOwnedOverviewModel } from "@/lib/owned-program/overview";
+import { buildProgramProgressView } from "@/lib/progress/helpers";
+import { getProgramLessonProgress } from "@/lib/progress/queries";
 
 type OwnedProgramOverviewPageProps = {
   params: Promise<{ slug: string }>;
@@ -50,11 +52,14 @@ export default async function OwnedProgramOverviewPage({
     notFound();
   }
 
-  const model = getOwnedOverviewModel(program);
+  const rows = await getProgramLessonProgress(slug);
+  const progress = buildProgramProgressView(program, rows);
 
-  if (!model) {
+  if (!progress) {
     notFound();
   }
+
+  const model = getOwnedOverviewModel(program, progress);
 
   return (
     <>

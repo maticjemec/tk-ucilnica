@@ -8,4 +8,5 @@ export type PurchasedProgram = DashboardProgram & {
   status: ProgramStatus;
   lessons: string;
   duration: string;
+  continueHref: string;
 };

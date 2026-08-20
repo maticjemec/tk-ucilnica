@@ -1,11 +1,11 @@
 "use client";
 
+import { useMemo, useState, useTransition } from "react";
 import { LessonBreadcrumb } from "@/components/lesson-player/LessonBreadcrumb";
 import { LessonDetails } from "@/components/lesson-player/LessonDetails";
 import { LessonMediaPlayer } from "@/components/lesson-player/LessonMediaPlayer";
 import { LessonNavigation } from "@/components/lesson-player/LessonNavigation";
 import { LessonProgramHeader } from "@/components/lesson-player/LessonProgramHeader";
-import { useOwnedProgress } from "@/components/lesson-player/OwnedProgressProvider";
 import { ProgramCurriculumPanel } from "@/components/lesson-player/ProgramCurriculumPanel";
 import { SupportCard } from "@/components/my-programs/SupportCard";
 import { getOwnedLessonNav } from "@/lib/content/owned-program";
@@ -15,22 +15,55 @@ import {
   resolveOwnedLessons,
 } from "@/lib/owned-program/access";
 import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
+import { markLessonCompleted } from "@/lib/progress/actions";
+import {
+  getProgramProgressPercent,
+  PROGRESS_SAVE_ERROR,
+} from "@/lib/progress/helpers";
 import type { OwnedProgram, ProgramLesson } from "@/types/owned-program";
 
 type LessonPlayerClientProps = {
   program: OwnedProgram;
   lesson: ProgramLesson;
+  completedLessonIds: string[];
 };
 
 export function LessonPlayerClient({
   program,
   lesson,
+  completedLessonIds,
 }: LessonPlayerClientProps) {
-  const { completedIds, progressPercent, markComplete, isComplete } =
-    useOwnedProgress();
-  const resolvedLessons = resolveOwnedLessons(program, lesson.id, completedIds);
-  const navigation = getOwnedLessonNav(program, lesson.slug);
-  const completed = isComplete(lesson.id);
+  const [completedIds, setCompletedIds] = useState(completedLessonIds);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const completedSet = useMemo(() => new Set(completedIds), [completedIds]);
+  const resolvedLessons = resolveOwnedLessons(program, lesson.id, completedSet);
+  const navigation = getOwnedLessonNav(program, lesson.slug, completedSet);
+  const completed = completedSet.has(lesson.id);
+  const displayPercent = getProgramProgressPercent(
+    completedSet.size,
+    program.lessons.length,
+  );
+
+  function handleComplete() {
+    if (completed || isPending) {
+      return;
+    }
+
+    setSaveError(null);
+    startTransition(async () => {
+      const result = await markLessonCompleted(program.slug, lesson.slug);
+
+      if (!result.ok) {
+        setSaveError(result.error || PROGRESS_SAVE_ERROR);
+        return;
+      }
+
+      setCompletedIds((current) =>
+        current.includes(lesson.id) ? current : [...current, lesson.id],
+      );
+    });
+  }
 
   return (
     <>
@@ -50,7 +83,7 @@ export function LessonPlayerClient({
           <LessonProgramHeader
             title={program.title}
             positionLabel={formatLessonPosition(lesson.day, program.totalDays)}
-            progressPercent={progressPercent}
+            progressPercent={displayPercent}
           />
 
           <LessonMediaPlayer
@@ -65,7 +98,9 @@ export function LessonPlayerClient({
           <LessonDetails
             lesson={lesson}
             completed={completed}
-            onComplete={() => markComplete(lesson.id)}
+            pending={isPending}
+            error={saveError}
+            onComplete={handleComplete}
           />
 
           <LessonNavigation
@@ -79,7 +114,7 @@ export function LessonPlayerClient({
             program={program}
             lessons={resolvedLessons}
             currentLessonSlug={lesson.slug}
-            progressPercent={progressPercent}
+            progressPercent={displayPercent}
           />
         </aside>
       </div>

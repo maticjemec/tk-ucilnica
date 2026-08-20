@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { LessonPlayerClient } from "@/components/lesson-player/LessonPlayerClient";
 import { requireProgramEntitlement } from "@/lib/auth/access";
 import {
@@ -7,7 +7,11 @@ import {
   getOwnedLessonStaticParams,
   getOwnedProgramBySlug,
 } from "@/lib/content/owned-program";
-import { formatLessonHeading } from "@/lib/owned-program/access";
+import { canOpenLesson, formatLessonHeading } from "@/lib/owned-program/access";
+import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
+import { buildProgramProgressView } from "@/lib/progress/helpers";
+import { markLessonOpened } from "@/lib/progress/mutations";
+import { getProgramLessonProgress } from "@/lib/progress/queries";
 
 type OwnedLessonPageProps = {
   params: Promise<{ slug: string; lessonSlug: string }>;
@@ -44,5 +48,21 @@ export default async function OwnedLessonPage({ params }: OwnedLessonPageProps) 
     notFound();
   }
 
-  return <LessonPlayerClient program={program} lesson={lesson} />;
+  const rows = await getProgramLessonProgress(slug);
+  const progress = buildProgramProgressView(program, rows);
+
+  if (!progress || !canOpenLesson(program, lesson, progress.completedIds)) {
+    redirect(progress?.continueHref ?? getOwnedProgramOverviewPath(slug));
+  }
+
+  await markLessonOpened(slug, lessonSlug);
+
+  return (
+    <LessonPlayerClient
+      key={lesson.id}
+      program={program}
+      lesson={lesson}
+      completedLessonIds={[...progress.completedIds]}
+    />
+  );
 }

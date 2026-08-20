@@ -1,7 +1,7 @@
 import { dashboardPrograms } from "@/lib/content/dashboard";
 import {
   formatLessonHeading,
-  getAdjacentLessons,
+  getAccessibleAdjacentLessons,
 } from "@/lib/owned-program/access";
 import { getOwnedLessonPath } from "@/lib/owned-program/paths";
 import type {
@@ -277,6 +277,7 @@ const confidenceProgram: OwnedProgram = {
   imageAlt: confidenceIdentity.imageAlt,
   totalDays: 21,
   unlockMode: "sequential",
+  // Demo metadata only. Authenticated progress uses public.user_lesson_progress.
   progress: confidenceIdentity.progress,
   currentLessonSlug: "zgradi-notranjo-moc",
   initialCompletedLessonIds: [
@@ -813,15 +814,6 @@ export function getOwnedLesson(program: OwnedProgram, lessonSlug: string) {
   return program.lessons.find((lesson) => lesson.slug === lessonSlug);
 }
 
-export function getOwnedProgramContinueHref(slug: string) {
-  const program = getOwnedProgramBySlug(slug);
-  if (!program) {
-    return undefined;
-  }
-
-  return getOwnedLessonPath(program.slug, program.currentLessonSlug);
-}
-
 export function getOwnedProgramStaticParams() {
   return ownedPrograms.map((program) => ({ slug: program.slug }));
 }
@@ -853,8 +845,16 @@ export function getOwnedProgramMaterials(program: OwnedProgram) {
   };
 }
 
-export function getOwnedLessonNav(program: OwnedProgram, lessonSlug: string) {
-  const { previous, next } = getAdjacentLessons(program.lessons, lessonSlug);
+export function getOwnedLessonNav(
+  program: OwnedProgram,
+  lessonSlug: string,
+  completedIds: ReadonlySet<string>,
+) {
+  const { previous, next } = getAccessibleAdjacentLessons(
+    program,
+    lessonSlug,
+    completedIds,
+  );
 
   return {
     previous: previous
