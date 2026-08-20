@@ -1,3 +1,11 @@
+/**
+ * LEGACY local owned curriculum, materials, and worksheet labels.
+ *
+ * TASK 013C: runtime sections/lessons come from public.program_sections
+ * and public.lessons via lib/programs. Do not use ownedPrograms as the
+ * curriculum authority. Materials and worksheet placeholders remain as
+ * an isolated overlay until a later storage/materials migration.
+ */
 import { dashboardPrograms } from "@/lib/content/dashboard";
 import {
   formatLessonHeading,
@@ -58,6 +66,7 @@ function createLesson(
     id: `${programSlug}-day-${day}`,
     slug,
     day,
+    order: day,
     title,
     description,
     duration: extras?.duration ?? timing.duration,
@@ -811,6 +820,35 @@ export const ownedPrograms: OwnedProgram[] = [
   selfHypnosisProgram,
 ];
 
+/**
+ * TASK 013C: local materials overlay only. Curriculum is not a runtime authority.
+ */
+export function getLocalOwnedProgramMaterials(slug: string) {
+  return (
+    ownedPrograms.find((program) => program.slug === slug)?.materials ?? []
+  );
+}
+
+/**
+ * TASK 013C: worksheet label fallback when public.lessons.worksheet_url is null.
+ * Only for programs that still have local owned extras.
+ */
+export function getLocalLessonWorksheet(
+  programSlug: string,
+  lessonOrder: number,
+  title: string,
+) {
+  if (!ownedPrograms.some((program) => program.slug === programSlug)) {
+    return [];
+  }
+
+  return [worksheet(programSlug, lessonOrder, title)];
+}
+
+/**
+ * @deprecated TASK 013C: runtime curriculum comes from lib/programs.
+ * Local ownedPrograms remain as materials/worksheet fallback only.
+ */
 export function getOwnedProgramBySlug(slug: string) {
   return ownedPrograms.find((program) => program.slug === slug);
 }

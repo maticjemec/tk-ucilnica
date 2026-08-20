@@ -99,26 +99,30 @@ export function OwnedProgramHero({ model }: OwnedProgramHeroProps) {
             </div>
           </div>
 
-          <ButtonLink
-            href={continueHref}
-            variant={isCompleted ? "success-outline" : "primary"}
-            className="mt-5 w-full lg:hidden"
-          >
-            <CirclePlay className="h-4 w-4" strokeWidth={1.6} aria-hidden />
-            {primaryCtaLabel}
-          </ButtonLink>
+          {model.hasCurriculum ? (
+            <ButtonLink
+              href={continueHref}
+              variant={isCompleted ? "success-outline" : "primary"}
+              className="mt-5 w-full lg:hidden"
+            >
+              <CirclePlay className="h-4 w-4" strokeWidth={1.6} aria-hidden />
+              {primaryCtaLabel}
+            </ButtonLink>
+          ) : null}
         </div>
 
-        <div className="absolute top-5 right-5 hidden lg:block">
-          <ButtonLink
-            href={continueHref}
-            variant={isCompleted ? "success-outline" : "primary"}
-            className="min-w-[11.75rem] shadow-[0_8px_24px_rgba(28,25,22,0.12)]"
-          >
-            <CirclePlay className="h-4 w-4" strokeWidth={1.6} aria-hidden />
-            {primaryCtaLabel}
-          </ButtonLink>
-        </div>
+        {model.hasCurriculum ? (
+          <div className="absolute top-5 right-5 hidden lg:block">
+            <ButtonLink
+              href={continueHref}
+              variant={isCompleted ? "success-outline" : "primary"}
+              className="min-w-[11.75rem] shadow-[0_8px_24px_rgba(28,25,22,0.12)]"
+            >
+              <CirclePlay className="h-4 w-4" strokeWidth={1.6} aria-hidden />
+              {primaryCtaLabel}
+            </ButtonLink>
+          </div>
+        ) : null}
       </div>
     </section>
   );

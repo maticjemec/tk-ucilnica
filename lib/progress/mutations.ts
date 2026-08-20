@@ -2,10 +2,7 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getUserAccessContext, ownsProgram } from "@/lib/auth/access";
-import {
-  getOwnedLesson,
-  getOwnedProgramBySlug,
-} from "@/lib/content/owned-program";
+import { getOwnedLesson } from "@/lib/content/owned-program";
 import { canOpenLesson } from "@/lib/owned-program/access";
 import {
   buildProgramProgressView,
@@ -13,6 +10,7 @@ import {
 } from "@/lib/progress/helpers";
 import { getProgramLessonProgress } from "@/lib/progress/queries";
 import type { ProgressWriteResult } from "@/lib/progress/types";
+import { getProgramWithCurriculum } from "@/lib/programs";
 import { createClient } from "@/lib/supabase/server";
 
 const USER_LESSON_PROGRESS_TABLE = "user_lesson_progress";
@@ -40,7 +38,8 @@ async function getProgressWriteContext(
     return null;
   }
 
-  const program = getOwnedProgramBySlug(programSlug);
+  const bundle = await getProgramWithCurriculum(programSlug);
+  const program = bundle?.program;
   const lesson = program ? getOwnedLesson(program, lessonSlug) : undefined;
 
   if (!program || !lesson) {
@@ -49,7 +48,7 @@ async function getProgressWriteContext(
 
   const rows = await getProgramLessonProgress(programSlug);
   const progress = buildProgramProgressView(program, rows);
-  const completedIds = progress?.completedIds ?? new Set<string>();
+  const completedIds = progress.completedIds;
 
   if (!canOpenLesson(program, lesson, completedIds)) {
     return null;

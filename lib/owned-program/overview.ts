@@ -63,21 +63,23 @@ export function getOwnedOverviewModel(
   identity: Program,
 ) {
   const currentLesson = progress.continueLesson;
-  const lessons = resolveOwnedLessons(
-    program,
-    currentLesson.id,
-    progress.completedIds,
-  );
+  const lessons = currentLesson
+    ? resolveOwnedLessons(program, currentLesson.id, progress.completedIds)
+    : [];
   const extras = getLocalProgramDetailExtras(program.slug);
   const visibleLessonCount = getVisibleLessonCount(program);
   const materials = getOwnedProgramMaterials(program);
+  const hasCurriculum = program.lessons.length > 0;
 
   return {
     program,
     currentLesson,
     lessons,
+    hasCurriculum,
     progressPercent: progress.progressPercent,
-    positionLabel: formatLessonPosition(currentLesson.day, program.totalDays),
+    positionLabel: currentLesson
+      ? formatLessonPosition(currentLesson.day, program.totalDays)
+      : "Vsebina programa še ni na voljo",
     continueHref: progress.continueHref,
     overviewHref: getOwnedProgramOverviewPath(program.slug),
     primaryCtaLabel: getOwnedPrimaryCtaLabel(progress.progressPercent),
@@ -85,7 +87,7 @@ export function getOwnedOverviewModel(
     statusLabel: progress.isCompleted ? "Zaključen" : "V teku",
     completedCount: progress.completedCount,
     visibleLessonCount,
-    lessonCountLabel: formatCatalogLessons(identity.lessonCount),
+    lessonCountLabel: formatCatalogLessons(visibleLessonCount),
     durationLabel: identity.duration,
     difficulty: identity.difficulty,
     categoryLabel: identity.categoryLabel,

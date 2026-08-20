@@ -55,13 +55,17 @@ export type LessonDrip = {
 export type ProgramLesson = {
   id: string;
   slug: string;
+  /** Display day; seeded as lesson_order. */
   day: number;
+  /** Canonical order from public.lessons.lesson_order. */
+  order: number;
   title: string;
   description: string;
   duration: string;
   durationSeconds: number;
   media: LessonMedia;
   resources: LessonResource[];
+  unlockMode?: ProgramUnlockMode;
   drip?: LessonDrip;
 };
 
@@ -96,20 +100,17 @@ export type OwnedProgram = {
   durationLabel?: string;
   unlockMode: ProgramUnlockMode;
   /**
-   * Demo-only catalog percent. TASK 012: not used as authenticated progress.
-   * Runtime percent comes from public.user_lesson_progress.
+   * @deprecated Unused at runtime. Progress comes from public.user_lesson_progress.
    */
-  progress: number;
+  progress?: number;
   /**
-   * Demo-only current lesson. TASK 012: not used as authenticated progress.
-   * Runtime continue lesson is the first incomplete accessible lesson.
+   * @deprecated Unused at runtime. Continue lesson is computed from DB curriculum + progress.
    */
-  currentLessonSlug: string;
+  currentLessonSlug?: string;
   /**
-   * Demo-only completed lesson ids. TASK 012: never copied into the database
-   * and never used as authenticated progress. New users start at 0%.
+   * @deprecated Unused at runtime. Never copied into the database.
    */
-  initialCompletedLessonIds: string[];
+  initialCompletedLessonIds?: string[];
   sections: ProgramSection[];
   lessons: ProgramLesson[];
   /** Program-level files. Future URLs live on each material's href. */

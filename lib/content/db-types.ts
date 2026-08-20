@@ -2,8 +2,8 @@
  * TASK 013A/013B — Supabase row types for program content.
  *
  * These match public.programs / program_sections / lessons.
- * ProgramRow is the canonical DB shape. UI mapping lives in lib/programs/.
- * Lesson/section rows are not yet read at runtime (TASK 013C).
+ * ProgramRow / ProgramSectionRow / LessonRow are the canonical DB shapes.
+ * UI mapping lives in lib/programs/.
  */
 
 export type ProgramContentType =

@@ -1,16 +1,15 @@
 import "server-only";
 
-import { getOwnedProgramBySlug } from "@/lib/content/owned-program";
 import { buildOwnedProgressBySlug } from "@/lib/progress/helpers";
 import { getUserLessonProgress } from "@/lib/progress/queries";
 import type { ProgramProgressView } from "@/lib/progress/helpers";
+import { getCurriculumForPrograms } from "@/lib/programs";
 
 export async function getOwnedProgressBySlug(
   ownedSlugs: readonly string[],
 ): Promise<Map<string, ProgramProgressView>> {
-  const programs = ownedSlugs
-    .map((slug) => getOwnedProgramBySlug(slug))
-    .filter((program): program is NonNullable<typeof program> => Boolean(program));
+  const bundles = await getCurriculumForPrograms(ownedSlugs);
+  const programs = bundles.map((bundle) => bundle.program);
   const rows = await getUserLessonProgress();
   return buildOwnedProgressBySlug(programs, rows);
 }

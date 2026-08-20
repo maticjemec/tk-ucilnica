@@ -22,18 +22,24 @@ export function formatTimecode(totalSeconds: number) {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
+export function orderedLessons(lessons: ProgramLesson[]) {
+  return [...lessons].sort((a, b) => a.order - b.order);
+}
+
 export function isLessonUnlocked(
   lesson: ProgramLesson,
   lessons: ProgramLesson[],
   completedIds: ReadonlySet<string>,
   unlockMode: ProgramUnlockMode,
 ) {
-  if (unlockMode === "all") {
+  const mode = lesson.unlockMode ?? unlockMode;
+
+  if (mode === "all") {
     return true;
   }
 
-  // "drip" stays sequential until a later task computes unlockAt / dayOffset.
-  const previous = lessons.filter((item) => item.day < lesson.day);
+  // "drip" stays sequential until TASK 014 computes unlockAt / dayOffset.
+  const previous = lessons.filter((item) => item.order < lesson.order);
   return previous.every((item) => completedIds.has(item.id));
 }
 
@@ -106,13 +112,14 @@ export function getAdjacentLessons(
   lessons: ProgramLesson[],
   lessonSlug: string,
 ) {
-  const index = lessons.findIndex((lesson) => lesson.slug === lessonSlug);
+  const ordered = orderedLessons(lessons);
+  const index = ordered.findIndex((lesson) => lesson.slug === lessonSlug);
 
   return {
-    previous: index > 0 ? lessons[index - 1] : undefined,
+    previous: index > 0 ? ordered[index - 1] : undefined,
     next:
-      index >= 0 && index < lessons.length - 1
-        ? lessons[index + 1]
+      index >= 0 && index < ordered.length - 1
+        ? ordered[index + 1]
         : undefined,
   };
 }
@@ -122,19 +129,37 @@ export function getAccessibleAdjacentLessons(
   lessonSlug: string,
   completedIds: ReadonlySet<string>,
 ) {
-  const { previous, next } = getAdjacentLessons(program.lessons, lessonSlug);
+  const ordered = orderedLessons(program.lessons);
+  const index = ordered.findIndex((lesson) => lesson.slug === lessonSlug);
 
-  return {
-    previous:
-      previous && canOpenLesson(program, previous, completedIds)
-        ? previous
-        : undefined,
-    next:
-      next && canOpenLesson(program, next, completedIds) ? next : undefined,
-  };
+  if (index < 0) {
+    return { previous: undefined, next: undefined };
+  }
+
+  let previous: ProgramLesson | undefined;
+  for (let i = index - 1; i >= 0; i -= 1) {
+    if (canOpenLesson(program, ordered[i], completedIds)) {
+      previous = ordered[i];
+      break;
+    }
+  }
+
+  let next: ProgramLesson | undefined;
+  for (let i = index + 1; i < ordered.length; i += 1) {
+    if (canOpenLesson(program, ordered[i], completedIds)) {
+      next = ordered[i];
+      break;
+    }
+  }
+
+  return { previous, next };
 }
 
 export function getVisibleLessonCount(program: OwnedProgram) {
+  if (program.lessons.length > 0) {
+    return program.lessons.length;
+  }
+
   const ids = new Set(program.sections.flatMap((section) => section.lessonIds));
   return ids.size;
 }

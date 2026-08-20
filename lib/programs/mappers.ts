@@ -212,8 +212,8 @@ export function toPurchasedProgram(
 }
 
 /**
- * Overlay DB program identity onto local owned curriculum.
- * Lesson lists, sections, and unlock rules stay local until TASK 013C.
+ * Overlay DB program identity onto an owned-program view-model.
+ * Curriculum must already come from public.program_sections / public.lessons.
  */
 export function applyProgramIdentity(
   program: OwnedProgram,

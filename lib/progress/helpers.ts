@@ -66,19 +66,20 @@ export function toCompletedLessonIds(
 }
 
 /**
- * First incomplete accessible lesson.
+ * First incomplete accessible lesson, by lesson_order.
  * If every lesson is complete, return the first lesson (replay).
  */
 export function getContinueLesson(
   program: OwnedProgram,
   completedIds: ReadonlySet<string>,
 ): ProgramLesson | undefined {
-  const nextIncomplete = program.lessons.find(
+  const ordered = [...program.lessons].sort((a, b) => a.order - b.order);
+  const nextIncomplete = ordered.find(
     (lesson) =>
       !completedIds.has(lesson.id) && canOpenLesson(program, lesson, completedIds),
   );
 
-  return nextIncomplete ?? program.lessons[0];
+  return nextIncomplete ?? ordered[0];
 }
 
 export type ProgramProgressView = {
@@ -87,7 +88,7 @@ export type ProgramProgressView = {
   completedCount: number;
   totalLessons: number;
   progressPercent: number;
-  continueLesson: ProgramLesson;
+  continueLesson?: ProgramLesson;
   continueHref: string;
   isCompleted: boolean;
 };
@@ -95,15 +96,10 @@ export type ProgramProgressView = {
 export function buildProgramProgressView(
   program: OwnedProgram,
   rows: readonly UserLessonProgressRow[],
-): ProgramProgressView | undefined {
+): ProgramProgressView {
   const completedSlugs = getCompletedLessonSlugs(program, rows);
   const completedIds = toCompletedLessonIds(program, completedSlugs);
   const continueLesson = getContinueLesson(program, completedIds);
-
-  if (!continueLesson) {
-    return undefined;
-  }
-
   const totalLessons = program.lessons.length;
   const completedCount = completedIds.size;
   const progressPercent = getProgramProgressPercent(
@@ -118,8 +114,10 @@ export function buildProgramProgressView(
     totalLessons,
     progressPercent,
     continueLesson,
-    continueHref: getOwnedLessonPath(program.slug, continueLesson.slug),
-    isCompleted: isOwnedProgramCompleted(progressPercent),
+    continueHref: continueLesson
+      ? getOwnedLessonPath(program.slug, continueLesson.slug)
+      : getFallbackContinueHref(program.slug),
+    isCompleted: totalLessons > 0 && isOwnedProgramCompleted(progressPercent),
   };
 }
 
@@ -130,11 +128,7 @@ export function buildOwnedProgressBySlug(
   const views = new Map<string, ProgramProgressView>();
 
   for (const program of programs) {
-    const view = buildProgramProgressView(program, rows);
-
-    if (view) {
-      views.set(program.slug, view);
-    }
+    views.set(program.slug, buildProgramProgressView(program, rows));
   }
 
   return views;

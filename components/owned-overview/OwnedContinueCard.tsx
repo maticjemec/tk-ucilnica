@@ -13,6 +13,11 @@ type OwnedContinueCardProps = {
 export function OwnedContinueCard({ model }: OwnedContinueCardProps) {
   const { program, currentLesson, continueHref, isCompleted, primaryCtaLabel } =
     model;
+
+  if (!currentLesson) {
+    return null;
+  }
+
   const heading = formatLessonHeading(currentLesson);
   const ctaLabel = isCompleted ? primaryCtaLabel : "Nadaljuj lekcijo";
 
