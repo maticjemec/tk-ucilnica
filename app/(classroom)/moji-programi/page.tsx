@@ -4,15 +4,19 @@ import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { MyProgramsClient } from "@/components/my-programs/MyProgramsClient";
 import { SupportCard } from "@/components/my-programs/SupportCard";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { requireAuthenticatedUser } from "@/lib/auth/access";
-import { purchasedPrograms } from "@/lib/content/programs";
+import {
+  getOwnedProgramSlugs,
+  requireAuthenticatedUser,
+} from "@/lib/auth/access";
+import { getPurchasedProgramsForSlugs } from "@/lib/content/programs";
 
 export const metadata: Metadata = {
   title: "Moji programi",
 };
 
 export default async function MojiProgramiPage() {
-  await requireAuthenticatedUser("/moji-programi");
+  const access = await requireAuthenticatedUser("/moji-programi");
+  const programs = getPurchasedProgramsForSlugs(getOwnedProgramSlugs(access));
 
   return (
     <>
@@ -31,7 +35,7 @@ export default async function MojiProgramiPage() {
         }
       />
 
-      <MyProgramsClient programs={purchasedPrograms} />
+      <MyProgramsClient programs={programs} />
       <SupportCard />
     </>
   );

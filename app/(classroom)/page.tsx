@@ -6,13 +6,17 @@ import { ProgressOverview } from "@/components/dashboard/ProgressOverview";
 import { SectionHeading } from "@/components/dashboard/SectionHeading";
 import { UpcomingLessonsCard } from "@/components/dashboard/UpcomingLessonsCard";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { requireAuthenticatedUser } from "@/lib/auth/access";
 import {
-  continueLesson,
+  getOwnedProgramSlugs,
+  requireAuthenticatedUser,
+} from "@/lib/auth/access";
+import {
   dashboardHero,
   dashboardPrograms,
   dashboardProgress,
-  upcomingLessons,
+  getOwnedContinueLesson,
+  getOwnedDashboardPrograms,
+  getOwnedUpcomingLessons,
 } from "@/lib/content/dashboard";
 
 export const metadata: Metadata = {
@@ -21,6 +25,10 @@ export const metadata: Metadata = {
 
 export default async function PregledPage() {
   const access = await requireAuthenticatedUser("/");
+  const ownedSlugs = getOwnedProgramSlugs(access);
+  const ownedPrograms = getOwnedDashboardPrograms(ownedSlugs);
+  const ownedContinueLesson = getOwnedContinueLesson(ownedSlugs);
+  const ownedUpcomingLessons = getOwnedUpcomingLessons(ownedSlugs);
 
   return (
     <>
@@ -39,9 +47,9 @@ export default async function PregledPage() {
               action={{ href: "/moji-programi", label: "Prikaži vse →" }}
             />
             <ProgramGrid
-              programs={dashboardPrograms}
+              programs={ownedPrograms}
               variant="progress"
-              showPeekControl
+              showPeekControl={ownedPrograms.length > 0}
             />
           </section>
 
@@ -53,8 +61,12 @@ export default async function PregledPage() {
 
         <aside className="flex min-w-0 flex-col gap-4">
           <ProgressOverview progress={dashboardProgress} />
-          <ContinueLessonCard lesson={continueLesson} />
-          <UpcomingLessonsCard lessons={upcomingLessons} />
+          {ownedContinueLesson ? (
+            <ContinueLessonCard lesson={ownedContinueLesson} />
+          ) : null}
+          {ownedUpcomingLessons.length > 0 ? (
+            <UpcomingLessonsCard lessons={ownedUpcomingLessons} />
+          ) : null}
         </aside>
       </div>
     </>

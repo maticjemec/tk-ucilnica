@@ -7,9 +7,20 @@ export type UserSession = {
   email: string;
 };
 
+export type UserProgramRow = {
+  id: string;
+  user_id: string;
+  program_slug: string;
+  granted_at: string;
+  access_expires_at: string | null;
+  source: string;
+  created_at: string;
+};
+
 export type ProgramEntitlement = {
   programSlug: string;
-  source: "purchase";
+  source: string;
+  accessExpiresAt: string | null;
 };
 
 export type GuestAccessContext = {

@@ -1,6 +1,10 @@
+import { cache } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { getTemporaryEntitlements } from "@/lib/auth/temporary-entitlements";
+import {
+  fetchValidProgramEntitlements,
+  isEntitlementCurrentlyValid,
+} from "@/lib/auth/entitlements";
 import { toUserSession } from "@/lib/auth/user";
 import {
   getLoginPath,
@@ -25,23 +29,30 @@ const guestContext: GuestAccessContext = {
  * Single app-level access reader.
  *
  * Authentication is validated on the server with Supabase `getUser()`.
- * Entitlements currently come from a temporary compatibility layer
- * and will be replaced by a database query in TASK 011.
+ * Owned program slugs come from public.user_programs via the entitlement
+ * data layer. Missing, expired, or failed queries yield no ownership.
  */
-export async function getUserAccessContext(): Promise<UserAccessContext> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
+export const getUserAccessContext = cache(
+  async (): Promise<UserAccessContext> => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.getUser();
 
-  if (error || !data.user) {
-    return guestContext;
-  }
+    if (error || !data.user) {
+      return guestContext;
+    }
 
-  return {
-    status: "authenticated",
-    user: toUserSession(data.user),
-    entitlements: getTemporaryEntitlements(),
-  };
-}
+    const entitlements = await fetchValidProgramEntitlements(
+      supabase,
+      data.user.id,
+    );
+
+    return {
+      status: "authenticated",
+      user: toUserSession(data.user),
+      entitlements,
+    };
+  },
+);
 
 export async function getRequestPath(fallback = "/") {
   const headerStore = await headers();
@@ -94,7 +105,11 @@ export function ownsProgram(access: UserAccessContext, slug: string) {
     return false;
   }
 
-  return access.entitlements.some((item) => item.programSlug === slug);
+  return access.entitlements.some(
+    (item) =>
+      item.programSlug === slug &&
+      isEntitlementCurrentlyValid(item.accessExpiresAt),
+  );
 }
 
 export function getOwnedProgramSlugs(access: UserAccessContext) {
@@ -102,5 +117,7 @@ export function getOwnedProgramSlugs(access: UserAccessContext) {
     return [];
   }
 
-  return access.entitlements.map((item) => item.programSlug);
+  return access.entitlements
+    .filter((item) => isEntitlementCurrentlyValid(item.accessExpiresAt))
+    .map((item) => item.programSlug);
 }

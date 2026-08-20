@@ -57,6 +57,11 @@ export const purchasedPrograms: PurchasedProgram[] = [
   }),
 ];
 
+export function getPurchasedProgramsForSlugs(ownedSlugs: readonly string[]) {
+  const owned = new Set(ownedSlugs);
+  return purchasedPrograms.filter((program) => owned.has(program.slug));
+}
+
 export function filterPurchasedPrograms(
   programs: PurchasedProgram[],
   filter: ProgramFilter,

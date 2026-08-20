@@ -4,6 +4,7 @@ export type {
   GuestAccessContext,
   ProgramEntitlement,
   UserAccessContext,
+  UserProgramRow,
   UserSession,
 } from "@/lib/auth/types";
 
@@ -16,7 +17,10 @@ export {
   requireProgramEntitlement,
 } from "@/lib/auth/access";
 
-export { MOCK_OWNED_PROGRAM_SLUGS } from "@/lib/auth/temporary-entitlements";
+export {
+  fetchValidProgramEntitlements,
+  isEntitlementCurrentlyValid,
+} from "@/lib/auth/entitlements";
 
 export { getUserDisplayName, getUserInitials } from "@/lib/auth/user";
 

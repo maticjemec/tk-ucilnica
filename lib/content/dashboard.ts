@@ -86,3 +86,33 @@ export const upcomingLessons: UpcomingLesson[] = [
     schedule: "Petek ob 19:00",
   },
 ];
+
+// Continue/upcoming rows are still mock content. They are only shown when
+// the matching local program slug is in the user's valid entitlements.
+function slugForDashboardProgramLabel(label: string) {
+  return dashboardPrograms.find((program) => program.label === label)?.slug;
+}
+
+export function getOwnedDashboardPrograms(ownedSlugs: readonly string[]) {
+  const owned = new Set(ownedSlugs);
+  return dashboardPrograms.filter((program) => owned.has(program.slug));
+}
+
+export function getOwnedContinueLesson(ownedSlugs: readonly string[]) {
+  const slug = slugForDashboardProgramLabel(continueLesson.program);
+
+  if (!slug || !ownedSlugs.includes(slug)) {
+    return null;
+  }
+
+  return continueLesson;
+}
+
+export function getOwnedUpcomingLessons(ownedSlugs: readonly string[]) {
+  const owned = new Set(ownedSlugs);
+
+  return upcomingLessons.filter((lesson) => {
+    const slug = slugForDashboardProgramLabel(lesson.program);
+    return Boolean(slug && owned.has(slug));
+  });
+}
