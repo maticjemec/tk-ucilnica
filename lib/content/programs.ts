@@ -15,7 +15,10 @@ type PurchasedFields = {
   description?: string;
 };
 
-type PurchasedProgramSeed = Omit<PurchasedProgram, "continueHref">;
+type PurchasedProgramSeed = Omit<
+  PurchasedProgram,
+  "continueHref" | "continueAvailable"
+>;
 
 function toPurchasedProgram(
   slug: string,
@@ -89,6 +92,7 @@ export function getPurchasedProgramsForSlugs(
         status: (isCompleted ? "completed" : "in-progress") as ProgramStatus,
         continueHref:
           progress?.continueHref ?? getFallbackContinueHref(program.slug),
+        continueAvailable: progress?.continueAvailable ?? true,
       };
     });
 }

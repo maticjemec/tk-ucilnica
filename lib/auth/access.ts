@@ -100,6 +100,19 @@ export async function redirectIfAuthenticated(redirectTo?: string) {
   }
 }
 
+export function getEntitlementForProgram(
+  access: UserAccessContext,
+  slug: string,
+) {
+  if (access.status !== "authenticated") {
+    return null;
+  }
+
+  return (
+    access.entitlements.find((item) => item.programSlug === slug) ?? null
+  );
+}
+
 export function ownsProgram(access: UserAccessContext, slug: string) {
   if (access.status !== "authenticated") {
     return false;

@@ -207,8 +207,8 @@ function mediaKind(contentType: ProgramContentType): LessonMediaKind {
 }
 
 /**
- * TASK 014: drip dates live on the row but are not evaluated yet.
- * Sequential behavior is used until then.
+ * Effective lesson mode is lesson.unlock_mode, else the program default.
+ * Drip dates are evaluated in lib/owned-program/access.ts.
  */
 export function resolveLessonUnlockMode(
   lessonMode: ProgramUnlockMode | undefined,
@@ -261,11 +261,28 @@ function toProgramLesson(programSlug: string, row: LessonRow): ProgramLesson {
   };
 }
 
+/**
+ * Program-level default. A single drip lesson must not flip the rest of
+ * the curriculum into drip (those rows would fail closed without dates).
+ * Use drip/all as the program default only when every published lesson
+ * explicitly shares that same mode.
+ */
 function deriveProgramUnlockMode(
   lessons: ProgramLesson[],
 ): ProgramUnlockMode {
-  const explicit = lessons.find((lesson) => lesson.unlockMode)?.unlockMode;
-  return explicit ?? "sequential";
+  if (lessons.length === 0) {
+    return "sequential";
+  }
+
+  const first = lessons[0]?.unlockMode;
+
+  if (!first) {
+    return "sequential";
+  }
+
+  return lessons.every((lesson) => lesson.unlockMode === first)
+    ? first
+    : "sequential";
 }
 
 export function assembleOwnedProgram(

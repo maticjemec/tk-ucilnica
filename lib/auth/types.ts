@@ -20,6 +20,7 @@ export type UserProgramRow = {
 export type ProgramEntitlement = {
   programSlug: string;
   source: string;
+  grantedAt: string;
   accessExpiresAt: string | null;
 };
 

@@ -20,25 +20,42 @@ import {
   getProgramProgressPercent,
   PROGRESS_SAVE_ERROR,
 } from "@/lib/progress/helpers";
-import type { OwnedProgram, ProgramLesson } from "@/types/owned-program";
+import type {
+  LessonAccessEntitlement,
+  OwnedProgram,
+  ProgramLesson,
+} from "@/types/owned-program";
 
 type LessonPlayerClientProps = {
   program: OwnedProgram;
   lesson: ProgramLesson;
   completedLessonIds: string[];
+  entitlement: LessonAccessEntitlement | null;
 };
 
 export function LessonPlayerClient({
   program,
   lesson,
   completedLessonIds,
+  entitlement,
 }: LessonPlayerClientProps) {
   const [completedIds, setCompletedIds] = useState(completedLessonIds);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const completedSet = useMemo(() => new Set(completedIds), [completedIds]);
-  const resolvedLessons = resolveOwnedLessons(program, lesson.id, completedSet);
-  const navigation = getOwnedLessonNav(program, lesson.slug, completedSet);
+  const access = { entitlement };
+  const resolvedLessons = resolveOwnedLessons(
+    program,
+    lesson.id,
+    completedSet,
+    access,
+  );
+  const navigation = getOwnedLessonNav(
+    program,
+    lesson.slug,
+    completedSet,
+    access,
+  );
   const completed = completedSet.has(lesson.id);
   const displayPercent = getProgramProgressPercent(
     completedSet.size,

@@ -8,6 +8,29 @@ export type LessonAccessState =
   | "available"
   | "locked";
 
+export type LessonLockedReason =
+  | "prerequisite"
+  | "drip-time"
+  | "entitlement-expired"
+  | "unpublished";
+
+export type LessonAccessEntitlement = {
+  grantedAt: string;
+  accessExpiresAt: string | null;
+};
+
+export type LessonAccessOptions = {
+  entitlement?: LessonAccessEntitlement | null;
+  now?: Date;
+};
+
+export type LessonAccessResolution = {
+  status: LessonAccessState;
+  lockedReason: LessonLockedReason | null;
+  unlockAt: Date | null;
+  canOpen: boolean;
+};
+
 export type LessonMediaKind = "video" | "audio";
 
 export type LessonMediaProvider = "mock" | "mux" | "vimeo" | "youtube";
@@ -45,7 +68,8 @@ export type OwnedProgramHighlight = {
 };
 
 /**
- * Prepared for drip unlock. TASK 007 does not compute calendar dates.
+ * Raw drip fields from public.lessons. Unlock time is resolved server-side
+ * in lib/owned-program/access.ts — never from a client-supplied clock.
  */
 export type LessonDrip = {
   dayOffset?: number;
@@ -122,4 +146,8 @@ export type ResolvedLesson = ProgramLesson & {
   completed: boolean;
   locked: boolean;
   href: string;
+  lockedReason: LessonLockedReason | null;
+  /** ISO timestamp; display-only. Authorization uses server time. */
+  unlockAt: string | null;
+  unlockLabel: string | null;
 };

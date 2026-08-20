@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { LessonPlayerClient } from "@/components/lesson-player/LessonPlayerClient";
-import { requireProgramEntitlement } from "@/lib/auth/access";
+import {
+  getEntitlementForProgram,
+  requireProgramEntitlement,
+} from "@/lib/auth/access";
 import { getOwnedLesson } from "@/lib/content/owned-program";
 import { canOpenLesson, formatLessonHeading } from "@/lib/owned-program/access";
 import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
@@ -35,7 +38,9 @@ export async function generateMetadata({
 
 export default async function OwnedLessonPage({ params }: OwnedLessonPageProps) {
   const { slug, lessonSlug } = await params;
-  await requireProgramEntitlement(slug);
+  const access = await requireProgramEntitlement(slug);
+  const entitlement = getEntitlementForProgram(access, slug);
+  const now = new Date();
   const bundle = await getProgramWithCurriculum(slug);
   const program = bundle?.program;
   const lesson = program ? getOwnedLesson(program, lessonSlug) : undefined;
@@ -45,10 +50,17 @@ export default async function OwnedLessonPage({ params }: OwnedLessonPageProps) 
   }
 
   const rows = await getProgramLessonProgress(slug);
-  const progress = buildProgramProgressView(program, rows);
+  const progress = buildProgramProgressView(program, rows, {
+    entitlement,
+    now,
+  });
 
-  if (!canOpenLesson(program, lesson, progress.completedIds)) {
-    redirect(progress.continueHref || getOwnedProgramOverviewPath(slug));
+  if (!canOpenLesson(program, lesson, progress.completedIds, { entitlement, now })) {
+    const fallback =
+      progress.continueAvailable && progress.continueLesson?.slug !== lessonSlug
+        ? progress.continueHref
+        : getOwnedProgramOverviewPath(slug);
+    redirect(fallback);
   }
 
   await markLessonOpened(slug, lessonSlug);
@@ -59,6 +71,7 @@ export default async function OwnedLessonPage({ params }: OwnedLessonPageProps) 
       program={program}
       lesson={lesson}
       completedLessonIds={[...progress.completedIds]}
+      entitlement={entitlement}
     />
   );
 }

@@ -16,6 +16,7 @@ import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
 import type { ProgramProgressView } from "@/lib/progress/helpers";
 import type { Program } from "@/lib/programs/types";
 import type {
+  LessonAccessOptions,
   OwnedProgram,
   OwnedProgramHighlight,
 } from "@/types/owned-program";
@@ -61,26 +62,46 @@ export function getOwnedOverviewModel(
   program: OwnedProgram,
   progress: ProgramProgressView,
   identity: Program,
+  access?: LessonAccessOptions,
 ) {
-  const currentLesson = progress.continueLesson;
-  const lessons = currentLesson
-    ? resolveOwnedLessons(program, currentLesson.id, progress.completedIds)
-    : [];
+  const currentLesson = progress.continueAvailable
+    ? progress.continueLesson
+    : undefined;
+  const waitingLesson =
+    !progress.continueAvailable && !progress.isCompleted
+      ? progress.nextIncompleteLesson
+      : undefined;
+  const currentLessonId = currentLesson?.id ?? "";
+  const lessons = resolveOwnedLessons(
+    program,
+    currentLessonId,
+    progress.completedIds,
+    access,
+  );
   const extras = getLocalProgramDetailExtras(program.slug);
   const visibleLessonCount = getVisibleLessonCount(program);
   const materials = getOwnedProgramMaterials(program);
   const hasCurriculum = program.lessons.length > 0;
+  const focusLesson = currentLesson ?? waitingLesson ?? program.lessons[0];
+  const waitingMessage = waitingLesson
+    ? progress.nextUnlockLabel
+      ? `Naslednja lekcija bo na voljo ${progress.nextUnlockLabel}.`
+      : "Naslednja lekcija še ni na voljo."
+    : null;
 
   return {
     program,
     currentLesson,
+    waitingLesson,
+    waitingMessage,
     lessons,
     hasCurriculum,
     progressPercent: progress.progressPercent,
-    positionLabel: currentLesson
-      ? formatLessonPosition(currentLesson.day, program.totalDays)
+    positionLabel: focusLesson
+      ? formatLessonPosition(focusLesson.day, program.totalDays)
       : "Vsebina programa še ni na voljo",
     continueHref: progress.continueHref,
+    continueAvailable: progress.continueAvailable,
     overviewHref: getOwnedProgramOverviewPath(program.slug),
     primaryCtaLabel: getOwnedPrimaryCtaLabel(progress.progressPercent),
     isCompleted: progress.isCompleted,
@@ -95,6 +116,7 @@ export function getOwnedOverviewModel(
     highlights: getOwnedProgramHighlights(program),
     materials,
     sectionProgress: getSectionProgress(program, progress.completedIds),
+    focusLessonSlug: focusLesson?.slug ?? "",
   };
 }
 

@@ -9,7 +9,10 @@ import { OwnedMaterials } from "@/components/owned-overview/OwnedMaterials";
 import { OwnedProgramHero } from "@/components/owned-overview/OwnedProgramHero";
 import { OwnedProgramHighlights } from "@/components/owned-overview/OwnedProgramHighlights";
 import { SupportCard } from "@/components/my-programs/SupportCard";
-import { requireProgramEntitlement } from "@/lib/auth/access";
+import {
+  getEntitlementForProgram,
+  requireProgramEntitlement,
+} from "@/lib/auth/access";
 import { getOwnedOverviewModel } from "@/lib/owned-program/overview";
 import { buildProgramProgressView } from "@/lib/progress/helpers";
 import { getProgramLessonProgress } from "@/lib/progress/queries";
@@ -39,17 +42,25 @@ export default async function OwnedProgramOverviewPage({
   params,
 }: OwnedProgramOverviewPageProps) {
   const { slug } = await params;
-  await requireProgramEntitlement(slug);
+  const access = await requireProgramEntitlement(slug);
   const bundle = await getProgramWithCurriculum(slug);
 
   if (!bundle) {
     notFound();
   }
 
+  const entitlement = getEntitlementForProgram(access, slug);
+  const now = new Date();
   const { identity, program } = bundle;
   const rows = await getProgramLessonProgress(slug);
-  const progress = buildProgramProgressView(program, rows);
-  const model = getOwnedOverviewModel(program, progress, identity);
+  const progress = buildProgramProgressView(program, rows, {
+    entitlement,
+    now,
+  });
+  const model = getOwnedOverviewModel(program, progress, identity, {
+    entitlement,
+    now,
+  });
 
   return (
     <>
@@ -62,7 +73,7 @@ export default async function OwnedProgramOverviewPage({
 
       <OwnedProgramHero model={model} />
 
-      {model.hasCurriculum && model.currentLesson ? (
+      {model.hasCurriculum && (model.currentLesson || model.waitingLesson) ? (
         <div className="mt-5 grid grid-cols-1 gap-5 lg:mt-6 lg:grid-cols-[minmax(0,1fr)_21.5rem] lg:items-stretch lg:gap-6">
           <OwnedContinueCard model={model} />
           <OwnedProgramHighlights highlights={model.highlights} />
@@ -74,12 +85,12 @@ export default async function OwnedProgramOverviewPage({
       )}
 
       <div className="mt-5 lg:mt-6">
-        {model.hasCurriculum && model.currentLesson ? (
+        {model.hasCurriculum ? (
           <OwnedCurriculum
             sections={program.sections}
             lessons={model.lessons}
             sectionProgress={model.sectionProgress}
-            currentLessonSlug={model.currentLesson.slug}
+            currentLessonSlug={model.focusLessonSlug}
           />
         ) : (
           <OwnedCurriculumUnavailable />

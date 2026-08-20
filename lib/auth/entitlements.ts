@@ -70,6 +70,7 @@ function toProgramEntitlement(row: UserProgramRow): ProgramEntitlement {
   return {
     programSlug: row.program_slug,
     source: row.source,
+    grantedAt: row.granted_at,
     accessExpiresAt: row.access_expires_at,
   };
 }

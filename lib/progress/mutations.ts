@@ -1,7 +1,11 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getUserAccessContext, ownsProgram } from "@/lib/auth/access";
+import {
+  getEntitlementForProgram,
+  getUserAccessContext,
+  ownsProgram,
+} from "@/lib/auth/access";
 import { getOwnedLesson } from "@/lib/content/owned-program";
 import { canOpenLesson } from "@/lib/owned-program/access";
 import {
@@ -47,10 +51,15 @@ async function getProgressWriteContext(
   }
 
   const rows = await getProgramLessonProgress(programSlug);
-  const progress = buildProgramProgressView(program, rows);
+  const entitlement = getEntitlementForProgram(access, programSlug);
+  const now = new Date();
+  const progress = buildProgramProgressView(program, rows, {
+    entitlement,
+    now,
+  });
   const completedIds = progress.completedIds;
 
-  if (!canOpenLesson(program, lesson, completedIds)) {
+  if (!canOpenLesson(program, lesson, completedIds, { entitlement, now })) {
     return null;
   }
 

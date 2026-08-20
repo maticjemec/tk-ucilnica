@@ -19,6 +19,10 @@ export const dashboardHero: DashboardHeroContent = {
  * Leftover demo copy. Pregled uses getDashboardProgressSummary() from
  * owned-program percents (average). Continue/upcoming widgets below are
  * still mock content, filtered by entitlements.
+ *
+ * TASK 014: do not wire these widgets to drip-locked lesson routes.
+ * They are not backed by curriculum access resolution, so they stay mock
+ * rather than linking to a lesson the server would block.
  */
 export const dashboardProgress: DashboardProgress = {
   percent: 42,

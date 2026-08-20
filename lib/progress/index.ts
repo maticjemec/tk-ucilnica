@@ -8,6 +8,7 @@ export {
   getCompletedLessonSlugs,
   getContinueLesson,
   getFallbackContinueHref,
+  getNextIncompleteLesson,
   getOwnedProgramStatusLabel,
   getProgramProgressPercent,
   toCompletedLessonIds,

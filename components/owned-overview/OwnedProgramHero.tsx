@@ -99,7 +99,7 @@ export function OwnedProgramHero({ model }: OwnedProgramHeroProps) {
             </div>
           </div>
 
-          {model.hasCurriculum ? (
+          {model.hasCurriculum && model.continueAvailable ? (
             <ButtonLink
               href={continueHref}
               variant={isCompleted ? "success-outline" : "primary"}
@@ -111,7 +111,7 @@ export function OwnedProgramHero({ model }: OwnedProgramHeroProps) {
           ) : null}
         </div>
 
-        {model.hasCurriculum ? (
+        {model.hasCurriculum && model.continueAvailable ? (
           <div className="absolute top-5 right-5 hidden lg:block">
             <ButtonLink
               href={continueHref}

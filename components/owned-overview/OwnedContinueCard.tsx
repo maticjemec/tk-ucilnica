@@ -2,6 +2,7 @@ import { CirclePlay, Clock, Shield } from "lucide-react";
 import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { CoverMedia } from "@/components/dashboard/CoverMedia";
 import { ProgramPlaceholder } from "@/components/dashboard/visuals";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { formatLessonHeading } from "@/lib/owned-program/access";
 import type { OwnedOverviewModel } from "@/lib/owned-program/overview";
@@ -11,14 +12,24 @@ type OwnedContinueCardProps = {
 };
 
 export function OwnedContinueCard({ model }: OwnedContinueCardProps) {
-  const { program, currentLesson, continueHref, isCompleted, primaryCtaLabel } =
-    model;
+  const {
+    program,
+    currentLesson,
+    waitingLesson,
+    waitingMessage,
+    continueHref,
+    continueAvailable,
+    isCompleted,
+    primaryCtaLabel,
+  } = model;
+  const displayLesson = currentLesson ?? waitingLesson;
 
-  if (!currentLesson) {
+  if (!displayLesson) {
     return null;
   }
 
-  const heading = formatLessonHeading(currentLesson);
+  const heading = formatLessonHeading(displayLesson);
+  const waiting = Boolean(waitingLesson) && !continueAvailable;
   const ctaLabel = isCompleted ? primaryCtaLabel : "Nadaljuj lekcijo";
 
   return (
@@ -54,23 +65,33 @@ export function OwnedContinueCard({ model }: OwnedContinueCardProps) {
         <div className="min-w-0 flex-1">
           <p className="font-medium leading-snug text-foreground">{heading}</p>
           <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted">
-            {currentLesson.description}
+            {waiting
+              ? waitingMessage
+              : displayLesson.description}
           </p>
-          <p className="mt-2 inline-flex items-center gap-1.5 text-sm text-muted">
-            <Clock className="h-3.5 w-3.5 shrink-0" strokeWidth={1.6} aria-hidden />
-            {currentLesson.duration}
-          </p>
+          {waiting ? null : (
+            <p className="mt-2 inline-flex items-center gap-1.5 text-sm text-muted">
+              <Clock className="h-3.5 w-3.5 shrink-0" strokeWidth={1.6} aria-hidden />
+              {displayLesson.duration}
+            </p>
+          )}
         </div>
       </div>
 
-      <ButtonLink
-        href={continueHref}
-        variant={isCompleted ? "success-outline" : "primary"}
-        className="mt-5 w-full sm:w-auto"
-      >
-        <CirclePlay className="h-4 w-4" strokeWidth={1.6} aria-hidden />
-        {ctaLabel}
-      </ButtonLink>
+      {waiting ? (
+        <Button disabled className="mt-5 w-full sm:w-auto">
+          Naslednja lekcija še ni na voljo
+        </Button>
+      ) : (
+        <ButtonLink
+          href={continueHref}
+          variant={isCompleted ? "success-outline" : "primary"}
+          className="mt-5 w-full sm:w-auto"
+        >
+          <CirclePlay className="h-4 w-4" strokeWidth={1.6} aria-hidden />
+          {ctaLabel}
+        </ButtonLink>
+      )}
     </Card>
   );
 }

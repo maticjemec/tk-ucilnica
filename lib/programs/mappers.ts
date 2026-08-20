@@ -208,6 +208,7 @@ export function toPurchasedProgram(
     duration: program.duration,
     continueHref:
       progress?.continueHref ?? getFallbackContinueHref(program.slug),
+    continueAvailable: progress?.continueAvailable ?? true,
   };
 }
 

@@ -1,10 +1,23 @@
 import {
+  canOpenLesson,
+  isOwnedProgramCompleted,
+  resolveLessonAccess,
+} from "@/lib/owned-program/access";
+import {
+  formatUnlockDate,
+} from "@/lib/owned-program/datetime";
+import {
   getOwnedLessonPath,
   getOwnedProgramOverviewPath,
 } from "@/lib/owned-program/paths";
 import type { UserLessonProgressRow } from "@/lib/progress/types";
-import type { OwnedProgram, ProgramLesson } from "@/types/owned-program";
-import { canOpenLesson, isOwnedProgramCompleted } from "@/lib/owned-program/access";
+import type {
+  LessonAccessEntitlement,
+  LessonAccessOptions,
+  LessonLockedReason,
+  OwnedProgram,
+  ProgramLesson,
+} from "@/types/owned-program";
 
 export const PROGRESS_SAVE_ERROR =
   "Napredka ni bilo mogoče shraniti. Poskusi znova.";
@@ -66,20 +79,44 @@ export function toCompletedLessonIds(
 }
 
 /**
- * First incomplete accessible lesson, by lesson_order.
+ * First incomplete lesson that is currently accessible, by lesson_order.
+ * Future drip lessons are skipped. If the next incomplete lesson is still
+ * drip-locked (or otherwise inaccessible), returns undefined so callers
+ * can keep the overview usable instead of linking to locked content.
  * If every lesson is complete, return the first lesson (replay).
  */
 export function getContinueLesson(
   program: OwnedProgram,
   completedIds: ReadonlySet<string>,
+  access?: LessonAccessOptions,
 ): ProgramLesson | undefined {
   const ordered = [...program.lessons].sort((a, b) => a.order - b.order);
-  const nextIncomplete = ordered.find(
+  const nextIncompleteAccessible = ordered.find(
     (lesson) =>
-      !completedIds.has(lesson.id) && canOpenLesson(program, lesson, completedIds),
+      !completedIds.has(lesson.id) &&
+      canOpenLesson(program, lesson, completedIds, access),
   );
 
-  return nextIncomplete ?? ordered[0];
+  if (nextIncompleteAccessible) {
+    return nextIncompleteAccessible;
+  }
+
+  const hasIncomplete = ordered.some((lesson) => !completedIds.has(lesson.id));
+
+  if (hasIncomplete) {
+    return undefined;
+  }
+
+  return ordered[0];
+}
+
+export function getNextIncompleteLesson(
+  program: OwnedProgram,
+  completedIds: ReadonlySet<string>,
+) {
+  return [...program.lessons]
+    .sort((a, b) => a.order - b.order)
+    .find((lesson) => !completedIds.has(lesson.id));
 }
 
 export type ProgramProgressView = {
@@ -90,22 +127,58 @@ export type ProgramProgressView = {
   progressPercent: number;
   continueLesson?: ProgramLesson;
   continueHref: string;
+  continueAvailable: boolean;
+  nextIncompleteLesson?: ProgramLesson;
+  nextLockedReason: LessonLockedReason | null;
+  nextUnlockAt: string | null;
+  nextUnlockLabel: string | null;
   isCompleted: boolean;
 };
 
 export function buildProgramProgressView(
   program: OwnedProgram,
   rows: readonly UserLessonProgressRow[],
+  access?: LessonAccessOptions,
 ): ProgramProgressView {
   const completedSlugs = getCompletedLessonSlugs(program, rows);
   const completedIds = toCompletedLessonIds(program, completedSlugs);
-  const continueLesson = getContinueLesson(program, completedIds);
+  const now = access?.now ?? new Date();
+  const continueLesson = getContinueLesson(program, completedIds, {
+    entitlement: access?.entitlement,
+    now,
+  });
+  const nextIncompleteLesson = getNextIncompleteLesson(program, completedIds);
   const totalLessons = program.lessons.length;
   const completedCount = completedIds.size;
   const progressPercent = getProgramProgressPercent(
     completedCount,
     totalLessons,
   );
+  const isCompleted = totalLessons > 0 && isOwnedProgramCompleted(progressPercent);
+  const continueAvailable = Boolean(
+    continueLesson &&
+      (isCompleted || !completedIds.has(continueLesson.id)),
+  );
+
+  let nextLockedReason: LessonLockedReason | null = null;
+  let nextUnlockAt: string | null = null;
+  let nextUnlockLabel: string | null = null;
+
+  if (nextIncompleteLesson && !continueAvailable) {
+    const resolution = resolveLessonAccess({
+      lesson: nextIncompleteLesson,
+      lessons: program.lessons,
+      completedIds,
+      unlockMode: program.unlockMode,
+      entitlement: access?.entitlement,
+      now,
+    });
+    nextLockedReason = resolution.lockedReason;
+    nextUnlockAt = resolution.unlockAt?.toISOString() ?? null;
+    nextUnlockLabel = resolution.unlockAt
+      ? formatUnlockDate(resolution.unlockAt, now)
+      : null;
+  }
 
   return {
     completedSlugs,
@@ -114,21 +187,38 @@ export function buildProgramProgressView(
     totalLessons,
     progressPercent,
     continueLesson,
-    continueHref: continueLesson
-      ? getOwnedLessonPath(program.slug, continueLesson.slug)
-      : getFallbackContinueHref(program.slug),
-    isCompleted: totalLessons > 0 && isOwnedProgramCompleted(progressPercent),
+    continueHref:
+      continueAvailable && continueLesson
+        ? getOwnedLessonPath(program.slug, continueLesson.slug)
+        : getFallbackContinueHref(program.slug),
+    continueAvailable,
+    nextIncompleteLesson,
+    nextLockedReason,
+    nextUnlockAt,
+    nextUnlockLabel,
+    isCompleted,
   };
 }
 
 export function buildOwnedProgressBySlug(
   programs: readonly OwnedProgram[],
   rows: readonly UserLessonProgressRow[],
+  entitlementsBySlug: ReadonlyMap<
+    string,
+    LessonAccessEntitlement | null | undefined
+  > = new Map(),
+  now = new Date(),
 ) {
   const views = new Map<string, ProgramProgressView>();
 
   for (const program of programs) {
-    views.set(program.slug, buildProgramProgressView(program, rows));
+    views.set(
+      program.slug,
+      buildProgramProgressView(program, rows, {
+        entitlement: entitlementsBySlug.get(program.slug) ?? null,
+        now,
+      }),
+    );
   }
 
   return views;

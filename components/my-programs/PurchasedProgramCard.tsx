@@ -86,13 +86,22 @@ export function PurchasedProgramCard({ program }: PurchasedProgramCardProps) {
                 <RotateCcw className="h-4 w-4" strokeWidth={1.6} aria-hidden />
                 Ponovi program
               </ButtonLink>
-            ) : (
+            ) : program.continueAvailable ? (
               <ButtonLink
                 href={continueHref}
                 className="w-full md:w-auto md:min-w-[10.5rem] lg:w-full"
               >
                 <CirclePlay className="h-4 w-4" strokeWidth={1.6} aria-hidden />
                 Nadaljuj
+              </ButtonLink>
+            ) : (
+              <ButtonLink
+                href={ownedOverviewHref}
+                variant="outline"
+                className="w-full md:w-auto md:min-w-[10.5rem] lg:w-full"
+              >
+                <BookOpen className="h-4 w-4" strokeWidth={1.6} aria-hidden />
+                Poglej program
               </ButtonLink>
             )}
             <a

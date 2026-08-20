@@ -9,4 +9,5 @@ export type PurchasedProgram = DashboardProgram & {
   lessons: string;
   duration: string;
   continueHref: string;
+  continueAvailable: boolean;
 };

@@ -13,6 +13,7 @@ import {
 } from "@/lib/owned-program/access";
 import { getOwnedLessonPath } from "@/lib/owned-program/paths";
 import type {
+  LessonAccessOptions,
   LessonResource,
   OwnedProgram,
   OwnedProgramMaterial,
@@ -892,11 +893,13 @@ export function getOwnedLessonNav(
   program: OwnedProgram,
   lessonSlug: string,
   completedIds: ReadonlySet<string>,
+  access?: LessonAccessOptions,
 ) {
   const { previous, next } = getAccessibleAdjacentLessons(
     program,
     lessonSlug,
     completedIds,
+    access,
   );
 
   return {

@@ -9,6 +9,7 @@ export type {
 } from "@/lib/auth/types";
 
 export {
+  getEntitlementForProgram,
   getOwnedProgramSlugs,
   getUserAccessContext,
   ownsProgram,
