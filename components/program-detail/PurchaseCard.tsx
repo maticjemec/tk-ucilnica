@@ -1,19 +1,18 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, useTransition } from "react";
 import { Gift, X } from "lucide-react";
 import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { getLoginPath } from "@/lib/auth/redirects";
+import { startProgramCheckoutAction } from "@/lib/billing/actions";
 import { cn } from "@/lib/cn";
 import { formatCatalogPrice } from "@/lib/content/catalog";
 import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
 import { programDetailIcons } from "@/components/program-detail/icons";
 import type { ProgramDetail } from "@/types/program-detail";
 
-const purchaseMessage =
-  "Nakup bo omogočen po povezavi uporabniškega in plačilnega sistema.";
 const giftMessage = "Darilni nakup bo omogočen kmalu.";
 
 type PurchaseCardProps = {
@@ -50,13 +49,7 @@ export function PurchaseCard({
             Odpri program
           </ButtonLink>
         ) : isAuthenticated ? (
-          <Button
-            className="w-full"
-            size="lg"
-            onClick={() => setNotice(purchaseMessage)}
-          >
-            Vključi se v program
-          </Button>
+          <CheckoutButton programSlug={program.slug} />
         ) : (
           <ButtonLink
             href={getLoginPath(programPath)}
@@ -107,6 +100,42 @@ export function PurchaseCard({
         onClose={() => setNotice(null)}
       />
     </Card>
+  );
+}
+
+function CheckoutButton({ programSlug }: { programSlug: string }) {
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  function onClick() {
+    if (pending) {
+      return;
+    }
+
+    setError(null);
+    startTransition(() => {
+      void startProgramCheckoutAction(programSlug).then((result) => {
+        if (result?.error) {
+          setError(result.error);
+        }
+      });
+    });
+  }
+
+  return (
+    <>
+      <Button
+        className="w-full"
+        size="lg"
+        disabled={pending}
+        onClick={onClick}
+      >
+        {pending ? "Pripravljam plačilo…" : "Vključi se v program"}
+      </Button>
+      {error ? (
+        <p className="text-sm leading-relaxed text-danger">{error}</p>
+      ) : null}
+    </>
   );
 }
 
