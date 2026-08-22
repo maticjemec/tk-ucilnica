@@ -99,12 +99,12 @@ export type ProgramLesson = {
    */
   videoSrc?: string;
   /**
-   * Legacy lessons.audio_url fallback only (http/https).
+   * Server-signed audio URL, or legacy lessons.audio_url (http/https).
    * audio_path is never copied here.
    */
   audioSrc?: string;
   /**
-   * Legacy lessons.worksheet_url fallback only (http/https).
+   * Server-signed worksheet URL, or legacy lessons.worksheet_url (http/https).
    * worksheet_path is never copied here.
    */
   worksheetSrc?: string;

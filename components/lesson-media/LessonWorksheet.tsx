@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import type { LessonWorksheetSource } from "@/lib/media/types";
 
-const MOCK_DOWNLOAD_MESSAGE =
-  "Prenos bo na voljo, ko povežemo shrambo datotek.";
+const UNAVAILABLE_DOWNLOAD_MESSAGE = "Prenos trenutno ni na voljo.";
 
 type LessonWorksheetProps = {
   worksheet: LessonWorksheetSource;
@@ -52,7 +51,7 @@ export function LessonWorksheet({
           ) : (
             <Button
               className="mt-5 w-full sm:w-auto"
-              onClick={() => setMessage(MOCK_DOWNLOAD_MESSAGE)}
+              onClick={() => setMessage(UNAVAILABLE_DOWNLOAD_MESSAGE)}
             >
               <Download className="h-4 w-4" strokeWidth={1.6} aria-hidden />
               Prenesi

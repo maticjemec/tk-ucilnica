@@ -6,6 +6,11 @@ import {
   requireProgramEntitlement,
 } from "@/lib/auth/access";
 import { getOwnedLesson } from "@/lib/content/owned-program";
+import {
+  applySignedLessonMedia,
+  getSignedLessonAudioUrl,
+  getSignedLessonWorksheetUrl,
+} from "@/lib/media/server";
 import { canOpenLesson, formatLessonHeading } from "@/lib/owned-program/access";
 import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
 import { buildProgramProgressView } from "@/lib/progress/helpers";
@@ -65,11 +70,20 @@ export default async function OwnedLessonPage({ params }: OwnedLessonPageProps) 
 
   await markLessonOpened(slug, lessonSlug);
 
+  const [audioUrl, worksheetUrl] = await Promise.all([
+    getSignedLessonAudioUrl(slug, lessonSlug),
+    getSignedLessonWorksheetUrl(slug, lessonSlug),
+  ]);
+  const playableLesson = applySignedLessonMedia(lesson, {
+    audioUrl,
+    worksheetUrl,
+  });
+
   return (
     <LessonPlayerClient
-      key={lesson.id}
+      key={playableLesson.id}
       program={program}
-      lesson={lesson}
+      lesson={playableLesson}
       completedLessonIds={[...progress.completedIds]}
       entitlement={entitlement}
     />

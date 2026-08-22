@@ -81,8 +81,7 @@ export function LessonMaterials({ resources }: LessonMaterialsProps) {
                 onMockDownload={() => {
                   setMessageById((current) => ({
                     ...current,
-                    [resource.id]:
-                      "Prenos bo na voljo, ko povežemo shrambo datotek.",
+                    [resource.id]: "Prenos trenutno ni na voljo.",
                   }));
                 }}
               />

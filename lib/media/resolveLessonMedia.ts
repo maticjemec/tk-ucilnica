@@ -56,10 +56,10 @@ function worksheetOf(lesson: ProgramLesson): ResolvedLessonMedia["worksheet"] {
 /**
  * Single lesson-content resolver.
  *
- * Mixed lessons only surface blocks that actually exist (non-empty URLs
- * for video/audio/worksheet). Typed video/audio/worksheet lessons still
- * render their primary surface when the URL is null — as a polished
- * mock/placeholder, not an empty hole.
+ * Mixed lessons only surface blocks that actually exist (signed or
+ * legacy URLs for video/audio/worksheet). Typed video/audio/worksheet
+ * lessons still render their primary surface when the URL is null —
+ * as a polished mock/placeholder, not an empty hole.
  */
 export function resolveLessonMedia(lesson: ProgramLesson): ResolvedLessonMedia {
   const contentType = inferContentType(lesson);
