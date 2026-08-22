@@ -1,5 +1,7 @@
 import type {
   LessonRow,
+  LessonVideoProviderDb,
+  LessonVideoStatusDb,
   ProgramContentType,
   ProgramSectionRow,
   ProgramUnlockModeDb,
@@ -29,6 +31,14 @@ const UNLOCK_MODES: readonly ProgramUnlockModeDb[] = [
   "all",
   "sequential",
   "drip",
+];
+
+const VIDEO_PROVIDERS: readonly LessonVideoProviderDb[] = ["mux"];
+
+const VIDEO_STATUSES: readonly LessonVideoStatusDb[] = [
+  "preparing",
+  "ready",
+  "errored",
 ];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -72,6 +82,55 @@ function parseUnlockMode(
   return UNLOCK_MODES.includes(value as ProgramUnlockModeDb)
     ? (value as ProgramUnlockModeDb)
     : undefined;
+}
+
+function parseVideoProvider(
+  value: unknown,
+): LessonVideoProviderDb | null | undefined {
+  if (value == null) {
+    return null;
+  }
+
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  return VIDEO_PROVIDERS.includes(value as LessonVideoProviderDb)
+    ? (value as LessonVideoProviderDb)
+    : undefined;
+}
+
+function parseVideoStatus(
+  value: unknown,
+): LessonVideoStatusDb | null | undefined {
+  if (value == null) {
+    return null;
+  }
+
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  return VIDEO_STATUSES.includes(value as LessonVideoStatusDb)
+    ? (value as LessonVideoStatusDb)
+    : undefined;
+}
+
+/**
+ * Legacy *_url fallback only. Storage paths and Mux IDs are not URLs.
+ */
+function legacyPublicUrl(value: string | null): string | undefined {
+  const trimmed = value?.trim();
+
+  if (!trimmed) {
+    return undefined;
+  }
+
+  if (trimmed.startsWith("https://") || trimmed.startsWith("http://")) {
+    return trimmed;
+  }
+
+  return undefined;
 }
 
 export function parseProgramSectionRow(
@@ -130,6 +189,10 @@ export function parseLessonRow(value: unknown): LessonRow | null {
   const videoUrl = readOptionalString(value.video_url);
   const audioUrl = readOptionalString(value.audio_url);
   const worksheetUrl = readOptionalString(value.worksheet_url);
+  const videoPlaybackId = readOptionalString(value.video_playback_id);
+  const videoAssetId = readOptionalString(value.video_asset_id);
+  const audioPath = readOptionalString(value.audio_path);
+  const worksheetPath = readOptionalString(value.worksheet_path);
   const unlockAt = readOptionalString(value.unlock_at);
   const durationMinutes =
     value.duration_minutes == null
@@ -143,8 +206,14 @@ export function parseLessonRow(value: unknown): LessonRow | null {
   }
 
   const unlockMode = parseUnlockMode(value.unlock_mode);
+  const videoProvider = parseVideoProvider(value.video_provider);
+  const videoStatus = parseVideoStatus(value.video_status);
 
-  if (unlockMode === undefined) {
+  if (
+    unlockMode === undefined ||
+    videoProvider === undefined ||
+    videoStatus === undefined
+  ) {
     return null;
   }
 
@@ -162,6 +231,10 @@ export function parseLessonRow(value: unknown): LessonRow | null {
     videoUrl === undefined ||
     audioUrl === undefined ||
     worksheetUrl === undefined ||
+    videoPlaybackId === undefined ||
+    videoAssetId === undefined ||
+    audioPath === undefined ||
+    worksheetPath === undefined ||
     unlockAt === undefined ||
     durationMinutes === undefined ||
     dayOffset === undefined ||
@@ -184,6 +257,12 @@ export function parseLessonRow(value: unknown): LessonRow | null {
     video_url: videoUrl,
     audio_url: audioUrl,
     worksheet_url: worksheetUrl,
+    video_provider: videoProvider,
+    video_playback_id: videoPlaybackId,
+    video_asset_id: videoAssetId,
+    video_status: videoStatus,
+    audio_path: audioPath,
+    worksheet_path: worksheetPath,
     is_preview: value.is_preview,
     is_published: value.is_published,
     unlock_mode: unlockMode,
@@ -219,9 +298,11 @@ export function resolveLessonUnlockMode(
 
 function toProgramLesson(programSlug: string, row: LessonRow): ProgramLesson {
   const timing = lessonDuration(row.duration_minutes);
-  const videoSrc = row.video_url?.trim() || undefined;
-  const audioSrc = row.audio_url?.trim() || undefined;
-  const worksheetSrc = row.worksheet_url?.trim() || undefined;
+  // Identity/path columns stay on LessonRow. Only http(s) legacy *_url
+  // values reach the browser-facing ProgramLesson src slots.
+  const videoSrc = legacyPublicUrl(row.video_url);
+  const audioSrc = legacyPublicUrl(row.audio_url);
+  const worksheetSrc = legacyPublicUrl(row.worksheet_url);
   const src = videoSrc || audioSrc;
   const unlockMode = row.unlock_mode ?? undefined;
   const resources = worksheetSrc

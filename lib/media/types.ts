@@ -1,11 +1,13 @@
 /**
  * Provider-neutral lesson media types.
  *
- * DB fields stay video_url / audio_url / worksheet_url.
+ * Canonical DB identity is video_provider / video_playback_id /
+ * video_asset_id / audio_path / worksheet_path.
+ * Legacy video_url / audio_url / worksheet_url are fallbacks only.
  * UI reads this resolved shape — never those column names.
  *
- * Video `src` may later be an HLS URL, signed URL, or playback ID
- * companion. Audio `src` may later be a Supabase Storage signed URL.
+ * Video `src` is a resolved playable URL, never a Mux ID or storage path.
+ * Audio `src` is a resolved signed URL, never audio_path.
  * Worksheet `signedDownloadUrl` is the only download slot; do not treat
  * it as a permanent private file URL.
  */

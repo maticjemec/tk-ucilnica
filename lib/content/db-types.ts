@@ -15,6 +15,12 @@ export type ProgramContentType =
 
 export type ProgramUnlockModeDb = "all" | "sequential" | "drip";
 
+/** Hosted video provider on public.lessons. null = placeholder. */
+export type LessonVideoProviderDb = "mux";
+
+/** Mux processing state on public.lessons. Playback only when ready. */
+export type LessonVideoStatusDb = "preparing" | "ready" | "errored";
+
 /**
  * Canonical program identity. Must match user_programs.program_slug
  * and local catalog / owned-program slugs.
@@ -71,9 +77,18 @@ export type LessonRow = {
   lesson_order: number;
   duration_minutes: number | null;
   content_type: ProgramContentType;
+  /** @deprecated Legacy fallback only. Prefer video_playback_id. */
   video_url: string | null;
+  /** @deprecated Legacy fallback only. Prefer audio_path. */
   audio_url: string | null;
+  /** @deprecated Legacy fallback only. Prefer worksheet_path. */
   worksheet_url: string | null;
+  video_provider: LessonVideoProviderDb | null;
+  video_playback_id: string | null;
+  video_asset_id: string | null;
+  video_status: LessonVideoStatusDb | null;
+  audio_path: string | null;
+  worksheet_path: string | null;
   is_preview: boolean;
   is_published: boolean;
   unlock_mode: ProgramUnlockModeDb | null;

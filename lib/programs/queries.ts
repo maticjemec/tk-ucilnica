@@ -17,7 +17,7 @@ const PROGRAMS_TABLE = "programs";
 const PROGRAM_COLUMNS =
   "id, slug, title, subtitle, short_description, long_description, category, category_label, price_cents, currency, duration_label, difficulty, lesson_count, is_published, is_featured, sort_order, cover_image_url, created_at, updated_at";
 
-const CURRICULUM_SELECT = `${PROGRAM_COLUMNS}, program_sections ( id, program_id, title, description, section_order, created_at, updated_at ), lessons ( id, program_id, section_id, slug, title, description, lesson_order, duration_minutes, content_type, video_url, audio_url, worksheet_url, is_preview, is_published, unlock_mode, unlock_at, day_offset, created_at, updated_at )`;
+const CURRICULUM_SELECT = `${PROGRAM_COLUMNS}, program_sections ( id, program_id, title, description, section_order, created_at, updated_at ), lessons ( id, program_id, section_id, slug, title, description, lesson_order, duration_minutes, content_type, video_url, audio_url, worksheet_url, video_provider, video_playback_id, video_asset_id, video_status, audio_path, worksheet_path, is_preview, is_published, unlock_mode, unlock_at, day_offset, created_at, updated_at )`;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;

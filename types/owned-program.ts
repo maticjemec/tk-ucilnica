@@ -93,11 +93,20 @@ export type ProgramLesson = {
   duration: string;
   durationSeconds: number;
   contentType?: LessonContentType;
-  /** Mapped from lessons.video_url. Hosted/HLS/signed URL later. */
+  /**
+   * Legacy lessons.video_url fallback only (http/https).
+   * Mux identity lives on LessonRow and is not a playable URL.
+   */
   videoSrc?: string;
-  /** Mapped from lessons.audio_url. Storage signed URL later. */
+  /**
+   * Legacy lessons.audio_url fallback only (http/https).
+   * audio_path is never copied here.
+   */
   audioSrc?: string;
-  /** Mapped from lessons.worksheet_url. Storage signed URL later. */
+  /**
+   * Legacy lessons.worksheet_url fallback only (http/https).
+   * worksheet_path is never copied here.
+   */
   worksheetSrc?: string;
   media: LessonMedia;
   resources: LessonResource[];

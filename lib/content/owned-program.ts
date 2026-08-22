@@ -832,7 +832,7 @@ export function getLocalOwnedProgramMaterials(slug: string) {
 }
 
 /**
- * TASK 013C: worksheet label fallback when public.lessons.worksheet_url is null.
+ * TASK 013C: worksheet label fallback when worksheet_url / worksheet_path are null.
  * Only for programs that still have local owned extras.
  */
 export function getLocalLessonWorksheet(
