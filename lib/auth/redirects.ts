@@ -106,6 +106,10 @@ export function isProtectedPath(pathname: string) {
     return true;
   }
 
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+    return true;
+  }
+
   return false;
 }
 
