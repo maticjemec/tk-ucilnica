@@ -1,4 +1,4 @@
-import type { LessonContentType } from "@/lib/media/types";
+import type { LessonContentType, LessonMuxPlayback } from "@/lib/media/types";
 import type { ProgramVisualId } from "@/types/dashboard";
 
 export type ProgramUnlockMode = "all" | "sequential" | "drip";
@@ -95,9 +95,14 @@ export type ProgramLesson = {
   contentType?: LessonContentType;
   /**
    * Legacy lessons.video_url fallback only (http/https).
-   * Mux identity lives on LessonRow and is not a playable URL.
+   * Production Mux playback uses videoPlayback, never this field.
    */
   videoSrc?: string;
+  /**
+   * Server-signed Mux playback for the current authorized lesson.
+   * Never includes video_asset_id or signing credentials.
+   */
+  videoPlayback?: LessonMuxPlayback;
   /**
    * Server-signed audio URL, or legacy lessons.audio_url (http/https).
    * audio_path is never copied here.

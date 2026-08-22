@@ -1,10 +1,12 @@
 import "server-only";
 
+import type { LessonMuxPlayback } from "@/lib/media/types";
 import type { ProgramLesson } from "@/types/owned-program";
 
 type SignedLessonMedia = {
   audioUrl: string | null;
   worksheetUrl: string | null;
+  video?: LessonMuxPlayback | null;
 };
 
 /**
@@ -53,10 +55,16 @@ export function applySignedLessonMedia(
     ...lesson,
     audioSrc,
     worksheetSrc,
+    videoPlayback: signed.video ?? lesson.videoPlayback,
     media: {
       ...lesson.media,
       ...(lesson.media.kind === "audio" && audioSrc
         ? { src: audioSrc, provider: "hosted" as const }
+        : {}),
+      ...(signed.video?.state === "ready" && signed.video.playbackId
+        ? {
+            playbackId: signed.video.playbackId,
+          }
         : {}),
     },
     resources,

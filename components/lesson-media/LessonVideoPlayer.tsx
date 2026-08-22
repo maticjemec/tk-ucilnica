@@ -60,7 +60,11 @@ export function LessonVideoPlayer({
 }: LessonVideoPlayerProps) {
   const containerRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const usesElement = Boolean(source.src);
+  const isMux = source.provider === "mux";
+  const usesMuxPlayer = Boolean(
+    isMux && source.playbackId && source.playbackToken && !source.unavailableReason,
+  );
+  const usesElement = Boolean(source.src) && !isMux;
   const mock = useMockPlayback(durationSeconds);
   const element = useElementPlayback(videoRef, durationSeconds);
   const playback = usesElement ? element : mock;
@@ -113,9 +117,11 @@ export function LessonVideoPlayer({
         videoRef={videoRef}
       />
 
+      {isMux ? null : (
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
+      )}
 
-      {!playback.isPlaying ? (
+      {!isMux && !playback.isPlaying ? (
         <button
           type="button"
           onClick={playback.togglePlaying}
@@ -134,6 +140,7 @@ export function LessonVideoPlayer({
         </button>
       ) : null}
 
+      {usesMuxPlayer || isMux ? null : (
       <div className="absolute inset-x-0 bottom-0 z-[1] bg-gradient-to-t from-black/80 via-black/55 to-transparent px-2.5 pt-10 pb-2.5 sm:px-3.5 sm:pb-3">
         <div className="flex items-center gap-2 text-white sm:gap-3">
           <MediaIconButton
@@ -240,6 +247,7 @@ export function LessonVideoPlayer({
           </MediaIconButton>
         </div>
       </div>
+      )}
     </section>
   );
 }

@@ -7,7 +7,7 @@ import {
 } from "@/lib/supabase/env";
 
 /**
- * Privileged server client for Storage signing only.
+ * Privileged server client for Storage signing and trusted lesson updates.
  *
  * Uses SUPABASE_SERVICE_ROLE_KEY. Never import from client components.
  * Do not persist or refresh an auth session on this client.

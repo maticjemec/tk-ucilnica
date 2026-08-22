@@ -3,6 +3,8 @@
 import type { RefObject } from "react";
 import { CoverMedia } from "@/components/dashboard/CoverMedia";
 import { ProgramPlaceholder } from "@/components/dashboard/visuals";
+import { MuxVideoSurface } from "@/components/lesson-media/video/MuxVideoSurface";
+import { VideoUnavailableState } from "@/components/lesson-media/video/VideoUnavailableState";
 import type { LessonVideoSource } from "@/lib/media/types";
 import type { ProgramVisualId } from "@/types/dashboard";
 
@@ -18,8 +20,9 @@ type VideoProviderAdapterProps = {
 /**
  * Provider-neutral video surface.
  *
- * hosted / hls → HTML5 <video> (HLS adapter can replace Html5VideoSurface later).
- * mock → existing cover placeholder. No Mux/Cloudflare SDKs.
+ * mux → MuxVideoSurface (signed HLS) or a safe unavailable state.
+ * hosted / hls → HTML5 <video>.
+ * mock → existing cover placeholder.
  */
 export function VideoProviderAdapter({
   source,
@@ -29,6 +32,25 @@ export function VideoProviderAdapter({
   imageAlt,
   videoRef,
 }: VideoProviderAdapterProps) {
+  if (source.provider === "mux") {
+    if (
+      source.unavailableReason ||
+      !source.playbackId ||
+      !source.playbackToken
+    ) {
+      return (
+        <VideoUnavailableState
+          reason={source.unavailableReason ?? "unavailable"}
+          visual={visual}
+          imageSrc={imageSrc}
+          imageAlt={imageAlt}
+        />
+      );
+    }
+
+    return <MuxVideoSurface source={source} title={title} />;
+  }
+
   if (source.provider === "mock" || !source.src) {
     return (
       <CoverMedia

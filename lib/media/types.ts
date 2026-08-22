@@ -19,14 +19,31 @@ export type LessonContentType =
   | "worksheet"
   | "mixed";
 
-export type LessonVideoProvider = "mock" | "hosted" | "hls";
+export type LessonVideoProvider = "mock" | "hosted" | "hls" | "mux";
 
 export type LessonAudioProvider = "mock" | "hosted";
+
+export type LessonVideoUnavailableReason =
+  | "preparing"
+  | "errored"
+  | "unavailable";
+
+export type LessonMuxPlayback = {
+  state: "ready" | LessonVideoUnavailableReason;
+  playbackId?: string;
+  playbackToken?: string;
+  thumbnailToken?: string;
+  storyboardToken?: string;
+};
 
 export type LessonVideoSource = {
   provider: LessonVideoProvider;
   src?: string;
   playbackId?: string;
+  playbackToken?: string;
+  thumbnailToken?: string;
+  storyboardToken?: string;
+  unavailableReason?: LessonVideoUnavailableReason;
 };
 
 export type LessonAudioSource = {

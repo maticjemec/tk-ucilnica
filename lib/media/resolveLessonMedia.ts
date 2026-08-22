@@ -1,4 +1,8 @@
-import type { LessonContentType, ResolvedLessonMedia } from "@/lib/media/types";
+import type {
+  LessonContentType,
+  LessonVideoSource,
+  ResolvedLessonMedia,
+} from "@/lib/media/types";
 import type { ProgramLesson } from "@/types/owned-program";
 
 function inferContentType(lesson: ProgramLesson): LessonContentType {
@@ -27,6 +31,29 @@ function audioSrcOf(lesson: ProgramLesson) {
   return lesson.audioSrc?.trim() || (
     lesson.media.kind === "audio" ? lesson.media.src?.trim() : undefined
   );
+}
+
+function muxVideoOf(lesson: ProgramLesson): LessonVideoSource | null {
+  const mux = lesson.videoPlayback;
+
+  if (!mux) {
+    return null;
+  }
+
+  if (mux.state === "ready" && mux.playbackId && mux.playbackToken) {
+    return {
+      provider: "mux",
+      playbackId: mux.playbackId,
+      playbackToken: mux.playbackToken,
+      thumbnailToken: mux.thumbnailToken,
+      storyboardToken: mux.storyboardToken,
+    };
+  }
+
+  return {
+    provider: "mux",
+    unavailableReason: mux.state === "ready" ? "unavailable" : mux.state,
+  };
 }
 
 function worksheetOf(lesson: ProgramLesson): ResolvedLessonMedia["worksheet"] {
@@ -63,13 +90,15 @@ function worksheetOf(lesson: ProgramLesson): ResolvedLessonMedia["worksheet"] {
  */
 export function resolveLessonMedia(lesson: ProgramLesson): ResolvedLessonMedia {
   const contentType = inferContentType(lesson);
-  const videoSrc = videoSrcOf(lesson) || undefined;
+  const muxVideo = muxVideoOf(lesson);
+  const videoSrc = muxVideo ? undefined : videoSrcOf(lesson) || undefined;
   const audioSrc = audioSrcOf(lesson) || undefined;
   const text = lesson.description.trim() || null;
   const worksheetSrc = lesson.worksheetSrc?.trim() || undefined;
 
   const hasVideo =
-    contentType === "video" || (contentType === "mixed" && Boolean(videoSrc));
+    contentType === "video" ||
+    (contentType === "mixed" && Boolean(videoSrc || muxVideo));
   const hasAudio =
     contentType === "audio" || (contentType === "mixed" && Boolean(audioSrc));
   const hasText =
@@ -86,10 +115,9 @@ export function resolveLessonMedia(lesson: ProgramLesson): ResolvedLessonMedia {
     hasWorksheet,
     primaryMediaType: contentType,
     video: hasVideo
-      ? {
+      ? muxVideo ?? {
           provider: videoSrc ? inferVideoProvider(videoSrc) : "mock",
           src: videoSrc,
-          playbackId: lesson.media.playbackId,
         }
       : null,
     audio: hasAudio

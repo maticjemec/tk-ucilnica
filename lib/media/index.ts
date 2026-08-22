@@ -4,8 +4,10 @@ export type {
   LessonAudioSource,
   LessonContentType,
   LessonDetailsSlots,
+  LessonMuxPlayback,
   LessonVideoProvider,
   LessonVideoSource,
+  LessonVideoUnavailableReason,
   LessonWorksheetSource,
   ResolvedLessonMedia,
 } from "@/lib/media/types";

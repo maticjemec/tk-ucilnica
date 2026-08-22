@@ -9,6 +9,7 @@ import { getOwnedLesson } from "@/lib/content/owned-program";
 import {
   applySignedLessonMedia,
   getSignedLessonAudioUrl,
+  getSignedLessonVideoPlayback,
   getSignedLessonWorksheetUrl,
 } from "@/lib/media/server";
 import { canOpenLesson, formatLessonHeading } from "@/lib/owned-program/access";
@@ -70,13 +71,15 @@ export default async function OwnedLessonPage({ params }: OwnedLessonPageProps) 
 
   await markLessonOpened(slug, lessonSlug);
 
-  const [audioUrl, worksheetUrl] = await Promise.all([
+  const [audioUrl, worksheetUrl, video] = await Promise.all([
     getSignedLessonAudioUrl(slug, lessonSlug),
     getSignedLessonWorksheetUrl(slug, lessonSlug),
+    getSignedLessonVideoPlayback(slug, lessonSlug),
   ]);
   const playableLesson = applySignedLessonMedia(lesson, {
     audioUrl,
     worksheetUrl,
+    video,
   });
 
   return (

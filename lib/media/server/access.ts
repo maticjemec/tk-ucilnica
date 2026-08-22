@@ -6,8 +6,12 @@ import {
   getUserAccessContext,
   ownsProgram,
 } from "@/lib/auth/access";
-import { IDENTITY_SLUG } from "@/lib/media/server/constants";
+import type {
+  LessonVideoProviderDb,
+  LessonVideoStatusDb,
+} from "@/lib/content/db-types";
 import { getOwnedLesson } from "@/lib/content/owned-program";
+import { IDENTITY_SLUG } from "@/lib/media/server/constants";
 import { canOpenLesson } from "@/lib/owned-program/access";
 import { buildProgramProgressView } from "@/lib/progress/helpers";
 import { getProgramLessonProgress } from "@/lib/progress/queries";
@@ -28,6 +32,9 @@ export type LessonMediaAccess =
       lessonId: string;
       audioPath: string | null;
       worksheetPath: string | null;
+      videoProvider: LessonVideoProviderDb | null;
+      videoPlaybackId: string | null;
+      videoStatus: LessonVideoStatusDb | null;
     }
   | {
       ok: false;
@@ -48,12 +55,22 @@ function readOptionalPath(value: unknown) {
     : null;
 }
 
+function readVideoProvider(value: unknown): LessonVideoProviderDb | null {
+  return value === "mux" ? "mux" : null;
+}
+
+function readVideoStatus(value: unknown): LessonVideoStatusDb | null {
+  return value === "preparing" || value === "ready" || value === "errored"
+    ? value
+    : null;
+}
+
 async function loadLessonMediaPaths(programSlug: string, lessonSlug: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("lessons")
     .select(
-      "audio_path, worksheet_path, slug, is_published, programs!inner ( slug, is_published )",
+      "audio_path, worksheet_path, video_provider, video_playback_id, video_status, slug, is_published, programs!inner ( slug, is_published )",
     )
     .eq("slug", lessonSlug)
     .eq("is_published", true)
@@ -72,6 +89,9 @@ async function loadLessonMediaPaths(programSlug: string, lessonSlug: string) {
   return {
     audioPath: readOptionalPath(data.audio_path),
     worksheetPath: readOptionalPath(data.worksheet_path),
+    videoProvider: readVideoProvider(data.video_provider),
+    videoPlaybackId: readOptionalPath(data.video_playback_id),
+    videoStatus: readVideoStatus(data.video_status),
   };
 }
 
@@ -134,6 +154,9 @@ export const resolveLessonMediaAccess = cache(
       lessonId: lesson.id,
       audioPath: paths.audioPath,
       worksheetPath: paths.worksheetPath,
+      videoProvider: paths.videoProvider,
+      videoPlaybackId: paths.videoPlaybackId,
+      videoStatus: paths.videoStatus,
     };
   },
 );
