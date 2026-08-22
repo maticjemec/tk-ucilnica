@@ -130,7 +130,7 @@ function CheckoutButton({ programSlug }: { programSlug: string }) {
         disabled={pending}
         onClick={onClick}
       >
-        {pending ? "Pripravljam plačilo…" : "Vključi se v program"}
+        {pending ? "Preusmerjam na varno plačilo …" : "Kupi program"}
       </Button>
       {error ? (
         <p className="text-sm leading-relaxed text-danger">{error}</p>

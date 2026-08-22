@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { getUserAccessContext, ownsProgram } from "@/lib/auth/access";
-import { firstSearchParam, getLoginPath } from "@/lib/auth/redirects";
-import { CHECKOUT_SESSION_ID } from "@/lib/billing/constants";
-import { getPurchaseForAuthenticatedUser } from "@/lib/billing/fulfill";
+import { requireAuthenticatedUser } from "@/lib/auth/access";
+import { firstSearchParam } from "@/lib/auth/redirects";
+import { resolveCheckoutSuccessView } from "@/lib/billing/success";
 import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
 
 export const metadata: Metadata = {
@@ -20,57 +19,51 @@ export default async function PurchaseSuccessPage({
   searchParams,
 }: SuccessPageProps) {
   const sessionId = firstSearchParam((await searchParams).session_id);
-  const access = await getUserAccessContext();
+  const access = await requireAuthenticatedUser("/nakup/uspesno");
+  const view = await resolveCheckoutSuccessView(sessionId, access.user.id);
 
-  if (access.status !== "authenticated") {
+  if (view.state === "owned") {
     return (
-      <PurchaseResult
-        title="Plačilo smo prejeli. Dostop do programa se pripravlja."
-        href={getLoginPath("/nakup/uspesno")}
-        cta="Prijavi se"
-      />
+      <>
+        <PageHeader
+          title="Plačilo je uspešno"
+          subtitle="Program je zdaj na voljo v tvoji učilnici."
+        />
+        <div className="flex flex-wrap gap-3">
+          <ButtonLink href={getOwnedProgramOverviewPath(view.programSlug)}>
+            Odpri program
+          </ButtonLink>
+          <ButtonLink href="/moji-programi" variant="outline">
+            Moji programi
+          </ButtonLink>
+        </div>
+      </>
     );
   }
 
-  const purchase =
-    sessionId && CHECKOUT_SESSION_ID.test(sessionId)
-      ? await getPurchaseForAuthenticatedUser(sessionId, access.user.id)
-      : null;
-  const programSlug = purchase?.program_slug;
-  const owned = programSlug ? ownsProgram(access, programSlug) : false;
-
-  if (owned && programSlug) {
+  if (view.state === "preparing") {
     return (
-      <PurchaseResult
-        title="Plačilo je bilo uspešno."
-        href={getOwnedProgramOverviewPath(programSlug)}
-        cta="Odpri program"
-      />
+      <>
+        <PageHeader
+          title="Plačilo smo prejeli"
+          subtitle="Dostop do programa se pripravlja. To običajno traja le nekaj trenutkov."
+        />
+        <ButtonLink
+          href={`/nakup/uspesno?session_id=${encodeURIComponent(view.sessionId)}`}
+        >
+          Preveri dostop
+        </ButtonLink>
+      </>
     );
   }
 
-  return (
-    <PurchaseResult
-      title="Plačilo smo prejeli. Dostop do programa se pripravlja."
-      href="/moji-programi"
-      cta="Moji programi"
-    />
-  );
-}
-
-function PurchaseResult({
-  title,
-  href,
-  cta,
-}: {
-  title: string;
-  href: string;
-  cta: string;
-}) {
   return (
     <>
-      <PageHeader title="Nakup" subtitle={title} />
-      <ButtonLink href={href}>{cta}</ButtonLink>
+      <PageHeader
+        title="Nakup"
+        subtitle="Če je bilo plačilo uspešno, bo program kmalu na voljo v tvoji učilnici."
+      />
+      <ButtonLink href="/moji-programi">Moji programi</ButtonLink>
     </>
   );
 }

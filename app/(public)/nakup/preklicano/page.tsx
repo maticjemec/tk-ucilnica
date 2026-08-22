@@ -25,23 +25,17 @@ export default async function PurchaseCancelPage({
 
   return (
     <>
-      <PageHeader title="Nakup" subtitle="Plačilo ni bilo dokončano." />
-      <div className="flex flex-wrap gap-3">
-        <ButtonLink
-          href={
-            hasProgram && slug
-              ? getPublicProgramPath(slug)
-              : getPublicCatalogPath()
-          }
-        >
-          {hasProgram ? "Nazaj na program" : "Poglej programe"}
+      <PageHeader
+        title="Plačilo ni bilo izvedeno"
+        subtitle="Nič ni bilo zaračunano. Če želiš, se lahko vrneš na program in poskusiš znova."
+      />
+      {hasProgram && slug ? (
+        <ButtonLink href={getPublicProgramPath(slug)}>
+          Nazaj na program
         </ButtonLink>
-        {hasProgram ? (
-          <ButtonLink href={getPublicCatalogPath()} variant="outline">
-            Poglej programe
-          </ButtonLink>
-        ) : null}
-      </div>
+      ) : (
+        <ButtonLink href={getPublicCatalogPath()}>Vsi programi</ButtonLink>
+      )}
     </>
   );
 }
