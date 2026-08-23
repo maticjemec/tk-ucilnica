@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/cn";
+import { isSupabaseProgramCoverSrc } from "@/lib/media/cover-src";
 
 type CoverMediaProps = {
   alt: string;
@@ -29,6 +30,7 @@ export function CoverMedia({
           className="object-cover"
           sizes={sizes}
           preload={preload}
+          unoptimized={!isSupabaseProgramCoverSrc(imageSrc)}
         />
       ) : (
         <div className="absolute inset-0" role="img" aria-label={alt}>

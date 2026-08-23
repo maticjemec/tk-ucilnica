@@ -8,7 +8,6 @@ import {
   categoryLabel,
   parseBoolean,
   parseCategory,
-  parseHttpUrl,
   parseNonNegativeInt,
   parseOptionalString,
   parsePriceCents,
@@ -40,7 +39,6 @@ export async function createProgram(input: CreateProgramInput) {
   const longDescription = parseOptionalString(input.longDescription, 8000);
   const durationLabel = parseOptionalString(input.durationLabel, 80);
   const difficulty = parseOptionalString(input.difficulty, 80);
-  const coverImageUrl = parseHttpUrl(input.coverImageUrl);
 
   if (
     !title ||
@@ -53,8 +51,7 @@ export async function createProgram(input: CreateProgramInput) {
     shortDescription === undefined ||
     longDescription === undefined ||
     durationLabel === undefined ||
-    difficulty === undefined ||
-    coverImageUrl === undefined
+    difficulty === undefined
   ) {
     return adminFail(ADMIN_ERRORS.invalidInput);
   }
@@ -76,7 +73,7 @@ export async function createProgram(input: CreateProgramInput) {
     is_published: parseBoolean(input.isPublished),
     is_featured: parseBoolean(input.isFeatured),
     sort_order: sortOrder,
-    cover_image_url: coverImageUrl,
+    cover_image_url: null,
   });
 
   if (error) {
@@ -109,7 +106,6 @@ export async function updateProgram(input: UpdateProgramInput) {
   const longDescription = parseOptionalString(input.longDescription, 8000);
   const durationLabel = parseOptionalString(input.durationLabel, 80);
   const difficulty = parseOptionalString(input.difficulty, 80);
-  const coverImageUrl = parseHttpUrl(input.coverImageUrl);
 
   if (
     !slug ||
@@ -122,8 +118,7 @@ export async function updateProgram(input: UpdateProgramInput) {
     shortDescription === undefined ||
     longDescription === undefined ||
     durationLabel === undefined ||
-    difficulty === undefined ||
-    coverImageUrl === undefined
+    difficulty === undefined
   ) {
     return adminFail(ADMIN_ERRORS.invalidInput);
   }
@@ -156,7 +151,6 @@ export async function updateProgram(input: UpdateProgramInput) {
       is_published: parseBoolean(input.isPublished),
       is_featured: parseBoolean(input.isFeatured),
       sort_order: sortOrder,
-      cover_image_url: coverImageUrl,
     })
     .eq("id", existing.id)
     .eq("slug", slug);

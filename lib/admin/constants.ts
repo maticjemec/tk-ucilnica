@@ -48,5 +48,13 @@ export const AUDIO_MIME_TYPES = [
   "audio/aac",
 ] as const;
 
+export const COVER_EXTENSIONS = ["jpg", "jpeg", "png", "webp"] as const;
+export const COVER_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+] as const;
+
 export const MAX_AUDIO_BYTES = 52_428_800;
 export const MAX_WORKSHEET_BYTES = 20_971_520;
+export const MAX_COVER_BYTES = 5_242_880;

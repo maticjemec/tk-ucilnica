@@ -6,6 +6,9 @@ export const LESSON_AUDIO_BUCKET = "lesson-audio";
 /** Private Storage bucket for lesson PDFs / worksheets. */
 export const LESSON_MATERIALS_BUCKET = "lesson-materials";
 
+/** Public Storage bucket for program cover images. */
+export const PROGRAM_COVERS_BUCKET = "program-covers";
+
 /**
  * Signed URL lifetime in seconds.
  * Page refresh mints a new URL. No client polling or refresh loop.

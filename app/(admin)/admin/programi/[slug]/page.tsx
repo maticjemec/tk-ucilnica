@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ProgramCoverPanel } from "@/components/admin/ProgramCoverPanel";
 import { ProgramForm } from "@/components/admin/ProgramForm";
 import { SectionManager } from "@/components/admin/SectionManager";
 import { Badge } from "@/components/ui/Badge";
@@ -49,6 +50,15 @@ export default async function AdminProgramDetailPage({
         Katalog: {detail.program.lesson_count} lekcij · kurikulum:{" "}
         {detail.lessonPublished} objavljenih / {detail.lessonTotal} skupaj
       </p>
+
+      <section className="mb-10">
+        <h2 className="mb-4 font-serif text-xl text-foreground">Naslovna slika</h2>
+        <ProgramCoverPanel
+          programSlug={detail.program.slug}
+          title={detail.program.title}
+          coverImageUrl={detail.program.cover_image_url}
+        />
+      </section>
 
       <section className="mb-10">
         <h2 className="mb-4 font-serif text-xl text-foreground">Program</h2>

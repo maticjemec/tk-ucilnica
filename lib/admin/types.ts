@@ -38,7 +38,6 @@ export type CreateProgramInput = {
   isPublished: boolean;
   isFeatured: boolean;
   sortOrder: number | string;
-  coverImageUrl: string | null;
 };
 
 export type UpdateProgramInput = Omit<CreateProgramInput, "slug"> & {

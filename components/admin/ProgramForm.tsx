@@ -47,7 +47,6 @@ export function ProgramForm({ program, nextSortOrder = 1 }: ProgramFormProps) {
       isPublished: form.get("isPublished") === "on",
       isFeatured: form.get("isFeatured") === "on",
       sortOrder: String(form.get("sortOrder") ?? "0"),
-      coverImageUrl: String(form.get("coverImageUrl") ?? ""),
     };
 
     const result = isCreate
@@ -169,12 +168,6 @@ export function ProgramForm({ program, nextSortOrder = 1 }: ProgramFormProps) {
           min="0"
           step="1"
           defaultValue={program?.sort_order ?? nextSortOrder}
-        />
-        <AdminInput
-          id="coverImageUrl"
-          label="URL naslovnice"
-          defaultValue={program?.cover_image_url ?? ""}
-          placeholder="https://"
         />
       </div>
 

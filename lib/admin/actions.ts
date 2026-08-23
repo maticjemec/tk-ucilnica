@@ -3,6 +3,11 @@
 import { createProgram, updateProgram } from "@/lib/admin/mutations/programs";
 import { createLesson, updateLesson } from "@/lib/admin/mutations/lessons";
 import {
+  confirmAdminProgramCoverUpload,
+  prepareAdminProgramCoverUpload,
+  removeAdminProgramCover,
+} from "@/lib/admin/mutations/covers";
+import {
   confirmAdminAudioUpload,
   confirmAdminWorksheetUpload,
   createAdminLessonVideoUpload,
@@ -32,6 +37,26 @@ export async function createProgramAction(input: CreateProgramInput) {
 
 export async function updateProgramAction(input: UpdateProgramInput) {
   return updateProgram(input);
+}
+
+export async function prepareProgramCoverUploadAction(input: {
+  programSlug: string;
+  filename: string;
+  contentType: string;
+  size: number;
+}) {
+  return prepareAdminProgramCoverUpload(input);
+}
+
+export async function confirmProgramCoverUploadAction(input: {
+  programSlug: string;
+  path: string;
+}) {
+  return confirmAdminProgramCoverUpload(input);
+}
+
+export async function removeProgramCoverAction(input: { programSlug: string }) {
+  return removeAdminProgramCover(input);
 }
 
 export async function createSectionAction(input: CreateSectionInput) {

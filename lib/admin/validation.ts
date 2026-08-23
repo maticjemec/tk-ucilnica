@@ -5,6 +5,8 @@ import {
   ADMIN_UNLOCK_MODES,
   AUDIO_EXTENSIONS,
   AUDIO_MIME_TYPES,
+  COVER_EXTENSIONS,
+  COVER_MIME_TYPES,
 } from "@/lib/admin/constants";
 import type { ProgramCategory } from "@/types/catalog";
 import type {
@@ -190,6 +192,56 @@ export function audioExtensionFromName(filename: string) {
 
 export function isAllowedAudioMime(value: string) {
   return AUDIO_MIME_TYPES.includes(value as (typeof AUDIO_MIME_TYPES)[number]);
+}
+
+export function isAllowedCoverMime(value: string) {
+  return COVER_MIME_TYPES.includes(value as (typeof COVER_MIME_TYPES)[number]);
+}
+
+export function coverExtensionFromName(filename: string) {
+  const match = filename.toLowerCase().match(/\.([a-z0-9]+)$/);
+  const ext = match?.[1];
+
+  if (!ext || !COVER_EXTENSIONS.includes(ext as (typeof COVER_EXTENSIONS)[number])) {
+    return null;
+  }
+
+  return ext === "jpeg" ? "jpg" : ext;
+}
+
+export function coverExtensionFromMime(contentType: string) {
+  if (contentType === "image/jpeg") {
+    return "jpg";
+  }
+
+  if (contentType === "image/png") {
+    return "png";
+  }
+
+  if (contentType === "image/webp") {
+    return "webp";
+  }
+
+  return null;
+}
+
+export function resolveCoverExtension(filename: string, contentType: string) {
+  if (!isAllowedCoverMime(contentType)) {
+    return null;
+  }
+
+  const fromMime = coverExtensionFromMime(contentType);
+  const fromName = coverExtensionFromName(filename);
+
+  if (!fromMime) {
+    return null;
+  }
+
+  if (fromName && fromName !== fromMime) {
+    return null;
+  }
+
+  return fromMime;
 }
 
 export function centsToEur(priceCents: number) {
