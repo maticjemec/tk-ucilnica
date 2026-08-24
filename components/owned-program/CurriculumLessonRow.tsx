@@ -71,6 +71,7 @@ export function CurriculumLessonRow({
     <li className="min-w-0">
       <Link
         href={lesson.href}
+        prefetch={false}
         className={className}
         aria-current={isViewing ? "page" : lesson.accessState === "current" ? "step" : undefined}
       >

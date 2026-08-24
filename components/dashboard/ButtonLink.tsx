@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import { isOwnedLessonPath } from "@/lib/owned-program/paths";
 
 type ButtonLinkVariant = "primary" | "outline" | "success-outline";
 
@@ -9,6 +10,7 @@ type ButtonLinkProps = {
   children: ReactNode;
   variant?: ButtonLinkVariant;
   className?: string;
+  prefetch?: boolean;
 };
 
 const variantClasses: Record<ButtonLinkVariant, string> = {
@@ -25,10 +27,12 @@ export function ButtonLink({
   children,
   variant = "primary",
   className,
+  prefetch,
 }: ButtonLinkProps) {
   return (
     <Link
       href={href}
+      prefetch={prefetch ?? (isOwnedLessonPath(href) ? false : undefined)}
       className={cn(
         "inline-flex items-center justify-center gap-2 rounded-sm border font-medium whitespace-nowrap transition-colors",
         "h-10 px-4 text-sm",

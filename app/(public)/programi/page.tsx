@@ -9,9 +9,12 @@ export const metadata: Metadata = {
 };
 
 export default async function ProgramiPage() {
-  const access = await getUserAccessContext();
+  const [access, published] = await Promise.all([
+    getUserAccessContext(),
+    getPublishedPrograms(),
+  ]);
   const ownedSlugs = getOwnedProgramSlugs(access);
-  const programs = (await getPublishedPrograms()).map(toCatalogProgram);
+  const programs = published.map(toCatalogProgram);
 
   return (
     <>

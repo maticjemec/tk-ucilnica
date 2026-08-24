@@ -21,20 +21,11 @@ const MAX_NAME_LENGTH = 80;
 
 export type AuthActionResult =
   | { error: string }
-  | { needsEmailConfirmation: true };
+  | { needsEmailConfirmation: true }
+  | { redirectTo: string };
 
 function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-function isNextRedirect(error: unknown) {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "digest" in error &&
-    typeof error.digest === "string" &&
-    error.digest.startsWith("NEXT_REDIRECT")
-  );
 }
 
 function logSignupThrownError(error: unknown) {
@@ -71,7 +62,7 @@ export async function signIn(input: {
   email: string;
   password: string;
   redirectTo?: string;
-}): Promise<Extract<AuthActionResult, { error: string }> | void> {
+}): Promise<Extract<AuthActionResult, { error: string } | { redirectTo: string }>> {
   const email = input.email.trim();
   const password = input.password;
 
@@ -90,7 +81,9 @@ export async function signIn(input: {
   }
 
   revalidatePath("/", "layout");
-  redirect(getSafeRedirectPath(input.redirectTo ?? DEFAULT_AFTER_AUTH_PATH));
+  return {
+    redirectTo: getSafeRedirectPath(input.redirectTo ?? DEFAULT_AFTER_AUTH_PATH),
+  };
 }
 
 export async function signUp(input: {
@@ -100,7 +93,7 @@ export async function signUp(input: {
   password: string;
   confirmPassword: string;
   redirectTo?: string;
-}): Promise<AuthActionResult | void> {
+}): Promise<AuthActionResult> {
   const firstName = input.firstName.trim();
   const lastName = input.lastName.trim();
   const email = input.email.trim();
@@ -156,7 +149,7 @@ export async function signUp(input: {
 
     if (data.session) {
       revalidatePath("/", "layout");
-      redirect(next);
+      return { redirectTo: next };
     }
 
     if (data.user) {
@@ -165,10 +158,6 @@ export async function signUp(input: {
 
     return { error: GENERIC_SIGN_UP_ERROR };
   } catch (error) {
-    if (isNextRedirect(error)) {
-      throw error;
-    }
-
     logSignupThrownError(error);
     return { error: UNEXPECTED_SIGN_UP_ERROR };
   }

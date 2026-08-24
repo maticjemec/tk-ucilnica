@@ -29,13 +29,14 @@ export default async function ProgramDetailPage({
   params,
 }: ProgramDetailPageProps) {
   const { slug } = await params;
-  const identity = await getProgramBySlug(slug);
+  const [identity, access] = await Promise.all([
+    getProgramBySlug(slug),
+    getUserAccessContext(),
+  ]);
 
   if (!identity) {
     notFound();
   }
-
-  const access = await getUserAccessContext();
   const owned = ownsProgram(access, slug);
   const program = overlayLocalProgramDetailExtras(identity);
 

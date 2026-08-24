@@ -4,6 +4,8 @@ import { CoverMedia } from "@/components/dashboard/CoverMedia";
 import { ProgramPlaceholder } from "@/components/dashboard/visuals";
 import { Card } from "@/components/ui/Card";
 import { Progress } from "@/components/ui/Progress";
+import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
+import Link from "next/link";
 
 type DashboardProgramCardProps = {
   program: DashboardProgram;
@@ -35,7 +37,10 @@ export function DashboardProgramCard({
       </div>
 
       {variant === "progress" ? (
-        <div className="flex flex-1 flex-col px-3.5 pt-3 pb-3.5">
+        <Link
+          href={getOwnedProgramOverviewPath(program.slug)}
+          className="flex flex-1 flex-col px-3.5 pt-3 pb-3.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
           <h3 className="text-sm leading-snug font-normal text-foreground">
             {program.label}
           </h3>
@@ -49,7 +54,7 @@ export function DashboardProgramCard({
               {program.progress}%
             </span>
           </div>
-        </div>
+        </Link>
       ) : (
         <div className="flex flex-1 flex-col px-3.5 pt-3 pb-3.5">
           <h3 className="text-sm leading-snug font-normal text-foreground">

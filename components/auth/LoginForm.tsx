@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useTransition, type FormEvent } from "react";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { AuthField } from "@/components/auth/AuthField";
+import { useAuthDestination } from "@/components/auth/useAuthDestination";
 import { Button } from "@/components/ui/Button";
 import { signIn } from "@/lib/auth/actions";
 import { getRegisterPath } from "@/lib/auth/redirects";
@@ -22,6 +23,7 @@ function isValidEmail(value: string) {
 }
 
 export function LoginForm({ redirectTo }: LoginFormProps) {
+  const goToDestination = useAuthDestination();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<LoginErrors>({});
@@ -55,16 +57,23 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
       return;
     }
 
-    startTransition(() => {
-      void signIn({
-        email: email.trim(),
-        password,
-        redirectTo,
-      }).then((result) => {
-        if (result?.error) {
+    startTransition(async () => {
+      try {
+        const result = await signIn({
+          email: email.trim(),
+          password,
+          redirectTo,
+        });
+
+        if ("error" in result) {
           setFormError(result.error);
+          return;
         }
-      });
+
+        goToDestination(result.redirectTo);
+      } catch {
+        setFormError("Prijava trenutno ni uspela. Poskusi znova.");
+      }
     });
   }
 

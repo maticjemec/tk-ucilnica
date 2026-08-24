@@ -16,7 +16,7 @@ import {
 import { getOwnedOverviewModel } from "@/lib/owned-program/overview";
 import { buildProgramProgressView } from "@/lib/progress/helpers";
 import { getProgramLessonProgress } from "@/lib/progress/queries";
-import { getProgramWithCurriculum } from "@/lib/programs";
+import { getProgramBySlug, getProgramWithCurriculum } from "@/lib/programs";
 
 type OwnedProgramOverviewPageProps = {
   params: Promise<{ slug: string }>;
@@ -26,15 +26,15 @@ export async function generateMetadata({
   params,
 }: OwnedProgramOverviewPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const bundle = await getProgramWithCurriculum(slug);
+  const program = await getProgramBySlug(slug);
 
-  if (!bundle) {
+  if (!program) {
     return { title: "Moj program" };
   }
 
   return {
-    title: bundle.identity.subtitle,
-    description: bundle.identity.shortDescription,
+    title: program.subtitle,
+    description: program.shortDescription,
   };
 }
 
@@ -42,8 +42,11 @@ export default async function OwnedProgramOverviewPage({
   params,
 }: OwnedProgramOverviewPageProps) {
   const { slug } = await params;
-  const access = await requireProgramEntitlement(slug);
-  const bundle = await getProgramWithCurriculum(slug);
+  const [access, bundle, rows] = await Promise.all([
+    requireProgramEntitlement(slug),
+    getProgramWithCurriculum(slug),
+    getProgramLessonProgress(slug),
+  ]);
 
   if (!bundle) {
     notFound();
@@ -52,7 +55,6 @@ export default async function OwnedProgramOverviewPage({
   const entitlement = getEntitlementForProgram(access, slug);
   const now = new Date();
   const { identity, program } = bundle;
-  const rows = await getProgramLessonProgress(slug);
   const progress = buildProgramProgressView(program, rows, {
     entitlement,
     now,

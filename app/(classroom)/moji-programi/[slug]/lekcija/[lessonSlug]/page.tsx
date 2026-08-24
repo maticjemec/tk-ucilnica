@@ -18,6 +18,7 @@ import { buildProgramProgressView } from "@/lib/progress/helpers";
 import { markLessonOpened } from "@/lib/progress/mutations";
 import { getProgramLessonProgress } from "@/lib/progress/queries";
 import { getProgramWithCurriculum } from "@/lib/programs";
+import { isNextRouterPrefetch } from "@/lib/http/prefetch";
 
 type OwnedLessonPageProps = {
   params: Promise<{ slug: string; lessonSlug: string }>;
@@ -44,10 +45,13 @@ export async function generateMetadata({
 
 export default async function OwnedLessonPage({ params }: OwnedLessonPageProps) {
   const { slug, lessonSlug } = await params;
-  const access = await requireProgramEntitlement(slug);
+  const [access, bundle, rows] = await Promise.all([
+    requireProgramEntitlement(slug),
+    getProgramWithCurriculum(slug),
+    getProgramLessonProgress(slug),
+  ]);
   const entitlement = getEntitlementForProgram(access, slug);
   const now = new Date();
-  const bundle = await getProgramWithCurriculum(slug);
   const program = bundle?.program;
   const lesson = program ? getOwnedLesson(program, lessonSlug) : undefined;
 
@@ -55,7 +59,6 @@ export default async function OwnedLessonPage({ params }: OwnedLessonPageProps) 
     notFound();
   }
 
-  const rows = await getProgramLessonProgress(slug);
   const progress = buildProgramProgressView(program, rows, {
     entitlement,
     now,
@@ -69,13 +72,26 @@ export default async function OwnedLessonPage({ params }: OwnedLessonPageProps) 
     redirect(fallback);
   }
 
-  await markLessonOpened(slug, lessonSlug);
+  const contentType = lesson.contentType ?? "video";
+  const signAudio = contentType === "audio" || contentType === "mixed";
+  const signVideo = contentType === "video" || contentType === "mixed";
+  const signWorksheet =
+    contentType === "worksheet" ||
+    contentType === "mixed" ||
+    Boolean(lesson.worksheetSrc);
 
+  const prefetch = await isNextRouterPrefetch();
   const [audioUrl, worksheetUrl, video] = await Promise.all([
-    getSignedLessonAudioUrl(slug, lessonSlug),
-    getSignedLessonWorksheetUrl(slug, lessonSlug),
-    getSignedLessonVideoPlayback(slug, lessonSlug),
+    signAudio ? getSignedLessonAudioUrl(slug, lessonSlug) : Promise.resolve(null),
+    signWorksheet
+      ? getSignedLessonWorksheetUrl(slug, lessonSlug)
+      : Promise.resolve(null),
+    signVideo
+      ? getSignedLessonVideoPlayback(slug, lessonSlug)
+      : Promise.resolve(null),
+    prefetch ? Promise.resolve(null) : markLessonOpened(slug, lessonSlug),
   ]);
+
   const playableLesson = applySignedLessonMedia(lesson, {
     audioUrl,
     worksheetUrl,

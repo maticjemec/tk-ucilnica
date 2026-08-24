@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useTransition, type FormEvent } from "react";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { AuthField } from "@/components/auth/AuthField";
+import { useAuthDestination } from "@/components/auth/useAuthDestination";
 import { Button } from "@/components/ui/Button";
 import { signUp } from "@/lib/auth/actions";
 import { getLoginPath } from "@/lib/auth/redirects";
@@ -25,6 +26,7 @@ function isValidEmail(value: string) {
 }
 
 export function RegisterForm({ redirectTo }: RegisterFormProps) {
+  const goToDestination = useAuthDestination();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -76,42 +78,33 @@ export function RegisterForm({ redirectTo }: RegisterFormProps) {
       return;
     }
 
-    startTransition(() => {
-      void signUp({
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        email: email.trim(),
-        password,
-        confirmPassword,
-        redirectTo,
-      })
-        .then((result) => {
-          if (!result) {
-            return;
-          }
-
-          if ("needsEmailConfirmation" in result) {
-            setNeedsEmailConfirmation(true);
-            return;
-          }
-
-          if ("error" in result) {
-            setFormError(result.error);
-          }
-        })
-        .catch((error: unknown) => {
-          if (
-            typeof error === "object" &&
-            error !== null &&
-            "digest" in error &&
-            typeof error.digest === "string" &&
-            error.digest.startsWith("NEXT_REDIRECT")
-          ) {
-            throw error;
-          }
-
-          setFormError("Prišlo je do nepričakovane napake pri registraciji. Poskusi znova.");
+    startTransition(async () => {
+      try {
+        const result = await signUp({
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          email: email.trim(),
+          password,
+          confirmPassword,
+          redirectTo,
         });
+
+        if ("needsEmailConfirmation" in result) {
+          setNeedsEmailConfirmation(true);
+          return;
+        }
+
+        if ("error" in result) {
+          setFormError(result.error);
+          return;
+        }
+
+        goToDestination(result.redirectTo);
+      } catch {
+        setFormError(
+          "Prišlo je do nepričakovane napake pri registraciji. Poskusi znova.",
+        );
+      }
     });
   }
 

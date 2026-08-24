@@ -5,7 +5,7 @@ import {
   fetchValidProgramEntitlements,
   isEntitlementCurrentlyValid,
 } from "@/lib/auth/entitlements";
-import { toUserSession } from "@/lib/auth/user";
+import { toUserSessionFromClaims } from "@/lib/auth/user";
 import {
   getLoginPath,
   getPublicCatalogPath,
@@ -17,6 +17,7 @@ import type {
   GuestAccessContext,
   UserAccessContext,
 } from "@/lib/auth/types";
+import { isNextServerAction } from "@/lib/http/server-action";
 import { createClient } from "@/lib/supabase/server";
 
 const guestContext: GuestAccessContext = {
@@ -28,27 +29,31 @@ const guestContext: GuestAccessContext = {
 /**
  * Single app-level access reader.
  *
- * Authentication is validated on the server with Supabase `getUser()`.
+ * Authentication is validated on the server with Supabase `getClaims()`,
+ * which verifies the JWT locally (same authority the proxy already uses).
  * Owned program slugs come from public.user_programs via the entitlement
  * data layer. Missing, expired, or failed queries yield no ownership.
  */
 export const getUserAccessContext = cache(
   async (): Promise<UserAccessContext> => {
     const supabase = await createClient();
-    const { data, error } = await supabase.auth.getUser();
+    const { data, error } = await supabase.auth.getClaims();
+    const user = !error && data?.claims
+      ? toUserSessionFromClaims(data.claims)
+      : null;
 
-    if (error || !data.user) {
+    if (!user) {
       return guestContext;
     }
 
     const entitlements = await fetchValidProgramEntitlements(
       supabase,
-      data.user.id,
+      user.id,
     );
 
     return {
       status: "authenticated",
-      user: toUserSession(data.user),
+      user,
       entitlements,
     };
   },
@@ -93,6 +98,13 @@ export async function requireProgramEntitlement(
 }
 
 export async function redirectIfAuthenticated(redirectTo?: string) {
+  // After sign-in/sign-up, Next re-renders the current auth page as part of
+  // the server action. A redirect() there competes with the action result and
+  // leaves the client stuck on "Prijava...". GET visits still bounce away.
+  if (await isNextServerAction()) {
+    return;
+  }
+
   const access = await getUserAccessContext();
 
   if (access.status === "authenticated") {

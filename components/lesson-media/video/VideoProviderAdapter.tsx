@@ -1,12 +1,20 @@
 "use client";
 
 import type { RefObject } from "react";
+import dynamic from "next/dynamic";
 import { CoverMedia } from "@/components/dashboard/CoverMedia";
 import { ProgramPlaceholder } from "@/components/dashboard/visuals";
-import { MuxVideoSurface } from "@/components/lesson-media/video/MuxVideoSurface";
 import { VideoUnavailableState } from "@/components/lesson-media/video/VideoUnavailableState";
 import type { LessonVideoSource } from "@/lib/media/types";
 import type { ProgramVisualId } from "@/types/dashboard";
+
+const MuxVideoSurface = dynamic(
+  () =>
+    import("@/components/lesson-media/video/MuxVideoSurface").then(
+      (mod) => mod.MuxVideoSurface,
+    ),
+  { ssr: false },
+);
 
 type VideoProviderAdapterProps = {
   source: LessonVideoSource;

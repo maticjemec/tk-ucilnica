@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { BookOpen, CirclePlay, Clock, RotateCcw } from "lucide-react";
 import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { CoverMedia } from "@/components/dashboard/CoverMedia";
@@ -104,12 +105,12 @@ export function PurchasedProgramCard({ program }: PurchasedProgramCardProps) {
                 Poglej program
               </ButtonLink>
             )}
-            <a
+            <Link
               href={ownedOverviewHref}
               className="relative z-10 text-sm text-foreground/80 transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent lg:text-center"
             >
               Poglej podrobnosti →
-            </a>
+            </Link>
           </div>
         </div>
       </article>

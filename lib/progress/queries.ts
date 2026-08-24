@@ -122,7 +122,15 @@ export const getUserLessonProgress = cache(
   },
 );
 
-export async function getProgramLessonProgress(programSlug: string) {
-  const rows = await getUserLessonProgress();
-  return rows.filter((row) => row.program_slug === programSlug);
-}
+export const getProgramLessonProgress = cache(
+  async (programSlug: string): Promise<UserLessonProgressRow[]> => {
+    const access = await getUserAccessContext();
+
+    if (access.status !== "authenticated" || !programSlug) {
+      return [];
+    }
+
+    const supabase = await createClient();
+    return fetchUserLessonProgress(supabase, access.user.id, programSlug);
+  },
+);

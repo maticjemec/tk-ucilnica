@@ -47,6 +47,7 @@ export function ContinueLessonCard({ lesson }: ContinueLessonCardProps) {
         <span className="text-sm text-muted">{lesson.duration}</span>
         <Link
           href={lesson.href}
+          prefetch={false}
           className="text-sm text-accent transition-colors hover:text-accent-hover"
         >
           Nadaljuj →
