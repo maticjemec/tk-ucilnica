@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, useTransition } from "react";
-import { Gift, X } from "lucide-react";
+import { useState, useTransition } from "react";
+import { Gift } from "lucide-react";
 import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -12,8 +12,6 @@ import { formatCatalogPrice } from "@/lib/content/catalog";
 import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
 import { programDetailIcons } from "@/components/program-detail/icons";
 import type { ProgramDetail } from "@/types/program-detail";
-
-const giftMessage = "Darilni nakup bo omogočen kmalu.";
 
 type PurchaseCardProps = {
   program: ProgramDetail;
@@ -27,7 +25,6 @@ export function PurchaseCard({
   className,
 }: PurchaseCardProps) {
   const owned = program.accessState === "owned";
-  const [notice, setNotice] = useState<string | null>(null);
   const programPath = `/programi/${program.slug}`;
 
   return (
@@ -64,10 +61,11 @@ export function PurchaseCard({
             variant="outline"
             className="w-full"
             size="lg"
-            onClick={() => setNotice(giftMessage)}
+            disabled
+            title="Darilni nakup bo omogočen kmalu."
           >
             <Gift className="h-4 w-4" strokeWidth={1.6} aria-hidden />
-            Podari program
+            Podari program (kmalu)
           </Button>
         )}
       </div>
@@ -95,10 +93,6 @@ export function PurchaseCard({
         </div>
       )}
 
-      <PurchaseNotice
-        message={notice}
-        onClose={() => setNotice(null)}
-      />
     </Card>
   );
 }
@@ -136,73 +130,5 @@ function CheckoutButton({ programSlug }: { programSlug: string }) {
         <p className="text-sm leading-relaxed text-danger">{error}</p>
       ) : null}
     </>
-  );
-}
-
-function PurchaseNotice({
-  message,
-  onClose,
-}: {
-  message: string | null;
-  onClose: () => void;
-}) {
-  const titleId = useId();
-  const closeRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (!message) {
-      return;
-    }
-
-    closeRef.current?.focus();
-
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    }
-
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [message, onClose]);
-
-  if (!message) {
-    return null;
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-5">
-      <button
-        type="button"
-        className="absolute inset-0 bg-[#1c1916]/40"
-        aria-label="Zapri obvestilo"
-        onClick={onClose}
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        className="relative w-full max-w-[26rem] rounded-md border border-border bg-surface px-5 py-5 shadow-[var(--shadow-card)] sm:px-6"
-      >
-        <div className="flex items-start justify-between gap-3">
-          <h2 id={titleId} className="text-[1.05rem] font-semibold tracking-tight">
-            Kmalu na voljo
-          </h2>
-          <button
-            ref={closeRef}
-            type="button"
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-sm text-muted transition-colors hover:bg-border/70 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            aria-label="Zapri"
-            onClick={onClose}
-          >
-            <X className="h-4 w-4" strokeWidth={1.7} />
-          </button>
-        </div>
-        <p className="mt-2.5 text-sm leading-relaxed text-muted">{message}</p>
-        <Button className="mt-5 w-full" onClick={onClose}>
-          Razumem
-        </Button>
-      </div>
-    </div>
   );
 }

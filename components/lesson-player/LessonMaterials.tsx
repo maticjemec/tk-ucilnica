@@ -34,10 +34,11 @@ function ResourceDownload({
     <Button
       variant="outline"
       className="w-full shrink-0 sm:w-auto"
+      disabled
       onClick={onMockDownload}
     >
       <Download className="h-4 w-4" strokeWidth={1.6} aria-hidden />
-      Prenesi
+      Ni na voljo
     </Button>
   );
 }

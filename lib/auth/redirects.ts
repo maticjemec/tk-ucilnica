@@ -110,6 +110,10 @@ export function isProtectedPath(pathname: string) {
     return true;
   }
 
+  if (pathname === "/nakup/uspesno" || pathname.startsWith("/nakup/uspesno/")) {
+    return true;
+  }
+
   return false;
 }
 

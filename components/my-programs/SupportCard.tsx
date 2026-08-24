@@ -30,9 +30,11 @@ export function SupportCard({
           variant="outline"
           className="w-full shrink-0 sm:w-auto"
           type="button"
+          disabled
+          title="Podpora bo kmalu na voljo."
         >
           <Mail className="h-4 w-4" strokeWidth={1.6} aria-hidden />
-          Kontaktiraj podporo
+          Kontakt kmalu
         </Button>
       </div>
     </Card>

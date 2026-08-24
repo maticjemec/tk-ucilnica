@@ -36,23 +36,18 @@ const defaultPurchaseBenefits: ProgramDetailListItem[] = [
   },
   {
     id: "lifetime-lessons",
-    label: "Dostop do vseh lekcij za vedno",
+    label: "Dostop do vseh lekcij programa",
     icon: "loop",
   },
   {
     id: "print-worksheets",
-    label: "Delovni listi za tiskanje",
+    label: "Delovni listi, ko so del programa",
     icon: "file",
   },
   {
     id: "multi-device",
     label: "Dostop na telefonu, tablici in računalniku",
     icon: "monitor",
-  },
-  {
-    id: "lifetime-updates",
-    label: "LifeTime posodobitve",
-    icon: "refresh",
   },
 ];
 
@@ -158,17 +153,12 @@ function defaultIncludes(program: CatalogProgram): ProgramDetailListItem[] {
     },
     {
       id: "worksheets",
-      label: "Delovni listi in vaje",
+      label: "Delovni listi, ko so del programa",
       icon: "file",
     },
     {
-      id: "reminders",
-      label: "Dnevni opomniki",
-      icon: "clock",
-    },
-    {
-      id: "forever-access",
-      label: "Dostop za vedno",
+      id: "program-access",
+      label: "Dostop do kupljenih lekcij",
       icon: "lock",
     },
   ];
@@ -269,7 +259,7 @@ export function overlayLocalProgramDetailExtras(
     breadcrumbLabel:
       extras.breadcrumbLabel ?? breadcrumbByCategory[program.category],
     benefits: extras.benefits ?? defaultBenefits,
-    curriculum: extras.curriculum ?? fallbackCurriculum(catalog),
+    curriculum: extras.curriculum ?? [],
     includes: extras.includes ?? defaultIncludes(catalog),
     purchaseBenefits: extras.purchaseBenefits ?? defaultPurchaseBenefits,
     author: extras.author ?? defaultAuthor,

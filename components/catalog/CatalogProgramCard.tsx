@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, Clock, Heart } from "lucide-react";
+import { BookOpen, Clock } from "lucide-react";
 import { CoverMedia } from "@/components/dashboard/CoverMedia";
 import { ProgramPlaceholder } from "@/components/dashboard/visuals";
 import { Badge } from "@/components/ui/Badge";
@@ -24,17 +24,13 @@ const categoryBadgeClass: Record<ProgramCategory, string> = {
 type CatalogProgramCardProps = {
   program: CatalogProgram;
   variant: CatalogView;
-  isFavorite: boolean;
   owned?: boolean;
-  onToggleFavorite: (id: string) => void;
 };
 
 export function CatalogProgramCard({
   program,
   variant,
-  isFavorite,
   owned = false,
-  onToggleFavorite,
 }: CatalogProgramCardProps) {
   const href = `/programi/${program.slug}`;
   const titleId = `catalog-title-${program.id}`;
@@ -107,33 +103,6 @@ export function CatalogProgramCard({
               {program.categoryLabel}
             </span>
 
-            <button
-              type="button"
-              aria-label={
-                isFavorite
-                  ? "Odstrani iz priljubljenih"
-                  : "Dodaj med priljubljene"
-              }
-              aria-pressed={isFavorite}
-              className={cn(
-                "pointer-events-auto absolute top-2.5 right-2.5 inline-flex h-8 w-8 items-center justify-center rounded-full text-white",
-                "drop-shadow-[0_1px_8px_rgba(28,25,22,0.35)] transition-colors",
-                "hover:bg-black/20",
-                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
-              )}
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                onToggleFavorite(program.id);
-              }}
-            >
-              <Heart
-                className="h-4 w-4"
-                strokeWidth={1.7}
-                fill={isFavorite ? "currentColor" : "none"}
-                aria-hidden
-              />
-            </button>
           </div>
         </div>
 

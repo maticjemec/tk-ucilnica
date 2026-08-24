@@ -13,20 +13,23 @@ type MyProgramsClientProps = {
 
 export function MyProgramsClient({ programs }: MyProgramsClientProps) {
   const [filter, setFilter] = useState<ProgramFilter>("all");
+  const hasOwned = programs.length > 0;
   const visible = filterPurchasedPrograms(programs, filter);
 
   return (
     <section>
-      <ProgramTabs value={filter} onChange={setFilter} />
+      {hasOwned ? <ProgramTabs value={filter} onChange={setFilter} /> : null}
 
       <div
         id="moji-programi-panel"
         role="tabpanel"
-        aria-labelledby={`moji-programi-tab-${filter}`}
-        className="mt-6"
+        aria-labelledby={hasOwned ? `moji-programi-tab-${filter}` : undefined}
+        className={hasOwned ? "mt-6" : undefined}
       >
-        {visible.length === 0 ? (
-          <ProgramsEmptyState />
+        {!hasOwned ? (
+          <ProgramsEmptyState variant="none" />
+        ) : visible.length === 0 ? (
+          <ProgramsEmptyState variant="filter" />
         ) : (
           <ul className="flex flex-col gap-4">
             {visible.map((program) => (

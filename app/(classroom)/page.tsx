@@ -4,7 +4,7 @@ import { DashboardHero } from "@/components/dashboard/DashboardHero";
 import { ProgramGrid } from "@/components/dashboard/ProgramGrid";
 import { ProgressOverview } from "@/components/dashboard/ProgressOverview";
 import { SectionHeading } from "@/components/dashboard/SectionHeading";
-import { UpcomingLessonsCard } from "@/components/dashboard/UpcomingLessonsCard";
+import { ProgramsEmptyState } from "@/components/my-programs/ProgramsEmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import {
   getOwnedProgramSlugs,
@@ -12,9 +12,8 @@ import {
 } from "@/lib/auth/access";
 import {
   dashboardHero,
+  getBestOwnedContinueLesson,
   getDashboardProgressSummary,
-  getOwnedContinueLesson,
-  getOwnedUpcomingLessons,
 } from "@/lib/content/dashboard";
 import { getOwnedProgressBySlug } from "@/lib/progress/owned";
 import { getPublishedPrograms, toDashboardProgram } from "@/lib/programs";
@@ -45,8 +44,10 @@ export default async function PregledPage() {
   const catalogPrograms = published.map((program) =>
     toDashboardProgram(program),
   );
-  const ownedContinueLesson = getOwnedContinueLesson(ownedSlugs);
-  const ownedUpcomingLessons = getOwnedUpcomingLessons(ownedSlugs);
+  const ownedContinueLesson = getBestOwnedContinueLesson(
+    ownedPrograms,
+    progressBySlug,
+  );
   const dashboardProgress = getDashboardProgressSummary(
     ownedPrograms.map((program) => program.progress),
   );
@@ -67,11 +68,15 @@ export default async function PregledPage() {
               title="Moji programi"
               action={{ href: "/moji-programi", label: "Prikaži vse →" }}
             />
-            <ProgramGrid
-              programs={ownedPrograms}
-              variant="progress"
-              showPeekControl={ownedPrograms.length > 0}
-            />
+            {ownedPrograms.length === 0 ? (
+              <ProgramsEmptyState variant="none" />
+            ) : (
+              <ProgramGrid
+                programs={ownedPrograms}
+                variant="progress"
+                showPeekControl
+              />
+            )}
           </section>
 
           <section className="mt-10 pb-6 min-[1440px]:mt-11 min-[1440px]:pb-8">
@@ -81,12 +86,17 @@ export default async function PregledPage() {
         </div>
 
         <aside className="flex min-w-0 flex-col gap-4">
-          <ProgressOverview progress={dashboardProgress} />
+          <ProgressOverview
+            progress={dashboardProgress}
+            detailsHref={ownedPrograms.length === 0 ? "/programi" : "/moji-programi"}
+            detailsLabel={
+              ownedPrograms.length === 0
+                ? "Razišči programe"
+                : "Ogled podrobnosti"
+            }
+          />
           {ownedContinueLesson ? (
             <ContinueLessonCard lesson={ownedContinueLesson} />
-          ) : null}
-          {ownedUpcomingLessons.length > 0 ? (
-            <UpcomingLessonsCard lessons={ownedUpcomingLessons} />
           ) : null}
         </aside>
       </div>

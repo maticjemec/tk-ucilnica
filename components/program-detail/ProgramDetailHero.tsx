@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, Clock, Heart } from "lucide-react";
+import { BarChart3, BookOpen, Clock } from "lucide-react";
 import { CoverMedia } from "@/components/dashboard/CoverMedia";
 import { ProgramPlaceholder } from "@/components/dashboard/visuals";
 import { cn } from "@/lib/cn";
@@ -18,15 +18,11 @@ const categoryBadgeClass: Record<ProgramCategory, string> = {
 
 type ProgramDetailHeroProps = {
   program: ProgramDetail;
-  isFavorite: boolean;
-  onToggleFavorite: () => void;
   className?: string;
 };
 
 export function ProgramDetailHero({
   program,
-  isFavorite,
-  onToggleFavorite,
   className,
 }: ProgramDetailHeroProps) {
   return (
@@ -52,27 +48,6 @@ export function ProgramDetailHero({
           {program.categoryLabel}
         </span>
 
-        <button
-          type="button"
-          aria-label={
-            isFavorite ? "Odstrani iz priljubljenih" : "Dodaj med priljubljene"
-          }
-          aria-pressed={isFavorite}
-          className={cn(
-            "absolute top-3 right-3 inline-flex h-9 w-9 items-center justify-center rounded-full text-white sm:top-3.5 sm:right-3.5",
-            "drop-shadow-[0_1px_8px_rgba(28,25,22,0.35)] transition-colors",
-            "hover:bg-black/20",
-            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
-          )}
-          onClick={onToggleFavorite}
-        >
-          <Heart
-            className="h-[18px] w-[18px]"
-            strokeWidth={1.7}
-            fill={isFavorite ? "currentColor" : "none"}
-            aria-hidden
-          />
-        </button>
       </div>
 
       <div className="px-5 pt-5 pb-5 sm:px-7 sm:pt-6 sm:pb-6 lg:px-8 lg:pt-7 lg:pb-6">

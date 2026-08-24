@@ -29,10 +29,7 @@ export function ProfileSettings({
           account={content.account}
           onManageSubscription={() => onNavigateTab("billing")}
         />
-        <SecurityCard
-          settings={content.security}
-          onAction={() => onNavigateTab("security")}
-        />
+        <SecurityCard settings={content.security} />
         <DeleteAccountCard />
       </aside>
     </div>

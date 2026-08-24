@@ -97,13 +97,15 @@ export default async function OwnedProgramOverviewPage({
         )}
       </div>
 
-      <div className="mt-8 lg:mt-9">
-        <OwnedMaterials
-          featured={model.materials.featured}
-          extra={model.materials.extra}
-          total={model.materials.total}
-        />
-      </div>
+      {model.materials.total > 0 ? (
+        <div className="mt-8 lg:mt-9">
+          <OwnedMaterials
+            featured={model.materials.featured}
+            extra={model.materials.extra}
+            total={model.materials.total}
+          />
+        </div>
+      ) : null}
 
       <div className="mt-5 lg:mt-6">
         <OwnedBenefits benefits={model.benefits} />

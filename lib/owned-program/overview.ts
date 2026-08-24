@@ -47,12 +47,12 @@ export function getOwnedProgramHighlights(
       id: "worksheets",
       icon: "file",
       title: "Delovni listi in vaje",
-      description: "Prenesi in uporabljaj kadarkoli",
+      description: "Na voljo, ko so del lekcije",
     },
     {
       id: "lifetime",
       icon: "infinity",
-      title: "Dostop za vedno",
+      title: "Dostop do programa",
       description: "Uči se v svojem ritmu",
     },
   ];

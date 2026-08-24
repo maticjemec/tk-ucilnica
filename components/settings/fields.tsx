@@ -37,6 +37,8 @@ type TextFieldProps = {
   type?: "text" | "email";
   autoComplete?: string;
   className?: string;
+  disabled?: boolean;
+  readOnly?: boolean;
 };
 
 export function TextField({
@@ -47,6 +49,8 @@ export function TextField({
   type = "text",
   autoComplete,
   className,
+  disabled,
+  readOnly,
 }: TextFieldProps) {
   return (
     <FieldWrap id={id} label={label} className={className}>
@@ -56,8 +60,13 @@ export function TextField({
         type={type}
         value={value}
         autoComplete={autoComplete}
+        disabled={disabled}
+        readOnly={readOnly}
         onChange={(event) => onChange(event.target.value)}
-        className={settingsControlClass}
+        className={cn(
+          settingsControlClass,
+          (disabled || readOnly) && "cursor-default bg-canvas text-muted",
+        )}
       />
     </FieldWrap>
   );
@@ -70,6 +79,7 @@ type DateFieldProps = {
   onChange: (value: string) => void;
   autoComplete?: string;
   className?: string;
+  disabled?: boolean;
 };
 
 export function DateField({
@@ -79,6 +89,7 @@ export function DateField({
   onChange,
   autoComplete,
   className,
+  disabled,
 }: DateFieldProps) {
   return (
     <FieldWrap id={id} label={label} className={className}>
@@ -88,10 +99,12 @@ export function DateField({
         type="date"
         value={value}
         autoComplete={autoComplete}
+        disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
         className={cn(
           settingsControlClass,
           "[&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-55",
+          disabled && "cursor-default bg-canvas text-muted",
         )}
       />
     </FieldWrap>
@@ -124,7 +137,11 @@ export function SelectField({
           name={id}
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className={cn(settingsControlClass, "appearance-none pr-10")}
+          className={cn(
+            settingsControlClass,
+            "appearance-none pr-10",
+            selectProps.disabled && "cursor-default bg-canvas text-muted",
+          )}
           {...selectProps}
         >
           {options.map((option) => (
@@ -149,6 +166,7 @@ type CheckboxFieldProps = {
   description?: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
+  disabled?: boolean;
 };
 
 export function CheckboxField({
@@ -157,15 +175,23 @@ export function CheckboxField({
   description,
   checked,
   onChange,
+  disabled,
 }: CheckboxFieldProps) {
   return (
-    <label htmlFor={id} className="flex cursor-pointer items-start gap-2.5">
+    <label
+      htmlFor={id}
+      className={cn(
+        "flex items-start gap-2.5",
+        disabled ? "cursor-default" : "cursor-pointer",
+      )}
+    >
       <span className="relative mt-px shrink-0">
         <input
           id={id}
           name={id}
           type="checkbox"
           checked={checked}
+          disabled={disabled}
           onChange={(event) => onChange(event.target.checked)}
           className="peer sr-only"
         />

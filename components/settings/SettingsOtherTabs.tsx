@@ -232,25 +232,25 @@ export function BillingSettings({ content }: BillingSettingsProps) {
     <div className="flex flex-col gap-5">
       <header>
         <h2 className="text-[1.0625rem] font-semibold tracking-tight text-foreground">
-          Plačila in naročnine
+          Plačila
         </h2>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">
-          Pregled tvojega načrta. Plačila in računi bodo na voljo v naslednji
-          fazi.
+          Programi se kupijo enkrat. Naročnine in vračila trenutno niso na
+          voljo.
         </p>
       </header>
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-        <SettingsCard title="Naročnina">
+        <SettingsCard title="Nakupi">
           <p className="font-medium text-foreground">{content.account.statusLabel}</p>
           <p className="mt-0.5 text-sm text-muted">
             {content.account.activeUntilLabel}
           </p>
           <Button variant="outline" size="sm" className="mt-3.5 h-9" disabled>
-            Upravljaj naročnino
+            Naročnine niso na voljo
           </Button>
           <PlaceholderNote>
-            Upravljanje naročnine bo na voljo po povezavi plačilnega sistema.
+            Naročnin ni. Kupljeni programi se odprejo po uspešnem plačilu.
           </PlaceholderNote>
         </SettingsCard>
 
@@ -278,7 +278,7 @@ export function BillingSettings({ content }: BillingSettingsProps) {
             <div className="min-w-0">
               <p className="text-sm font-medium text-foreground">Računov še ni</p>
               <p className="mt-0.5 text-sm text-muted">
-                Tukaj se bodo prikazali računi za tvoje nakupe in naročnino.
+                Tukaj se bodo prikazali računi za tvoje nakupe.
               </p>
             </div>
           </div>

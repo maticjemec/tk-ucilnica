@@ -1,12 +1,7 @@
-"use client";
-
-import { useState } from "react";
 import { Download, FileText } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import type { LessonWorksheetSource } from "@/lib/media/types";
-
-const UNAVAILABLE_DOWNLOAD_MESSAGE = "Prenos trenutno ni na voljo.";
 
 type LessonWorksheetProps = {
   worksheet: LessonWorksheetSource;
@@ -17,7 +12,6 @@ export function LessonWorksheet({
   worksheet,
   description,
 }: LessonWorksheetProps) {
-  const [message, setMessage] = useState<string | null>(null);
   const downloadUrl = worksheet.signedDownloadUrl;
 
   return (
@@ -49,20 +43,11 @@ export function LessonWorksheet({
               Prenesi
             </a>
           ) : (
-            <Button
-              className="mt-5 w-full sm:w-auto"
-              onClick={() => setMessage(UNAVAILABLE_DOWNLOAD_MESSAGE)}
-            >
+            <Button className="mt-5 w-full sm:w-auto" disabled>
               <Download className="h-4 w-4" strokeWidth={1.6} aria-hidden />
-              Prenesi
+              Ni na voljo
             </Button>
           )}
-
-          {message ? (
-            <p className="mt-2 text-xs text-muted" role="status">
-              {message}
-            </p>
-          ) : null}
         </div>
       </div>
     </Card>

@@ -1,12 +1,18 @@
 import type { DashboardProgress } from "@/types/dashboard";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { Card } from "@/components/ui/Card";
 
 type ProgressOverviewProps = {
   progress: DashboardProgress;
+  detailsHref?: string;
+  detailsLabel?: string;
 };
 
-export function ProgressOverview({ progress }: ProgressOverviewProps) {
+export function ProgressOverview({
+  progress,
+  detailsHref = "/moji-programi",
+  detailsLabel = "Ogled podrobnosti",
+}: ProgressOverviewProps) {
   return (
     <Card padding="none" className="px-5 py-4">
       <h2 className="font-serif text-lg tracking-tight text-foreground">
@@ -25,9 +31,9 @@ export function ProgressOverview({ progress }: ProgressOverviewProps) {
         </div>
       </div>
 
-      <Button variant="outline" className="mt-4 w-full">
-        Ogled podrobnosti
-      </Button>
+      <ButtonLink variant="outline" href={detailsHref} className="mt-4 w-full">
+        {detailsLabel}
+      </ButtonLink>
     </Card>
   );
 }

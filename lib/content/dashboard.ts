@@ -1,4 +1,7 @@
-import { getAverageOwnedProgressPercent } from "@/lib/progress/helpers";
+import {
+  getAverageOwnedProgressPercent,
+  type ProgramProgressView,
+} from "@/lib/progress/helpers";
 import type {
   ContinueLesson,
   DashboardHeroContent,
@@ -17,12 +20,9 @@ export const dashboardHero: DashboardHeroContent = {
 
 /**
  * Leftover demo copy. Pregled uses getDashboardProgressSummary() from
- * owned-program percents (average). Continue/upcoming widgets below are
- * still mock content, filtered by entitlements.
+ * owned-program percents (average). Continue uses getBestOwnedContinueLesson().
  *
- * TASK 014: do not wire these widgets to drip-locked lesson routes.
- * They are not backed by curriculum access resolution, so they stay mock
- * rather than linking to a lesson the server would block.
+ * Upcoming mock rows below are not shown in production UI.
  */
 export const dashboardProgress: DashboardProgress = {
   percent: 42,
@@ -35,7 +35,7 @@ export const dashboardProgress: DashboardProgress = {
  * TASK 013B: Pregled program cards read public.programs via lib/programs.
  * `progress` on these objects is leftover demo metadata. Owned-program
  * cards overlay authenticated percent from public.user_lesson_progress.
- * Continue/upcoming widgets below still use this list for mock slug lookup.
+ * Continue/upcoming mock rows below are unused at runtime.
  *
  * @deprecated TASK 013B: program identity comes from public.programs.
  */
@@ -138,13 +138,66 @@ export function getDashboardProgressSummary(
     };
   }
 
+  const percent = getAverageOwnedProgressPercent(percents);
+
+  if (percent === 0) {
+    return {
+      percent,
+      headline: "Začni, ko si pripravljen/a.",
+      supporting: "Napredek se prikaže, ko zaključiš prvo lekcijo.",
+    };
+  }
+
+  if (percent === 100) {
+    return {
+      percent,
+      headline: "Čestitke!",
+      supporting: "Zaključil/a si svoje programe.",
+    };
+  }
+
   return {
-    percent: getAverageOwnedProgressPercent(percents),
+    percent,
     headline: "Odlično delaš!",
     supporting: "Nadaljuj in bodi ponosen/a nase.",
   };
 }
 
+/**
+ * First owned program with an accessible incomplete continue target.
+ * Completed programs are skipped so Pregled does not show a fake next lesson.
+ */
+export function getBestOwnedContinueLesson(
+  ownedPrograms: readonly DashboardProgram[],
+  progressBySlug: ReadonlyMap<string, ProgramProgressView>,
+): ContinueLesson | null {
+  for (const program of ownedPrograms) {
+    const progress = progressBySlug.get(program.slug);
+
+    if (
+      !progress ||
+      progress.isCompleted ||
+      !progress.continueAvailable ||
+      !progress.continueLesson
+    ) {
+      continue;
+    }
+
+    return {
+      title: progress.continueLesson.title,
+      program: program.label,
+      duration: progress.continueLesson.duration,
+      href: progress.continueHref,
+      visual: program.visual,
+      imageSrc: program.imageSrc,
+      imageAlt: program.imageAlt,
+    };
+  }
+
+  return null;
+}
+
+/** @deprecated TASK 020: Pregled uses getBestOwnedContinueLesson. */
 export function getOwnedContinueLesson(ownedSlugs: readonly string[]) {
   const slug = slugForDashboardProgramLabel(continueLesson.program);
 
@@ -155,6 +208,7 @@ export function getOwnedContinueLesson(ownedSlugs: readonly string[]) {
   return continueLesson;
 }
 
+/** @deprecated TASK 020: upcoming widget is hidden (no real schedule). */
 export function getOwnedUpcomingLessons(ownedSlugs: readonly string[]) {
   const owned = new Set(ownedSlugs);
 

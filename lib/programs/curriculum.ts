@@ -6,10 +6,6 @@ import type {
   ProgramSectionRow,
   ProgramUnlockModeDb,
 } from "@/lib/content/db-types";
-import {
-  getLocalLessonWorksheet,
-  getLocalOwnedProgramMaterials,
-} from "@/lib/content/owned-program";
 import type { Program } from "@/lib/programs/types";
 import type {
   LessonMediaKind,
@@ -316,7 +312,7 @@ function toProgramLesson(programSlug: string, row: LessonRow): ProgramLesson {
           signedDownloadUrl: worksheetSrc,
         },
       ]
-    : getLocalLessonWorksheet(programSlug, row.lesson_order, row.title);
+    : [];
 
   return {
     id: row.id,
@@ -430,7 +426,7 @@ export function assembleOwnedProgram(
     unlockMode: deriveProgramUnlockMode(lessons),
     sections,
     lessons,
-    materials: getLocalOwnedProgramMaterials(identity.slug),
+    materials: [],
   };
 }
 

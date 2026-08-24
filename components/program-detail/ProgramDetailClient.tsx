@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { ProgramAuthorCard } from "@/components/program-detail/ProgramAuthorCard";
 import { ProgramBenefits } from "@/components/program-detail/ProgramBenefits";
 import { ProgramBreadcrumb } from "@/components/program-detail/ProgramBreadcrumb";
@@ -22,8 +21,6 @@ export function ProgramDetailClient({
   program,
   isAuthenticated,
 }: ProgramDetailClientProps) {
-  const [isFavorite, setIsFavorite] = useState(program.isFavorite);
-
   return (
     <>
       <ProgramBreadcrumb label={program.breadcrumbLabel} />
@@ -38,8 +35,6 @@ export function ProgramDetailClient({
           >
             <ProgramDetailHero
               program={program}
-              isFavorite={isFavorite}
-              onToggleFavorite={() => setIsFavorite((current) => !current)}
               className="order-1 rounded-md border border-border shadow-[var(--shadow-card)] md:order-none md:rounded-none md:border-0 md:shadow-none"
             />
             <ProgramBenefits
@@ -49,11 +44,13 @@ export function ProgramDetailClient({
             />
           </article>
 
-          <ProgramCurriculum
-            items={program.curriculum}
-            accessState={program.accessState}
-            className="order-4 md:order-none"
-          />
+          {program.curriculum.length > 0 ? (
+            <ProgramCurriculum
+              items={program.curriculum}
+              accessState={program.accessState}
+              className="order-4 md:order-none"
+            />
+          ) : null}
         </div>
 
         <aside className="contents md:flex md:flex-col md:gap-3.5 lg:sticky lg:top-6">

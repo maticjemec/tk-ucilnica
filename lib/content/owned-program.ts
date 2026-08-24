@@ -873,20 +873,25 @@ export function getOwnedLessonStaticParams() {
 }
 
 export function getOwnedProgramMaterials(program: OwnedProgram) {
-  const featuredIds = new Set(program.materials.map((item) => item.id));
+  const hasDownload = (resource: { signedDownloadUrl?: string; href?: string }) =>
+    Boolean(resource.signedDownloadUrl || resource.href);
+  const featured = program.materials.filter(hasDownload);
+  const featuredIds = new Set(featured.map((item) => item.id));
   const visibleIds = new Set(
     program.sections.flatMap((section) => section.lessonIds),
   );
   const extra = program.lessons
     .filter((lesson) => visibleIds.has(lesson.id))
     .flatMap((lesson) =>
-      lesson.resources.filter((resource) => !featuredIds.has(resource.id)),
+      lesson.resources.filter(
+        (resource) => !featuredIds.has(resource.id) && hasDownload(resource),
+      ),
     );
 
   return {
-    featured: program.materials,
+    featured,
     extra,
-    total: program.materials.length + extra.length,
+    total: featured.length + extra.length,
   };
 }
 

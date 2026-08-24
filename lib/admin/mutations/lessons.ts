@@ -103,7 +103,7 @@ export async function createLesson(input: CreateLessonInput) {
   }
 
   const supabase = createAdminClient();
-  const { error } = await supabase.from("lessons").insert({
+  const payload = {
     program_id: programId,
     section_id: fields.sectionId,
     slug,
@@ -117,7 +117,29 @@ export async function createLesson(input: CreateLessonInput) {
     unlock_mode: fields.unlockMode,
     unlock_at: fields.unlockAt,
     day_offset: fields.dayOffset,
-  });
+  };
+  const { error } = await supabase.from("lessons").insert(payload);
+
+  if (error?.message.includes("lesson_order")) {
+    const { data: last } = await supabase
+      .from("lessons")
+      .select("lesson_order")
+      .eq("program_id", programId)
+      .order("lesson_order", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const nextOrder =
+      typeof last?.lesson_order === "number" ? last.lesson_order + 1 : 1;
+    const retry = await supabase.from("lessons").insert({
+      ...payload,
+      lesson_order: nextOrder,
+    });
+
+    if (!retry.error) {
+      revalidateAdminLesson(input.programSlug, slug);
+      return adminOk({ slug });
+    }
+  }
 
   if (error) {
     console.error("[admin] Failed to create lesson.");

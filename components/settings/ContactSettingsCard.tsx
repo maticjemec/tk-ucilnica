@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { SettingsCard } from "@/components/settings/SettingsCard";
 import { CheckboxField, SelectField } from "@/components/settings/fields";
 import type { ContactSettings, SettingsFieldOptions } from "@/types/settings";
@@ -14,38 +13,32 @@ export function ContactSettingsCard({
   contact,
   options,
 }: ContactSettingsCardProps) {
-  const [form, setForm] = useState(contact);
-
-  function update<K extends keyof ContactSettings>(
-    key: K,
-    value: ContactSettings[K],
-  ) {
-    setForm((current) => ({ ...current, [key]: value }));
-  }
-
   return (
     <SettingsCard title="Kontaktne nastavitve">
       <div className="grid grid-cols-1 items-end gap-x-4 gap-y-4 md:grid-cols-3">
         <SelectField
           id="language"
           label="Jezik"
-          value={form.language}
+          value={contact.language}
           options={options.language}
-          onChange={(value) => update("language", value)}
+          disabled
+          onChange={() => undefined}
         />
         <SelectField
           id="timeUnit"
           label="Enote časa"
-          value={form.timeUnit}
+          value={contact.timeUnit}
           options={options.timeUnit}
-          onChange={(value) => update("timeUnit", value)}
+          disabled
+          onChange={() => undefined}
         />
         <SelectField
           id="timeFormat"
           label="Oblika časa"
-          value={form.timeFormat}
+          value={contact.timeFormat}
           options={options.timeFormat}
-          onChange={(value) => update("timeFormat", value)}
+          disabled
+          onChange={() => undefined}
         />
       </div>
 
@@ -53,11 +46,16 @@ export function ContactSettingsCard({
         <CheckboxField
           id="newsletterOptIn"
           label="Rad/a prejemam e-novice, nasvete in posebne ponudbe."
-          description="Svoje soglasje lahko kadarkoli prekličem."
-          checked={form.newsletterOptIn}
-          onChange={(checked) => update("newsletterOptIn", checked)}
+          description="E-novice še niso povezane."
+          checked={contact.newsletterOptIn}
+          disabled
+          onChange={() => undefined}
         />
       </div>
+
+      <p className="mt-4 text-sm leading-relaxed text-muted">
+        Te nastavitve se trenutno ne shranjujejo.
+      </p>
     </SettingsCard>
   );
 }

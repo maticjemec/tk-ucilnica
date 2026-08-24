@@ -11,8 +11,7 @@ export function DeleteAccountCard() {
     <>
       <SettingsCard title="Izbriši račun" compact>
         <p className="text-sm leading-relaxed text-muted">
-          Če želiš trajno izbrisati svoj račun in vse podatke, klikni spodnji
-          gumb.
+          Brisanje računa še ni na voljo. Tvoj račun se s tem gumbom ne izbriše.
         </p>
         <Button
           variant="destructive"
@@ -73,7 +72,7 @@ function DeleteAccountDialog({ onClose }: DeleteAccountDialogProps) {
           Izbriši račun
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-muted">
-          Brisanje računa bo na voljo po povezavi uporabniškega sistema.
+          Brisanje računa še ni povezano. Račun in podatki ostanejo nespremenjeni.
         </p>
         <div className="mt-5 flex justify-end">
           <Button id="delete-account-close" variant="outline" onClick={onClose}>

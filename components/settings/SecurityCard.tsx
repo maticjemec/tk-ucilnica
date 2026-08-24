@@ -15,10 +15,9 @@ const rowIcons: Record<
 
 type SecurityCardProps = {
   settings: SecuritySetting[];
-  onAction: () => void;
 };
 
-export function SecurityCard({ settings, onAction }: SecurityCardProps) {
+export function SecurityCard({ settings }: SecurityCardProps) {
   return (
     <SettingsCard title="Varnost" compact>
       <ul className="-mt-0.5 flex flex-col">
@@ -55,8 +54,8 @@ export function SecurityCard({ settings, onAction }: SecurityCardProps) {
 
               <button
                 type="button"
-                onClick={onAction}
-                className="shrink-0 text-sm font-medium text-accent transition-colors hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                disabled
+                className="shrink-0 text-sm font-medium text-muted"
               >
                 {setting.actionLabel}
               </button>

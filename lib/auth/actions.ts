@@ -145,11 +145,6 @@ export async function signUp(input: {
       },
     });
 
-    console.log("SUPABASE SIGNUP RESULT", {
-      hasUser: Boolean(data?.user),
-      hasSession: Boolean(data?.session),
-    });
-
     if (error) {
       console.error("SUPABASE SIGNUP ERROR", {
         message: error.message,

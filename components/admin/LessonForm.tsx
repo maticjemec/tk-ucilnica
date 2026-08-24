@@ -241,7 +241,8 @@ export function LessonForm({
         />
         <AdminCheckbox
           id="isPreview"
-          label="Predogled"
+          label="Predogled (kmalu)"
+          hint="Označba se shrani, a javni predogled še ni vklopljen. Plačljive lekcije ostanejo zaprte."
           defaultChecked={lesson?.is_preview ?? false}
         />
       </div>

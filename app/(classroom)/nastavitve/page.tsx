@@ -28,7 +28,7 @@ export default async function NastavitvePage() {
     <>
       <PageHeader
         title="Nastavitve"
-        subtitle="Uredi svoje podatke, nastavitve računa in nastavitve učenja."
+        subtitle="Pregled računa, odjava in nastavitve, ki so že povezane."
       />
 
       <SettingsClient content={content} />

@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { Crown, FileText, Headphones, ShieldCheck } from "lucide-react";
+import { FileText, Headphones, ShieldCheck } from "lucide-react";
 import { SettingsCard } from "@/components/settings/SettingsCard";
 import { Button } from "@/components/ui/Button";
 import type { AccountBenefitIcon, AccountPlan } from "@/types/settings";
@@ -24,8 +24,7 @@ export function AccountCard({ account, onManageSubscription }: AccountCardProps)
       title="Tvoj račun"
       compact
       action={
-        <span className="inline-flex items-center gap-1 rounded-sm border border-accent/30 bg-warning-soft px-1.5 py-px text-[0.65rem] font-medium text-warning-foreground">
-          <Crown className="h-3 w-3" strokeWidth={1.8} aria-hidden />
+        <span className="inline-flex items-center rounded-sm border border-border bg-canvas px-1.5 py-px text-[0.65rem] font-medium text-muted">
           {account.badge}
         </span>
       }
@@ -39,7 +38,7 @@ export function AccountCard({ account, onManageSubscription }: AccountCardProps)
         className="mt-3.5 h-9 w-full"
         onClick={onManageSubscription}
       >
-        Upravljaj naročnino
+        Pregled plačil
       </Button>
 
       <ul className="mt-4 flex flex-col gap-2.5">

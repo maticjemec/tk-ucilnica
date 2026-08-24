@@ -25,26 +25,10 @@ export function CatalogClient({
   const [filter, setFilter] = useState<CatalogFilterId>("all");
   const [sort, setSort] = useState<CatalogSortId>("popularity");
   const [view, setView] = useState<CatalogView>("grid");
-  const [favorites, setFavorites] = useState<Set<string>>(
-    () => new Set(programs.filter((program) => program.isFavorite).map((program) => program.id)),
-  );
-
   const visible = useMemo(
     () => getVisibleCatalogPrograms(programs, filter, sort),
     [programs, filter, sort],
   );
-
-  function toggleFavorite(id: string) {
-    setFavorites((current) => {
-      const next = new Set(current);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  }
 
   return (
     <>
@@ -81,9 +65,7 @@ export function CatalogClient({
                 <CatalogProgramCard
                   program={program}
                   variant={view}
-                  isFavorite={favorites.has(program.id)}
                   owned={ownedSlugs.includes(program.slug)}
-                  onToggleFavorite={toggleFavorite}
                 />
               </li>
             ))}

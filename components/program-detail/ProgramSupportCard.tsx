@@ -16,9 +16,15 @@ export function ProgramSupportCard({ className }: ProgramSupportCardProps) {
       <p className="mt-1.5 text-sm leading-relaxed text-muted">
         Na voljo smo vam na vsakem koraku vaše poti.
       </p>
-      <Button variant="outline" className="mt-3.5 w-full" type="button">
+      <Button
+        variant="outline"
+        className="mt-3.5 w-full"
+        type="button"
+        disabled
+        title="Podpora bo kmalu na voljo."
+      >
         <Mail className="h-4 w-4" strokeWidth={1.6} aria-hidden />
-        Kontaktiraj podporo
+        Kontakt kmalu
       </Button>
     </Card>
   );
