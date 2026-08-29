@@ -82,10 +82,14 @@ function toProgramEntitlement(row: UserProgramRow): ProgramEntitlement {
  * Fails closed: query errors, missing table, and invalid rows yield no access.
  * This module does not insert, update, or delete entitlement rows.
  */
+export type EntitlementsQueryResult =
+  | { ok: true; entitlements: ProgramEntitlement[] }
+  | { ok: false; entitlements: [] };
+
 export async function fetchValidProgramEntitlements(
   supabase: SupabaseClient,
   userId: string,
-): Promise<ProgramEntitlement[]> {
+): Promise<EntitlementsQueryResult> {
   const { data, error } = await supabase
     .from(USER_PROGRAMS_TABLE)
     .select(USER_PROGRAM_COLUMNS)
@@ -93,12 +97,12 @@ export async function fetchValidProgramEntitlements(
 
   if (error) {
     console.error("[entitlements] Failed to load program entitlements.");
-    return [];
+    return { ok: false, entitlements: [] };
   }
 
   if (!Array.isArray(data)) {
     console.error("[entitlements] Failed to load program entitlements.");
-    return [];
+    return { ok: false, entitlements: [] };
   }
 
   const now = new Date();
@@ -114,5 +118,5 @@ export async function fetchValidProgramEntitlements(
     entitlements.push(toProgramEntitlement(row));
   }
 
-  return entitlements;
+  return { ok: true, entitlements };
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { CreditCard, Receipt } from "lucide-react";
 import { SettingsCard } from "@/components/settings/SettingsCard";
 import { SelectField, ToggleField } from "@/components/settings/fields";
@@ -37,8 +38,8 @@ export function LearningSettings({ content }: LearningSettingsProps) {
           Nastavitve učenja
         </h2>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">
-          Prilagodi tempo, predvajanje lekcij in opomnike. Spremembe ostanejo
-          lokalne, dokler ne povežemo uporabniškega sistema.
+          Prilagodi tempo, predvajanje lekcij in opomnike. Te nastavitve se
+          trenutno shranijo samo v tem brskalniku.
         </p>
       </header>
 
@@ -93,8 +94,8 @@ export function NotificationSettings({ content }: NotificationSettingsProps) {
           Obvestila
         </h2>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">
-          Izberi, katera obvestila želiš prejemati. Nastavitve so trenutno
-          samo lokalni predogled.
+          Izberi, katera obvestila želiš prejemati. Te nastavitve se trenutno
+          shranijo samo v tem brskalniku.
         </p>
       </header>
 
@@ -174,8 +175,8 @@ export function SecuritySettings({ content }: SecuritySettingsProps) {
           Varnost
         </h2>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">
-          Geslo, dvofaktorska avtentikacija in seje bodo na voljo po povezavi
-          uporabniškega sistema.
+          Spremeni geslo. Dvofaktorska avtentikacija in pregled naprav bosta na
+          voljo kasneje.
         </p>
       </header>
 
@@ -193,19 +194,27 @@ export function SecuritySettings({ content }: SecuritySettingsProps) {
                     <p className="mt-0.5 text-muted">{setting.value}</p>
                   ) : (
                     <p className="mt-0.5 text-muted">
-                      Pregled aktivnih naprav pride kasneje.
+                      Trenutno ni na voljo.
                     </p>
                   )}
                 </div>
-                <span className="shrink-0 text-sm text-muted">
-                  {setting.actionLabel}
-                </span>
+                {setting.actionHref ? (
+                  <Link
+                    href={setting.actionHref}
+                    className="shrink-0 text-sm font-medium text-accent transition-colors hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  >
+                    {setting.actionLabel}
+                  </Link>
+                ) : (
+                  <span className="shrink-0 text-sm text-muted">
+                    {setting.actionLabel}
+                  </span>
+                )}
               </li>
             ))}
           </ul>
           <PlaceholderNote>
-            Dejanja so trenutno samo prikaz. Spremembe gesla in 2FA še niso
-            povezane.
+            Dvofaktorska avtentikacija in pregled naprav še nista na voljo.
           </PlaceholderNote>
         </SettingsCard>
 

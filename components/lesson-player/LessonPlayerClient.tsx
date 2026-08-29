@@ -12,6 +12,7 @@ import { getOwnedLessonNav } from "@/lib/content/owned-program";
 import {
   formatLessonHeading,
   formatLessonPosition,
+  getLessonCompletionNextStep,
   resolveOwnedLessons,
 } from "@/lib/owned-program/access";
 import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
@@ -61,6 +62,9 @@ export function LessonPlayerClient({
     completedSet.size,
     program.lessons.length,
   );
+  const nextStep = completed
+    ? getLessonCompletionNextStep(program, lesson, completedSet, access)
+    : null;
 
   function handleComplete() {
     if (completed || isPending) {
@@ -117,6 +121,8 @@ export function LessonPlayerClient({
             pending={isPending}
             error={saveError}
             onComplete={handleComplete}
+            programSlug={program.slug}
+            nextStep={nextStep}
           />
 
           <LessonNavigation

@@ -1,6 +1,7 @@
 import { isEntitlementCurrentlyValid } from "@/lib/auth/entitlements";
 import {
   formatDripAvailabilityLabel,
+  formatNextLessonUnlockMessage,
   parseTimestamp,
   addUtcDays,
 } from "@/lib/owned-program/datetime";
@@ -368,9 +369,57 @@ export function isOwnedProgramCompleted(progressPercent: number) {
 }
 
 export function getOwnedPrimaryCtaLabel(progressPercent: number) {
-  return isOwnedProgramCompleted(progressPercent)
-    ? "Ponovi program"
-    : "Nadaljuj program";
+  if (isOwnedProgramCompleted(progressPercent)) {
+    return "Ponovi program";
+  }
+
+  return progressPercent <= 0 ? "Začni program" : "Nadaljuj program";
+}
+
+export type LessonCompletionNextStep =
+  | { kind: "next"; href: string; label: string }
+  | { kind: "waiting"; message: string }
+  | { kind: "complete" };
+
+export function getLessonCompletionNextStep(
+  program: OwnedProgram,
+  lesson: ProgramLesson,
+  completedIds: ReadonlySet<string>,
+  access?: LessonAccessOptions,
+): LessonCompletionNextStep {
+  const ordered = orderedLessons(program.lessons);
+  const index = ordered.findIndex((item) => item.id === lesson.id);
+  const nextLesson = index >= 0 ? ordered[index + 1] : undefined;
+
+  if (!nextLesson) {
+    return { kind: "complete" };
+  }
+
+  const now = access?.now ?? new Date();
+  const resolution = resolveLessonAccess({
+    lesson: nextLesson,
+    lessons: program.lessons,
+    completedIds,
+    unlockMode: program.unlockMode,
+    entitlement: access?.entitlement,
+    now,
+    currentLessonId: lesson.id,
+  });
+
+  if (resolution.canOpen) {
+    return {
+      kind: "next",
+      href: getOwnedLessonPath(program.slug, nextLesson.slug),
+      label: formatLessonHeading(nextLesson),
+    };
+  }
+
+  return {
+    kind: "waiting",
+    message: resolution.unlockAt
+      ? formatNextLessonUnlockMessage(resolution.unlockAt, now)
+      : "Naslednja lekcija še ni na voljo.",
+  };
 }
 
 export function formatSectionProgress(completed: number, total: number) {

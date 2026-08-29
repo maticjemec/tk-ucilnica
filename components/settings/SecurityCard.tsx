@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import Link from "next/link";
 import { LockKeyhole, Shield, Smartphone } from "lucide-react";
 import { SettingsCard } from "@/components/settings/SettingsCard";
 import { cn } from "@/lib/cn";
@@ -52,13 +53,18 @@ export function SecurityCard({ settings }: SecurityCardProps) {
                 ) : null}
               </div>
 
-              <button
-                type="button"
-                disabled
-                className="shrink-0 text-sm font-medium text-muted"
-              >
-                {setting.actionLabel}
-              </button>
+              {setting.actionHref ? (
+                <Link
+                  href={setting.actionHref}
+                  className="shrink-0 text-sm font-medium text-accent transition-colors hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                >
+                  {setting.actionLabel}
+                </Link>
+              ) : (
+                <span className="shrink-0 text-sm font-medium text-muted">
+                  {setting.actionLabel}
+                </span>
+              )}
             </li>
           );
         })}

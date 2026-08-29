@@ -4,7 +4,9 @@ import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { MyProgramsClient } from "@/components/my-programs/MyProgramsClient";
 import { SupportCard } from "@/components/my-programs/SupportCard";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { QueryRecovery } from "@/components/ui/QueryRecovery";
 import {
+  areEntitlementsReadable,
   getOwnedProgramSlugs,
   requireAuthenticatedUser,
 } from "@/lib/auth/access";
@@ -18,8 +20,34 @@ export const metadata: Metadata = {
 export default async function MojiProgramiPage() {
   const access = await requireAuthenticatedUser("/moji-programi");
   const ownedSlugs = getOwnedProgramSlugs(access);
-  const { bundles, progressBySlug } =
+  const { readable, bundles, progressBySlug } =
     await getOwnedCurriculumAndProgress(ownedSlugs);
+
+  if (!areEntitlementsReadable(access) || !readable) {
+    return (
+      <>
+        <PageHeader
+          title="Moji programi"
+          subtitle="Tukaj vidiš vse programe, ki si jih kupil/a. Nadaljuj tam, kjer si končal/a."
+          actions={
+            <ButtonLink
+              href="/programi"
+              variant="outline"
+              className="w-full sm:w-auto"
+            >
+              <LayoutGrid className="h-4 w-4" strokeWidth={1.6} aria-hidden />
+              Razišči vse programe
+            </ButtonLink>
+          }
+        />
+        <QueryRecovery
+          title="Programov trenutno ni mogoče naložiti."
+          description="Seznam tvojih programov trenutno ni na voljo. Poskusi znova čez trenutek."
+        />
+      </>
+    );
+  }
+
   const programs = bundles.map((bundle) =>
     toPurchasedProgram(bundle.identity, progressBySlug.get(bundle.identity.slug)),
   );

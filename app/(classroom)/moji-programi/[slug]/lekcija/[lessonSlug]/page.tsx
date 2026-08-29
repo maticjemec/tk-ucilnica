@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { LessonPlayerClient } from "@/components/lesson-player/LessonPlayerClient";
+import { QueryRecovery } from "@/components/ui/QueryRecovery";
 import {
   getEntitlementForProgram,
   requireProgramEntitlement,
@@ -17,7 +18,7 @@ import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
 import { buildProgramProgressView } from "@/lib/progress/helpers";
 import { markLessonOpened } from "@/lib/progress/mutations";
 import { getProgramLessonProgress } from "@/lib/progress/queries";
-import { getProgramWithCurriculum } from "@/lib/programs";
+import { getProgramWithCurriculumResult } from "@/lib/programs";
 import { isNextRouterPrefetch } from "@/lib/http/prefetch";
 
 type OwnedLessonPageProps = {
@@ -28,12 +29,12 @@ export async function generateMetadata({
   params,
 }: OwnedLessonPageProps): Promise<Metadata> {
   const { slug, lessonSlug } = await params;
-  const bundle = await getProgramWithCurriculum(slug);
-  const lesson = bundle
-    ? getOwnedLesson(bundle.program, lessonSlug)
+  const lookup = await getProgramWithCurriculumResult(slug);
+  const lesson = lookup.bundle
+    ? getOwnedLesson(lookup.bundle.program, lessonSlug)
     : undefined;
 
-  if (!bundle || !lesson) {
+  if (!lookup.bundle || !lesson) {
     return { title: "Lekcija" };
   }
 
@@ -45,14 +46,24 @@ export async function generateMetadata({
 
 export default async function OwnedLessonPage({ params }: OwnedLessonPageProps) {
   const { slug, lessonSlug } = await params;
-  const [access, bundle, rows] = await Promise.all([
+  const [access, lookup, rows] = await Promise.all([
     requireProgramEntitlement(slug),
-    getProgramWithCurriculum(slug),
+    getProgramWithCurriculumResult(slug),
     getProgramLessonProgress(slug),
   ]);
+
+  if (!lookup.ok) {
+    return (
+      <QueryRecovery
+        title="Lekcije trenutno ni mogoče naložiti."
+        description="Poskusi znova čez trenutek. Če se stran ne naloži, se vrni na program."
+      />
+    );
+  }
+
   const entitlement = getEntitlementForProgram(access, slug);
   const now = new Date();
-  const program = bundle?.program;
+  const program = lookup.bundle?.program;
   const lesson = program ? getOwnedLesson(program, lessonSlug) : undefined;
 
   if (!program || !lesson) {

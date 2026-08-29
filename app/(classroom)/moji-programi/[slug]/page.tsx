@@ -9,6 +9,7 @@ import { OwnedMaterials } from "@/components/owned-overview/OwnedMaterials";
 import { OwnedProgramHero } from "@/components/owned-overview/OwnedProgramHero";
 import { OwnedProgramHighlights } from "@/components/owned-overview/OwnedProgramHighlights";
 import { SupportCard } from "@/components/my-programs/SupportCard";
+import { QueryRecovery } from "@/components/ui/QueryRecovery";
 import {
   getEntitlementForProgram,
   requireProgramEntitlement,
@@ -16,7 +17,7 @@ import {
 import { getOwnedOverviewModel } from "@/lib/owned-program/overview";
 import { buildProgramProgressView } from "@/lib/progress/helpers";
 import { getProgramLessonProgress } from "@/lib/progress/queries";
-import { getProgramBySlug, getProgramWithCurriculum } from "@/lib/programs";
+import { getProgramBySlug, getProgramWithCurriculumResult } from "@/lib/programs";
 
 type OwnedProgramOverviewPageProps = {
   params: Promise<{ slug: string }>;
@@ -42,15 +43,26 @@ export default async function OwnedProgramOverviewPage({
   params,
 }: OwnedProgramOverviewPageProps) {
   const { slug } = await params;
-  const [access, bundle, rows] = await Promise.all([
+  const [access, lookup, rows] = await Promise.all([
     requireProgramEntitlement(slug),
-    getProgramWithCurriculum(slug),
+    getProgramWithCurriculumResult(slug),
     getProgramLessonProgress(slug),
   ]);
 
-  if (!bundle) {
+  if (!lookup.ok) {
+    return (
+      <QueryRecovery
+        title="Programa trenutno ni mogoče naložiti."
+        description="Poskusi znova čez trenutek. Če se stran ne naloži, se vrni na Moje programe."
+      />
+    );
+  }
+
+  if (!lookup.bundle) {
     notFound();
   }
+
+  const bundle = lookup.bundle;
 
   const entitlement = getEntitlementForProgram(access, slug);
   const now = new Date();

@@ -50,7 +50,9 @@ export function CatalogClient({
       <section className="mt-6" aria-label="Katalog programov">
         {visible.length === 0 ? (
           <p className="rounded-md border border-border bg-surface px-6 py-12 text-center text-sm text-muted shadow-[var(--shadow-card)]">
-            V tej kategoriji trenutno ni programov.
+            {programs.length === 0
+              ? "Trenutno ni objavljenih programov."
+              : "V tej kategoriji trenutno ni programov."}
           </p>
         ) : (
           <ul

@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProgramDetailClient } from "@/components/program-detail/ProgramDetailClient";
-import { getUserAccessContext, ownsProgram } from "@/lib/auth/access";
+import { QueryRecovery } from "@/components/ui/QueryRecovery";
+import {
+  areEntitlementsReadable,
+  getUserAccessContext,
+  ownsProgram,
+} from "@/lib/auth/access";
 import { overlayLocalProgramDetailExtras } from "@/lib/content/program-detail";
-import { getProgramBySlug } from "@/lib/programs";
+import { getProgramBySlug, getProgramBySlugResult } from "@/lib/programs";
 
 type ProgramDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -29,22 +34,37 @@ export default async function ProgramDetailPage({
   params,
 }: ProgramDetailPageProps) {
   const { slug } = await params;
-  const [identity, access] = await Promise.all([
-    getProgramBySlug(slug),
+  const [lookup, access] = await Promise.all([
+    getProgramBySlugResult(slug),
     getUserAccessContext(),
   ]);
 
-  if (!identity) {
+  if (!lookup.ok) {
+    return (
+      <QueryRecovery
+        title="Programa trenutno ni mogoče naložiti."
+        description="Poskusi znova čez trenutek. Če se stran ne naloži, se vrni na katalog."
+      />
+    );
+  }
+
+  if (!lookup.program) {
     notFound();
   }
+
   const owned = ownsProgram(access, slug);
-  const program = overlayLocalProgramDetailExtras(identity);
+  const program = overlayLocalProgramDetailExtras(lookup.program);
+  const accessState = !areEntitlementsReadable(access)
+    ? "unavailable"
+    : owned
+      ? "owned"
+      : "public";
 
   return (
     <ProgramDetailClient
       program={{
         ...program,
-        accessState: owned ? "owned" : "public",
+        accessState,
       }}
       isAuthenticated={access.status === "authenticated"}
     />

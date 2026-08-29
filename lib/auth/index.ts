@@ -9,6 +9,7 @@ export type {
 } from "@/lib/auth/types";
 
 export {
+  areEntitlementsReadable,
   getEntitlementForProgram,
   getOwnedProgramSlugs,
   getUserAccessContext,
@@ -26,9 +27,12 @@ export {
 export { getUserDisplayName, getUserInitials } from "@/lib/auth/user";
 
 export {
+  getCheckoutSuccessPath,
+  getForgotPasswordPath,
   getLoginPath,
   getPublicCatalogPath,
   getPublicProgramPath,
   getRegisterPath,
+  getResetPasswordPath,
   getSafeRedirectPath,
 } from "@/lib/auth/redirects";

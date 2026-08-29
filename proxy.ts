@@ -38,8 +38,12 @@ export async function proxy(request: NextRequest) {
   expireLegacyMockAuthCookie(supabaseResponse);
 
   if (isProtectedPath(pathname) && !isAuthenticated) {
+    const returnPath =
+      pathname === "/nakup/uspesno"
+        ? `${pathname}${request.nextUrl.search}`
+        : pathname;
     const redirectResponse = NextResponse.redirect(
-      new URL(getLoginPath(pathname), request.url),
+      new URL(getLoginPath(returnPath), request.url),
     );
 
     return copySupabaseCookies(supabaseResponse, redirectResponse);

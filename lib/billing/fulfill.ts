@@ -165,6 +165,8 @@ async function grantStripeEntitlement(userId: string, programSlug: string) {
   revalidatePath(`/moji-programi/${programSlug}`);
   revalidatePath(`/programi/${programSlug}`);
   revalidatePath("/");
+  revalidatePath("/", "layout");
+  revalidatePath("/nakup/uspesno");
 }
 
 function sessionMatchesPurchase(

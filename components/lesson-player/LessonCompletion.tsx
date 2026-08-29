@@ -1,14 +1,19 @@
 "use client";
 
 import { Check } from "lucide-react";
+import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
+import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
+import type { LessonCompletionNextStep } from "@/lib/owned-program/access";
 
 type LessonCompletionProps = {
   completed: boolean;
   pending?: boolean;
   error?: string | null;
   onComplete: () => void;
+  programSlug: string;
+  nextStep?: LessonCompletionNextStep | null;
 };
 
 export function LessonCompletion({
@@ -16,6 +21,8 @@ export function LessonCompletion({
   pending = false,
   error,
   onComplete,
+  programSlug,
+  nextStep,
 }: LessonCompletionProps) {
   return (
     <section
@@ -53,6 +60,29 @@ export function LessonCompletion({
           <p className="text-sm leading-snug text-danger" role="alert">
             {error}
           </p>
+        ) : null}
+        {completed && nextStep?.kind === "next" ? (
+          <ButtonLink href={nextStep.href} className="w-full">
+            Naslednja lekcija
+            <span className="sr-only">: {nextStep.label}</span>
+          </ButtonLink>
+        ) : null}
+        {completed && nextStep?.kind === "waiting" ? (
+          <p className="text-sm leading-snug text-muted">{nextStep.message}</p>
+        ) : null}
+        {completed && nextStep?.kind === "complete" ? (
+          <>
+            <p className="text-sm font-medium text-success-foreground">
+              Program je zaključen
+            </p>
+            <ButtonLink
+              href={getOwnedProgramOverviewPath(programSlug)}
+              variant="success-outline"
+              className="w-full"
+            >
+              Nazaj na program
+            </ButtonLink>
+          </>
         ) : null}
       </div>
     </section>

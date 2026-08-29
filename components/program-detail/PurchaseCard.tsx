@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Gift } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -25,12 +25,17 @@ export function PurchaseCard({
   className,
 }: PurchaseCardProps) {
   const owned = program.accessState === "owned";
+  const unavailable = program.accessState === "unavailable";
   const programPath = `/programi/${program.slug}`;
 
   return (
     <Card padding="none" className={cn("px-5 py-5", className)}>
       {owned ? (
         <p className="text-sm text-muted">Program je že tvoj.</p>
+      ) : unavailable ? (
+        <p className="text-sm text-muted">
+          Dostopa trenutno ni mogoče preveriti.
+        </p>
       ) : (
         <p className="pt-0.5 font-serif text-[2.15rem] leading-none font-semibold tracking-tight text-foreground">
           {formatCatalogPrice(program.price)}
@@ -45,6 +50,8 @@ export function PurchaseCard({
           >
             Odpri program
           </ButtonLink>
+        ) : unavailable ? (
+          <AccessRetryButton />
         ) : isAuthenticated ? (
           <CheckoutButton programSlug={program.slug} />
         ) : (
@@ -55,22 +62,9 @@ export function PurchaseCard({
             Prijavi se za nakup
           </ButtonLink>
         )}
-
-        {owned || !isAuthenticated ? null : (
-          <Button
-            variant="outline"
-            className="w-full"
-            size="lg"
-            disabled
-            title="Darilni nakup bo omogočen kmalu."
-          >
-            <Gift className="h-4 w-4" strokeWidth={1.6} aria-hidden />
-            Podari program (kmalu)
-          </Button>
-        )}
       </div>
 
-      {owned ? null : (
+      {owned || unavailable ? null : (
         <div className="mt-4 border-t border-border pt-3.5">
           <ul className="flex flex-col gap-2.5">
             {program.purchaseBenefits.map((item) => {
@@ -97,7 +91,22 @@ export function PurchaseCard({
   );
 }
 
+function AccessRetryButton() {
+  const router = useRouter();
+
+  return (
+    <Button
+      variant="outline"
+      className="h-11 w-full px-5"
+      onClick={() => router.refresh()}
+    >
+      Poskusi znova
+    </Button>
+  );
+}
+
 function CheckoutButton({ programSlug }: { programSlug: string }) {
+  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -107,12 +116,34 @@ function CheckoutButton({ programSlug }: { programSlug: string }) {
     }
 
     setError(null);
-    startTransition(() => {
-      void startProgramCheckoutAction(programSlug).then((result) => {
-        if (result?.error) {
-          setError(result.error);
+    startTransition(async () => {
+      try {
+        const result = await startProgramCheckoutAction(programSlug);
+
+        if (!result) {
+          setError("Plačila trenutno ni mogoče začeti. Poskusi znova čez trenutek.");
+          return;
         }
-      });
+
+        if ("error" in result) {
+          setError(result.error);
+          return;
+        }
+
+        if ("checkoutUrl" in result && result.checkoutUrl.startsWith("https://")) {
+          window.location.assign(result.checkoutUrl);
+          return;
+        }
+
+        if ("redirectTo" in result) {
+          router.replace(result.redirectTo);
+          return;
+        }
+
+        setError("Plačila trenutno ni mogoče začeti. Poskusi znova čez trenutek.");
+      } catch {
+        setError("Plačila trenutno ni mogoče začeti. Poskusi znova čez trenutek.");
+      }
     });
   }
 

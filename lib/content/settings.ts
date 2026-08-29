@@ -53,9 +53,10 @@ export const settingsContent: SettingsContent = {
     {
       id: "password",
       label: "Geslo",
-      value: "Sprememba gesla pride kasneje.",
+      value: "Spremeni geslo za svoj račun.",
       valueTone: "muted",
-      actionLabel: "Kmalu",
+      actionLabel: "Spremeni",
+      actionHref: "/ponastavi-geslo",
     },
     {
       id: "twoFactor",
@@ -67,7 +68,7 @@ export const settingsContent: SettingsContent = {
     {
       id: "sessions",
       label: "Seje in naprave",
-      value: "Pregled naprav pride kasneje.",
+      value: "Pregled naprav ni na voljo.",
       valueTone: "muted",
       actionLabel: "Kmalu",
     },

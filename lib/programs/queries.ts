@@ -99,9 +99,25 @@ function mapCurriculumRows(data: unknown): ProgramWithCurriculum[] {
   return results;
 }
 
+export type PublishedProgramsResult =
+  | { ok: true; programs: Program[] }
+  | { ok: false; programs: [] };
+
+export type ProgramLookupResult =
+  | { ok: true; program: Program | null }
+  | { ok: false; program: null };
+
+export type ProgramCurriculumResult =
+  | { ok: true; bundle: ProgramWithCurriculum | null }
+  | { ok: false; bundle: null };
+
+export type ProgramCurriculaResult =
+  | { ok: true; bundles: ProgramWithCurriculum[] }
+  | { ok: false; bundles: [] };
+
 async function fetchPublishedPrograms(
   supabase: SupabaseClient,
-): Promise<Program[]> {
+): Promise<PublishedProgramsResult> {
   const { data, error } = await supabase
     .from(PROGRAMS_TABLE)
     .select(PROGRAM_LIST_COLUMNS)
@@ -110,29 +126,37 @@ async function fetchPublishedPrograms(
 
   if (error) {
     console.error("[programs] Failed to load published programs.");
-    return [];
+    return { ok: false, programs: [] };
   }
 
-  return mapProgramRows(data);
+  return { ok: true, programs: mapProgramRows(data) };
 }
 
-/**
- * Published catalog programs, ordered by sort_order.
- * Request-level cache via React cache().
- */
-export const getPublishedPrograms = cache(async (): Promise<Program[]> => {
+const loadPublishedPrograms = cache(async (): Promise<PublishedProgramsResult> => {
   const supabase = await createClient();
   return fetchPublishedPrograms(supabase);
 });
 
 /**
+ * Published catalog programs, ordered by sort_order.
+ * Request-level cache via React cache().
+ */
+export async function getPublishedPrograms(): Promise<Program[]> {
+  return (await loadPublishedPrograms()).programs;
+}
+
+export async function getPublishedProgramsResult(): Promise<PublishedProgramsResult> {
+  return loadPublishedPrograms();
+}
+
+/**
  * Single published program by slug.
  * Unpublished or missing rows resolve to null (RLS + explicit filter).
  */
-export const getProgramBySlug = cache(
-  async (slug: string): Promise<Program | null> => {
+const loadProgramBySlug = cache(
+  async (slug: string): Promise<ProgramLookupResult> => {
     if (!slug) {
-      return null;
+      return { ok: true, program: null };
     }
 
     const supabase = await createClient();
@@ -145,18 +169,28 @@ export const getProgramBySlug = cache(
 
     if (error) {
       console.error("[programs] Failed to load program.");
-      return null;
+      return { ok: false, program: null };
     }
 
     const row = parseProgramRow(data);
 
     if (!row || !row.is_published) {
-      return null;
+      return { ok: true, program: null };
     }
 
-    return toProgram(row);
+    return { ok: true, program: toProgram(row) };
   },
 );
+
+export async function getProgramBySlug(slug: string): Promise<Program | null> {
+  return (await loadProgramBySlug(slug)).program;
+}
+
+export async function getProgramBySlugResult(
+  slug: string,
+): Promise<ProgramLookupResult> {
+  return loadProgramBySlug(slug);
+}
 
 /**
  * Published programs for the given slugs, one query.
@@ -191,10 +225,10 @@ export const getProgramsBySlugs = cache(
  * Published program plus sections and lessons in one nested query.
  * Query failure and missing/unpublished programs resolve to null.
  */
-export const getProgramWithCurriculum = cache(
-  async (slug: string): Promise<ProgramWithCurriculum | null> => {
+const loadProgramWithCurriculum = cache(
+  async (slug: string): Promise<ProgramCurriculumResult> => {
     if (!slug) {
-      return null;
+      return { ok: true, bundle: null };
     }
 
     const supabase = await createClient();
@@ -207,22 +241,34 @@ export const getProgramWithCurriculum = cache(
 
     if (error) {
       console.error("[programs] Failed to load program curriculum.");
-      return null;
+      return { ok: false, bundle: null };
     }
 
-    return mapCurriculumRow(data);
+    return { ok: true, bundle: mapCurriculumRow(data) };
   },
 );
+
+export async function getProgramWithCurriculum(
+  slug: string,
+): Promise<ProgramWithCurriculum | null> {
+  return (await loadProgramWithCurriculum(slug)).bundle;
+}
+
+export async function getProgramWithCurriculumResult(
+  slug: string,
+): Promise<ProgramCurriculumResult> {
+  return loadProgramWithCurriculum(slug);
+}
 
 /**
  * Batched curriculum for owned-program lists. One query for all slugs.
  */
-export const getCurriculumForPrograms = cache(
-  async (slugs: readonly string[]): Promise<ProgramWithCurriculum[]> => {
+const loadCurriculumForPrograms = cache(
+  async (slugs: readonly string[]): Promise<ProgramCurriculaResult> => {
     const unique = [...new Set(slugs.filter((slug) => slug.length > 0))];
 
     if (unique.length === 0) {
-      return [];
+      return { ok: true, bundles: [] };
     }
 
     const supabase = await createClient();
@@ -235,9 +281,21 @@ export const getCurriculumForPrograms = cache(
 
     if (error) {
       console.error("[programs] Failed to load program curricula.");
-      return [];
+      return { ok: false, bundles: [] };
     }
 
-    return mapCurriculumRows(data);
+    return { ok: true, bundles: mapCurriculumRows(data) };
   },
 );
+
+export async function getCurriculumForPrograms(
+  slugs: readonly string[],
+): Promise<ProgramWithCurriculum[]> {
+  return (await loadCurriculumForPrograms(slugs)).bundles;
+}
+
+export async function getCurriculumForProgramsResult(
+  slugs: readonly string[],
+): Promise<ProgramCurriculaResult> {
+  return loadCurriculumForPrograms(slugs);
+}

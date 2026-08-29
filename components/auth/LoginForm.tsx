@@ -7,10 +7,11 @@ import { AuthField } from "@/components/auth/AuthField";
 import { useAuthDestination } from "@/components/auth/useAuthDestination";
 import { Button } from "@/components/ui/Button";
 import { signIn } from "@/lib/auth/actions";
-import { getRegisterPath } from "@/lib/auth/redirects";
+import { getForgotPasswordPath, getRegisterPath } from "@/lib/auth/redirects";
 
 type LoginFormProps = {
   redirectTo?: string;
+  notice?: string | null;
 };
 
 type LoginErrors = {
@@ -22,13 +23,12 @@ function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-export function LoginForm({ redirectTo }: LoginFormProps) {
+export function LoginForm({ redirectTo, notice }: LoginFormProps) {
   const goToDestination = useAuthDestination();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<LoginErrors>({});
-  const [status, setStatus] = useState<string | null>(null);
-  const [formError, setFormError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(notice ?? null);
   const [pending, startTransition] = useTransition();
 
   function validate() {
@@ -50,7 +50,6 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setStatus(null);
     setFormError(null);
 
     if (!validate()) {
@@ -125,24 +124,18 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
         />
 
         <div className="flex justify-end">
-          <button
-            type="button"
+          <Link
+            href={getForgotPasswordPath()}
             className="text-sm text-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            onClick={() =>
-              setStatus("Ponastavitev gesla bo na voljo kmalu.")
-            }
           >
             Pozabljeno geslo?
-          </button>
+          </Link>
         </div>
 
         <div aria-live="polite" className="min-h-[1.25rem]">
           {formError ? (
             <p className="text-sm text-danger">{formError}</p>
-          ) : status ? (
-            <p className="text-sm text-muted">{status}</p>
-          ) : null}
-          {Object.keys(errors).length > 0 ? (
+          ) : Object.keys(errors).length > 0 ? (
             <p className="sr-only">Obrazec vsebuje napake.</p>
           ) : null}
         </div>

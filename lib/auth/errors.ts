@@ -4,6 +4,12 @@ export const GENERIC_SIGN_UP_ERROR =
   "Računa ni bilo mogoče ustvariti. Poskusi znova.";
 export const UNEXPECTED_SIGN_UP_ERROR =
   "Prišlo je do nepričakovane napake pri registraciji. Poskusi znova.";
+export const GENERIC_PASSWORD_RESET_ERROR =
+  "Ponastavitve gesla trenutno ni mogoče začeti. Poskusi znova.";
+export const GENERIC_PASSWORD_UPDATE_ERROR =
+  "Gesla ni bilo mogoče posodobiti. Poskusi znova.";
+export const PASSWORD_RESET_SENT_MESSAGE =
+  "Če račun s tem e-poštnim naslovom obstaja, smo ti poslali povezavo za ponastavitev gesla.";
 
 function errorCode(error: { code?: string; message?: string }) {
   return (error.code ?? "").toLowerCase();
@@ -88,4 +94,55 @@ export function mapSignUpError(error: {
   }
 
   return UNEXPECTED_SIGN_UP_ERROR;
+}
+
+export function mapPasswordResetError(error: {
+  code?: string;
+  message?: string;
+}): string {
+  const code = errorCode(error);
+  const message = errorMessage(error);
+
+  if (
+    code === "over_email_send_rate_limit" ||
+    code === "over_request_rate_limit" ||
+    message.includes("rate limit") ||
+    message.includes("too many requests")
+  ) {
+    return "Preveč poskusov. Počakaj trenutek in poskusi znova.";
+  }
+
+  return GENERIC_PASSWORD_RESET_ERROR;
+}
+
+export function mapPasswordUpdateError(error: {
+  code?: string;
+  message?: string;
+}): string {
+  const code = errorCode(error);
+  const message = errorMessage(error);
+
+  if (
+    code === "weak_password" ||
+    message.includes("password should be") ||
+    message.includes("weak password")
+  ) {
+    return "Geslo ni dovolj močno. Uporabi vsaj 8 znakov.";
+  }
+
+  if (
+    code === "same_password" ||
+    message.includes("should be different from the old password")
+  ) {
+    return "Novo geslo mora biti drugačno od trenutnega.";
+  }
+
+  if (
+    code === "session_not_found" ||
+    (message.includes("session") && message.includes("not found"))
+  ) {
+    return "Seja za ponastavitev je potekla. Zahtevaj novo povezavo.";
+  }
+
+  return GENERIC_PASSWORD_UPDATE_ERROR;
 }

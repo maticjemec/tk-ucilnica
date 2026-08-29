@@ -8,14 +8,22 @@ export const metadata: Metadata = {
 };
 
 type PrijavaPageProps = {
-  searchParams: Promise<{ redirectTo?: string | string[] }>;
+  searchParams: Promise<{
+    redirectTo?: string | string[];
+    napaka?: string | string[];
+  }>;
 };
 
 export default async function PrijavaPage({ searchParams }: PrijavaPageProps) {
   const params = await searchParams;
   const redirectTo = firstSearchParam(params.redirectTo);
+  const napaka = firstSearchParam(params.napaka);
+  const notice =
+    napaka === "potrditev"
+      ? "Potrditev računa ni uspela. Zahtevaj novo povezavo ali se prijavi."
+      : null;
 
   await redirectIfAuthenticated(redirectTo);
 
-  return <LoginForm redirectTo={redirectTo} />;
+  return <LoginForm redirectTo={redirectTo} notice={notice} />;
 }

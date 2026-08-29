@@ -6,7 +6,9 @@ import { ProgressOverview } from "@/components/dashboard/ProgressOverview";
 import { SectionHeading } from "@/components/dashboard/SectionHeading";
 import { ProgramsEmptyState } from "@/components/my-programs/ProgramsEmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { QueryRecovery } from "@/components/ui/QueryRecovery";
 import {
+  areEntitlementsReadable,
   getOwnedProgramSlugs,
   requireAuthenticatedUser,
 } from "@/lib/auth/access";
@@ -16,7 +18,7 @@ import {
   getDashboardProgressSummary,
 } from "@/lib/content/dashboard";
 import { getOwnedProgressBySlug } from "@/lib/progress/owned";
-import { getPublishedPrograms, toDashboardProgram } from "@/lib/programs";
+import { getPublishedProgramsResult, toDashboardProgram } from "@/lib/programs";
 
 export const metadata: Metadata = {
   title: "Pregled",
@@ -24,24 +26,56 @@ export const metadata: Metadata = {
 
 export default async function PregledPage() {
   const access = await requireAuthenticatedUser("/");
+
+  if (!areEntitlementsReadable(access)) {
+    return (
+      <>
+        <PageHeader
+          title={`Dobrodošel nazaj, ${access.user.firstName} 👋`}
+          subtitle="Nadaljuj svojo pot rasti in spremembe."
+        />
+        <QueryRecovery
+          title="Pregleda trenutno ni mogoče naložiti."
+          description="Tvojih programov in napredka trenutno ni mogoče prikazati. Poskusi znova čez trenutek."
+        />
+      </>
+    );
+  }
+
   const ownedSlugs = getOwnedProgramSlugs(access);
-  const owned = new Set(ownedSlugs);
   const [progressBySlug, published] = await Promise.all([
     getOwnedProgressBySlug(ownedSlugs),
-    getPublishedPrograms(),
+    getPublishedProgramsResult(),
   ]);
+
+  if (!published.ok) {
+    return (
+      <>
+        <PageHeader
+          title={`Dobrodošel nazaj, ${access.user.firstName} 👋`}
+          subtitle="Nadaljuj svojo pot rasti in spremembe."
+        />
+        <QueryRecovery
+          title="Pregleda trenutno ni mogoče naložiti."
+          description="Tvojih programov in napredka trenutno ni mogoče prikazati. Poskusi znova čez trenutek."
+        />
+      </>
+    );
+  }
+
+  const owned = new Set(ownedSlugs);
   const percentBySlug = new Map(
     [...progressBySlug.entries()].map(([slug, progress]) => [
       slug,
       progress.progressPercent,
     ]),
   );
-  const ownedPrograms = published
+  const ownedPrograms = published.programs
     .filter((program) => owned.has(program.slug))
     .map((program) =>
       toDashboardProgram(program, percentBySlug.get(program.slug) ?? 0),
     );
-  const catalogPrograms = published.map((program) =>
+  const catalogPrograms = published.programs.map((program) =>
     toDashboardProgram(program),
   );
   const ownedContinueLesson = getBestOwnedContinueLesson(

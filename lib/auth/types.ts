@@ -34,6 +34,7 @@ export type AuthenticatedAccessContext = {
   status: "authenticated";
   user: UserSession;
   entitlements: ProgramEntitlement[];
+  entitlementsReadable: boolean;
 };
 
 export type UserAccessContext = GuestAccessContext | AuthenticatedAccessContext;

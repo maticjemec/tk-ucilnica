@@ -60,6 +60,7 @@ export type SecuritySetting = {
   value?: string;
   valueTone?: "muted" | "success";
   actionLabel: string;
+  actionHref?: string;
 };
 
 export type LearningPreferences = {

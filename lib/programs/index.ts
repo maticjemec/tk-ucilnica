@@ -10,8 +10,12 @@ export {
 
 export {
   getCurriculumForPrograms,
+  getCurriculumForProgramsResult,
   getProgramBySlug,
+  getProgramBySlugResult,
   getProgramWithCurriculum,
+  getProgramWithCurriculumResult,
   getProgramsBySlugs,
   getPublishedPrograms,
+  getPublishedProgramsResult,
 } from "@/lib/programs/queries";

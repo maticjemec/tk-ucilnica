@@ -1,6 +1,6 @@
 import type { CatalogProgram } from "@/types/catalog";
 
-export type ProgramAccessState = "public" | "owned";
+export type ProgramAccessState = "public" | "owned" | "unavailable";
 
 export type ProgramDetailIcon =
   | "bell"

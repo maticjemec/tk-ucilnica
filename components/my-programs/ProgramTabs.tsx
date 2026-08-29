@@ -7,7 +7,7 @@ type ProgramTabsProps = {
 };
 
 const tabs: Array<{ id: ProgramFilter; label: string }> = [
-  { id: "all", label: "Vsi programi" },
+  { id: "all", label: "Vsi" },
   { id: "in-progress", label: "V teku" },
   { id: "completed", label: "Zaključeni" },
 ];

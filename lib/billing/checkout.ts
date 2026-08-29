@@ -1,6 +1,5 @@
 import "server-only";
 
-import { redirect } from "next/navigation";
 import type Stripe from "stripe";
 import { getUserAccessContext } from "@/lib/auth/access";
 import { getStripeClient } from "@/lib/billing/client";
@@ -223,7 +222,14 @@ async function createStripeCheckoutSession(input: {
   });
 }
 
-export async function startProgramCheckout(programSlug: string) {
+export type CheckoutStartResult =
+  | { error: string }
+  | { checkoutUrl: string }
+  | { redirectTo: string };
+
+export async function startProgramCheckout(
+  programSlug: string,
+): Promise<CheckoutStartResult> {
   if (!PROGRAM_SLUG.test(programSlug)) {
     return { error: BILLING_ERRORS.startFailed };
   }
@@ -247,7 +253,7 @@ export async function startProgramCheckout(programSlug: string) {
   }
 
   if (ownership.owned) {
-    redirect(getOwnedProgramOverviewPath(program.slug));
+    return { redirectTo: getOwnedProgramOverviewPath(program.slug) };
   }
 
   const origin = await getBillingRequestOrigin();
@@ -268,11 +274,13 @@ export async function startProgramCheckout(programSlug: string) {
   }
 
   if (existing.kind === "paid") {
-    redirect(`/nakup/uspesno?session_id=${existing.sessionId}`);
+    return {
+      redirectTo: `/nakup/uspesno?session_id=${encodeURIComponent(existing.sessionId)}`,
+    };
   }
 
   if (existing.kind === "reuse") {
-    redirect(existing.url);
+    return { checkoutUrl: existing.url };
   }
 
   const { data: purchase, error: insertError } = await admin
@@ -334,5 +342,5 @@ export async function startProgramCheckout(programSlug: string) {
     return { error: BILLING_ERRORS.startFailed };
   }
 
-  redirect(session.url);
+  return { checkoutUrl: session.url };
 }

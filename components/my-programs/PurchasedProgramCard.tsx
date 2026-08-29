@@ -93,7 +93,7 @@ export function PurchasedProgramCard({ program }: PurchasedProgramCardProps) {
                 className="w-full md:w-auto md:min-w-[10.5rem] lg:w-full"
               >
                 <CirclePlay className="h-4 w-4" strokeWidth={1.6} aria-hidden />
-                Nadaljuj
+                {program.progress <= 0 ? "Začni" : "Nadaljuj"}
               </ButtonLink>
             ) : (
               <ButtonLink

@@ -3,6 +3,7 @@ import { LessonCompletion } from "@/components/lesson-player/LessonCompletion";
 import { LessonMaterials } from "@/components/lesson-player/LessonMaterials";
 import { resolveLessonMedia } from "@/lib/media/resolveLessonMedia";
 import { formatLessonHeading } from "@/lib/owned-program/access";
+import type { LessonCompletionNextStep } from "@/lib/owned-program/access";
 import type { ProgramLesson } from "@/types/owned-program";
 
 type LessonDetailsProps = {
@@ -11,6 +12,8 @@ type LessonDetailsProps = {
   pending?: boolean;
   error?: string | null;
   onComplete: () => void;
+  programSlug: string;
+  nextStep?: LessonCompletionNextStep | null;
 };
 
 export function LessonDetails({
@@ -19,6 +22,8 @@ export function LessonDetails({
   pending,
   error,
   onComplete,
+  programSlug,
+  nextStep,
 }: LessonDetailsProps) {
   const media = resolveLessonMedia(lesson);
   const showHeading = media.details.showHeading;
@@ -54,6 +59,8 @@ export function LessonDetails({
           pending={pending}
           error={error}
           onComplete={onComplete}
+          programSlug={programSlug}
+          nextStep={nextStep}
         />
       </div>
     </Card>

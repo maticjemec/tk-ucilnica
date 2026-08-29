@@ -46,15 +46,13 @@ export const getUserAccessContext = cache(
       return guestContext;
     }
 
-    const entitlements = await fetchValidProgramEntitlements(
-      supabase,
-      user.id,
-    );
+    const result = await fetchValidProgramEntitlements(supabase, user.id);
 
     return {
       status: "authenticated",
       user,
-      entitlements,
+      entitlements: result.entitlements,
+      entitlementsReadable: result.ok,
     };
   },
 );
@@ -89,6 +87,10 @@ export async function requireProgramEntitlement(
   const access = await requireAuthenticatedUser(
     returnPath ?? `/moji-programi/${slug}`,
   );
+
+  if (!access.entitlementsReadable) {
+    redirect("/moji-programi");
+  }
 
   if (!ownsProgram(access, slug)) {
     redirect(getPublicProgramPath(slug));
@@ -135,6 +137,10 @@ export function ownsProgram(access: UserAccessContext, slug: string) {
       item.programSlug === slug &&
       isEntitlementCurrentlyValid(item.accessExpiresAt),
   );
+}
+
+export function areEntitlementsReadable(access: UserAccessContext) {
+  return access.status === "guest" || access.entitlementsReadable;
 }
 
 export function getOwnedProgramSlugs(access: UserAccessContext) {

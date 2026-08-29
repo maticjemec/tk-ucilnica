@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import { PurchaseAccessPoller } from "@/components/billing/PurchaseAccessPoller";
 import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { requireAuthenticatedUser } from "@/lib/auth/access";
-import { firstSearchParam } from "@/lib/auth/redirects";
+import { firstSearchParam, getCheckoutSuccessPath } from "@/lib/auth/redirects";
 import { resolveCheckoutSuccessView } from "@/lib/billing/success";
 import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
 
@@ -19,7 +20,9 @@ export default async function PurchaseSuccessPage({
   searchParams,
 }: SuccessPageProps) {
   const sessionId = firstSearchParam((await searchParams).session_id);
-  const access = await requireAuthenticatedUser("/nakup/uspesno");
+  const access = await requireAuthenticatedUser(
+    getCheckoutSuccessPath(sessionId),
+  );
   const view = await resolveCheckoutSuccessView(sessionId, access.user.id);
 
   if (view.state === "owned") {
@@ -53,6 +56,7 @@ export default async function PurchaseSuccessPage({
         >
           Preveri dostop
         </ButtonLink>
+        <PurchaseAccessPoller />
       </>
     );
   }

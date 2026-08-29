@@ -4,14 +4,19 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
+  GENERIC_PASSWORD_RESET_ERROR,
   GENERIC_SIGN_UP_ERROR,
+  PASSWORD_RESET_SENT_MESSAGE,
   UNEXPECTED_SIGN_UP_ERROR,
+  mapPasswordResetError,
+  mapPasswordUpdateError,
   mapSignInError,
   mapSignUpError,
 } from "@/lib/auth/errors";
 import {
   DEFAULT_AFTER_AUTH_PATH,
   getPublicCatalogPath,
+  getResetPasswordPath,
   getSafeRedirectPath,
 } from "@/lib/auth/redirects";
 import { createClient } from "@/lib/supabase/server";
@@ -168,4 +173,69 @@ export async function signOut() {
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
   redirect(getPublicCatalogPath());
+}
+
+export async function requestPasswordReset(input: {
+  email: string;
+}): Promise<{ error: string } | { sent: true; message: string }> {
+  const email = input.email.trim();
+
+  if (!email || !isValidEmail(email)) {
+    return { error: "Vnesi veljaven e-poštni naslov." };
+  }
+
+  const origin = await getOrigin();
+
+  if (!origin) {
+    return { error: GENERIC_PASSWORD_RESET_ERROR };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(getResetPasswordPath())}`,
+  });
+
+  if (error) {
+    const code = (error.code ?? "").toLowerCase();
+    const message = (error.message ?? "").toLowerCase();
+
+    if (code === "user_not_found" || message.includes("user not found")) {
+      return { sent: true, message: PASSWORD_RESET_SENT_MESSAGE };
+    }
+
+    return { error: mapPasswordResetError(error) };
+  }
+
+  return { sent: true, message: PASSWORD_RESET_SENT_MESSAGE };
+}
+
+export async function updatePassword(input: {
+  password: string;
+  confirmPassword: string;
+}): Promise<Extract<AuthActionResult, { error: string } | { redirectTo: string }>> {
+  const password = input.password;
+
+  if (!password || password.length < MIN_PASSWORD_LENGTH) {
+    return { error: "Geslo mora imeti vsaj 8 znakov." };
+  }
+
+  if (password !== input.confirmPassword) {
+    return { error: "Gesli se ne ujemata." };
+  }
+
+  const supabase = await createClient();
+  const { data: claimsData, error: sessionError } = await supabase.auth.getClaims();
+
+  if (sessionError || !claimsData?.claims) {
+    return { error: "Seja za ponastavitev je potekla. Zahtevaj novo povezavo." };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    return { error: mapPasswordUpdateError(error) };
+  }
+
+  revalidatePath("/", "layout");
+  return { redirectTo: DEFAULT_AFTER_AUTH_PATH };
 }
