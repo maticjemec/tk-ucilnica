@@ -33,7 +33,7 @@ export function ProgramTabs({ value, onChange }: ProgramTabsProps) {
               aria-controls="moji-programi-panel"
               tabIndex={0}
               className={cn(
-                "-mb-px shrink-0 border-b-2 pb-3 text-sm whitespace-nowrap transition-colors",
+                "-mb-px min-h-11 shrink-0 border-b-2 pb-3 text-sm whitespace-nowrap transition-colors",
                 "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
                 selected
                   ? "border-accent font-medium text-foreground"

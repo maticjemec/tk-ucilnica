@@ -46,7 +46,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                   href={item.href}
                   onClick={onNavigate}
                   className={cn(
-                    "nav-label flex items-center gap-3 rounded-md px-3 py-[0.7rem] transition-colors",
+                    "nav-label flex min-h-11 items-center gap-3 rounded-md px-3 py-2.5 transition-colors",
                     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft",
                     active
                       ? "bg-accent text-accent-foreground"
@@ -70,7 +70,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
             <form action={signOut}>
               <button
                 type="submit"
-                className="nav-label flex w-full items-center gap-3 rounded-md px-3 py-[0.7rem] text-sidebar-foreground/88 transition-colors hover:bg-white/5 hover:text-sidebar-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                className="nav-label flex min-h-11 w-full items-center gap-3 rounded-md px-3 py-2.5 text-sidebar-foreground/88 transition-colors hover:bg-white/5 hover:text-sidebar-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
               >
                 <LogOut className="h-[18px] w-[18px] shrink-0 text-accent-soft" strokeWidth={1.6} />
                 Odjava

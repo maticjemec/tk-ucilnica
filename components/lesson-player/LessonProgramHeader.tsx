@@ -1,4 +1,5 @@
 import { Progress } from "@/components/ui/Progress";
+import { formatProgressPercent } from "@/lib/progress/helpers";
 
 type LessonProgramHeaderProps = {
   title: string;
@@ -11,7 +12,7 @@ export function LessonProgramHeader({
   positionLabel,
   progressPercent,
 }: LessonProgramHeaderProps) {
-  const progressLabel = `Napredek programa: ${progressPercent} %`;
+  const progressLabel = `Napredek programa: ${formatProgressPercent(progressPercent)}`;
 
   return (
     <header className="mb-3.5 flex flex-col gap-3 sm:mb-4 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
@@ -26,7 +27,7 @@ export function LessonProgramHeader({
         <div className="mb-1.5 flex items-baseline justify-between gap-3 text-sm">
           <span className="text-muted">Napredek</span>
           <span className="tabular-nums text-foreground">
-            {progressPercent} %
+            {formatProgressPercent(progressPercent)}
           </span>
         </div>
         <Progress

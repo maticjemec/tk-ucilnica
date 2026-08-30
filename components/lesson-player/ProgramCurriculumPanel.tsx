@@ -4,6 +4,7 @@ import { CurriculumLessonRow } from "@/components/owned-program/CurriculumLesson
 import { Card } from "@/components/ui/Card";
 import { Progress } from "@/components/ui/Progress";
 import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
+import { formatProgressPercent } from "@/lib/progress/helpers";
 import type { OwnedProgram, ResolvedLesson } from "@/types/owned-program";
 
 type ProgramCurriculumPanelProps = {
@@ -20,7 +21,7 @@ export function ProgramCurriculumPanel({
   progressPercent,
 }: ProgramCurriculumPanelProps) {
   const lessonById = new Map(lessons.map((lesson) => [lesson.id, lesson]));
-  const progressLabel = `Napredek programa: ${progressPercent} %`;
+  const progressLabel = `Napredek programa: ${formatProgressPercent(progressPercent)}`;
   const overviewHref = getOwnedProgramOverviewPath(program.slug);
 
   return (
@@ -32,7 +33,7 @@ export function ProgramCurriculumPanel({
       <div className="mt-3 flex items-center justify-between gap-3 text-sm text-muted">
         <p>Program: {program.totalDays} dni</p>
         <p className="tabular-nums text-foreground">
-          Napredek {progressPercent} %
+          Napredek {formatProgressPercent(progressPercent)}
         </p>
       </div>
       <Progress

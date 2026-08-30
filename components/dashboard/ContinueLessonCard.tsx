@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { Play } from "lucide-react";
 import type { ContinueLesson } from "@/types/dashboard";
+import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { CoverMedia } from "@/components/dashboard/CoverMedia";
 import { ProgramPlaceholder } from "@/components/dashboard/visuals";
 import { Card } from "@/components/ui/Card";
@@ -43,16 +43,13 @@ export function ContinueLessonCard({ lesson }: ContinueLessonCardProps) {
         </div>
       </div>
 
-      <div className="mt-3 flex items-center justify-between gap-3">
-        <span className="text-sm text-muted">{lesson.duration}</span>
-        <Link
-          href={lesson.href}
-          prefetch={false}
-          className="text-sm text-accent transition-colors hover:text-accent-hover"
-        >
-          Nadaljuj →
-        </Link>
-      </div>
+      {lesson.duration ? (
+        <p className="mt-3 text-sm text-muted">{lesson.duration}</p>
+      ) : null}
+
+      <ButtonLink href={lesson.href} prefetch={false} className="mt-4 w-full">
+        Nadaljuj lekcijo
+      </ButtonLink>
     </Card>
   );
 }

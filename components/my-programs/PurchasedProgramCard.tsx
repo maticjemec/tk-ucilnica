@@ -8,6 +8,7 @@ import { ProgramPlaceholder } from "@/components/dashboard/visuals";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { Progress } from "@/components/ui/Progress";
+import { formatProgressPercent } from "@/lib/progress/helpers";
 import type { PurchasedProgram } from "@/types/programs";
 
 type PurchasedProgramCardProps = {
@@ -60,8 +61,8 @@ export function PurchasedProgramCard({ program }: PurchasedProgramCardProps) {
                 label={`Napredek: ${program.label}`}
                 className="h-1.5 flex-1"
               />
-              <span className="w-11 shrink-0 text-right text-sm tabular-nums text-muted">
-                {program.progress}%
+              <span className="w-12 shrink-0 text-right text-sm tabular-nums text-muted">
+                {formatProgressPercent(program.progress)}
               </span>
             </div>
 

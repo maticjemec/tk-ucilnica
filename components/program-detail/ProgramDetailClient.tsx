@@ -73,8 +73,8 @@ export function ProgramDetailClient({
 
       <div className="pt-1">
         <SupportCard
-          title="Potrebujete pomoč?"
-          description="Če imate vprašanja ali potrebujete podporo, smo tukaj za vas."
+          title="Potrebuješ pomoč?"
+          description="Če imaš vprašanje ali potrebuješ podporo, smo tukaj zate."
         />
       </div>
     </>

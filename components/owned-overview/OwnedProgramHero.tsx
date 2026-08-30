@@ -5,6 +5,7 @@ import { ProgramPlaceholder } from "@/components/dashboard/visuals";
 import { Badge } from "@/components/ui/Badge";
 import { Progress } from "@/components/ui/Progress";
 import type { OwnedOverviewModel } from "@/lib/owned-program/overview";
+import { formatProgressPercent } from "@/lib/progress/helpers";
 
 type OwnedProgramHeroProps = {
   model: OwnedOverviewModel;
@@ -24,7 +25,7 @@ export function OwnedProgramHero({ model }: OwnedProgramHeroProps) {
     difficulty,
     categoryLabel,
   } = model;
-  const progressLabel = `Napredek programa: ${progressPercent} %`;
+  const progressLabel = `Napredek programa: ${formatProgressPercent(progressPercent)}`;
 
   return (
     <section className="overflow-hidden rounded-md border border-border bg-surface shadow-[var(--shadow-card)]">
@@ -79,7 +80,7 @@ export function OwnedProgramHero({ model }: OwnedProgramHeroProps) {
             <div className="mb-1.5 flex items-baseline justify-between gap-3">
               <p className="text-sm text-muted">Napredek programa</p>
               <p className="text-[1.35rem] leading-none font-medium tabular-nums text-foreground">
-                {progressPercent} %
+                {formatProgressPercent(progressPercent)}
               </p>
             </div>
             <Progress

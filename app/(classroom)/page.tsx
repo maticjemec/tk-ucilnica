@@ -31,7 +31,7 @@ export default async function PregledPage() {
     return (
       <>
         <PageHeader
-          title={`Dobrodošel nazaj, ${access.user.firstName} 👋`}
+          title={`Dobrodošel nazaj, ${access.user.firstName}`}
           subtitle="Nadaljuj svojo pot rasti in spremembe."
         />
         <QueryRecovery
@@ -52,7 +52,7 @@ export default async function PregledPage() {
     return (
       <>
         <PageHeader
-          title={`Dobrodošel nazaj, ${access.user.firstName} 👋`}
+          title={`Dobrodošel nazaj, ${access.user.firstName}`}
           subtitle="Nadaljuj svojo pot rasti in spremembe."
         />
         <QueryRecovery
@@ -89,13 +89,29 @@ export default async function PregledPage() {
   return (
     <>
       <PageHeader
-        title={`Dobrodošel nazaj, ${access.user.firstName} 👋`}
+        title={`Dobrodošel nazaj, ${access.user.firstName}`}
         subtitle="Nadaljuj svojo pot rasti in spremembe."
       />
 
       <div className="grid grid-cols-1 gap-8 min-[1440px]:grid-cols-[minmax(0,1fr)_17.75rem] min-[1440px]:items-start min-[1440px]:gap-6">
         <div className="min-w-0">
-          <DashboardHero content={dashboardHero} />
+          <DashboardHero
+            content={dashboardHero}
+            action={
+              ownedContinueLesson
+                ? {
+                    href: ownedContinueLesson.href,
+                    label: "Nadaljuj program",
+                  }
+                : undefined
+            }
+          />
+
+          {ownedContinueLesson ? (
+            <div className="mt-5 min-[1440px]:hidden">
+              <ContinueLessonCard lesson={ownedContinueLesson} />
+            </div>
+          ) : null}
 
           <section className="mt-8">
             <SectionHeading
@@ -105,11 +121,7 @@ export default async function PregledPage() {
             {ownedPrograms.length === 0 ? (
               <ProgramsEmptyState variant="none" />
             ) : (
-              <ProgramGrid
-                programs={ownedPrograms}
-                variant="progress"
-                showPeekControl
-              />
+              <ProgramGrid programs={ownedPrograms} variant="progress" />
             )}
           </section>
 
@@ -130,7 +142,9 @@ export default async function PregledPage() {
             }
           />
           {ownedContinueLesson ? (
-            <ContinueLessonCard lesson={ownedContinueLesson} />
+            <div className="hidden min-[1440px]:block">
+              <ContinueLessonCard lesson={ownedContinueLesson} />
+            </div>
           ) : null}
         </aside>
       </div>

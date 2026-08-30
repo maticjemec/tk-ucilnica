@@ -40,7 +40,7 @@ export function LessonWorksheet({
               className="mt-5 inline-flex h-10 w-full items-center justify-center gap-2 rounded-sm border border-transparent bg-accent px-4 text-sm font-medium whitespace-nowrap text-accent-foreground transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:w-auto"
             >
               <Download className="h-4 w-4" strokeWidth={1.6} aria-hidden />
-              Prenesi
+              Prenesi delovni list
             </a>
           ) : (
             <Button className="mt-5 w-full sm:w-auto" disabled>

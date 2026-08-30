@@ -49,11 +49,18 @@ export function CatalogClient({
 
       <section className="mt-6" aria-label="Katalog programov">
         {visible.length === 0 ? (
-          <p className="rounded-md border border-border bg-surface px-6 py-12 text-center text-sm text-muted shadow-[var(--shadow-card)]">
-            {programs.length === 0
-              ? "Trenutno ni objavljenih programov."
-              : "V tej kategoriji trenutno ni programov."}
-          </p>
+          <div className="rounded-md border border-border bg-surface px-6 py-16 text-center shadow-[var(--shadow-card)] sm:px-10">
+            <p className="font-serif text-[1.45rem] tracking-tight text-foreground">
+              {programs.length === 0
+                ? "Trenutno ni objavljenih programov."
+                : "V tej kategoriji trenutno ni programov."}
+            </p>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted">
+              {programs.length === 0
+                ? "Ko bodo programi na voljo, jih boš našel/a tukaj."
+                : "Preklopi kategorijo ali si oglej vse programe."}
+            </p>
+          </div>
         ) : (
           <ul
             className={

@@ -31,7 +31,11 @@ export function LessonNavigation({ previous, next }: LessonNavigationProps) {
       )}
 
       {next ? (
-        <ButtonLink href={next.href} className="w-full sm:w-auto">
+        <ButtonLink
+          href={next.href}
+          variant="outline"
+          className="w-full sm:w-auto"
+        >
           Naslednja lekcija
           <span aria-hidden>→</span>
           <span className="sr-only">: {next.label}</span>

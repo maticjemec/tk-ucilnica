@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ButtonLink } from "@/components/dashboard/ButtonLink";
-import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
 import {
   firstSearchParam,
   getPublicCatalogPath,
@@ -24,18 +24,28 @@ export default async function PurchaseCancelPage({
   const hasProgram = Boolean(slug && PROGRAM_SLUG.test(slug));
 
   return (
-    <>
-      <PageHeader
-        title="Plačilo ni bilo izvedeno"
-        subtitle="Nič ni bilo zaračunano. Če želiš, se lahko vrneš na program in poskusiš znova."
-      />
-      {hasProgram && slug ? (
-        <ButtonLink href={getPublicProgramPath(slug)}>
-          Nazaj na program
-        </ButtonLink>
-      ) : (
-        <ButtonLink href={getPublicCatalogPath()}>Vsi programi</ButtonLink>
-      )}
-    </>
+    <Card padding="none" className="mx-auto max-w-xl px-6 py-8 sm:px-8 sm:py-10">
+      <h1 className="page-title text-[1.85rem] sm:text-[2.1rem]">
+        Plačilo ni bilo izvedeno
+      </h1>
+      <p className="page-subtitle">
+        Nič ni bilo zaračunano. Če želiš, se lahko vrneš na program in poskusiš
+        znova.
+      </p>
+      <div className="mt-7">
+        {hasProgram && slug ? (
+          <ButtonLink
+            href={getPublicProgramPath(slug)}
+            className="w-full sm:w-auto"
+          >
+            Nazaj na program
+          </ButtonLink>
+        ) : (
+          <ButtonLink href={getPublicCatalogPath()} className="w-full sm:w-auto">
+            Vsi programi
+          </ButtonLink>
+        )}
+      </div>
+    </Card>
   );
 }

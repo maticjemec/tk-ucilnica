@@ -93,7 +93,7 @@ export function LoginForm({ redirectTo, notice }: LoginFormProps) {
       }
     >
       <form
-        className="mt-8 flex flex-col gap-4"
+        className="mt-8 flex flex-col gap-5"
         onSubmit={onSubmit}
         noValidate
       >

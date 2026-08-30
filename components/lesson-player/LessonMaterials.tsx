@@ -25,7 +25,7 @@ function ResourceDownload({
         className="inline-flex h-10 w-full shrink-0 items-center justify-center gap-2 rounded-sm border border-accent/50 bg-transparent px-4 text-sm font-medium whitespace-nowrap text-accent transition-colors hover:border-accent hover:bg-accent/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:w-auto"
       >
         <Download className="h-4 w-4" strokeWidth={1.6} aria-hidden />
-        Prenesi
+        Prenesi delovni list
       </a>
     );
   }

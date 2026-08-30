@@ -5,6 +5,7 @@ import { ProgramPlaceholder } from "@/components/dashboard/visuals";
 import { Card } from "@/components/ui/Card";
 import { Progress } from "@/components/ui/Progress";
 import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
+import { formatProgressPercent } from "@/lib/progress/helpers";
 import Link from "next/link";
 
 type DashboardProgramCardProps = {
@@ -50,8 +51,8 @@ export function DashboardProgramCard({
               label={`Napredek: ${program.label}`}
               className="h-1.5 flex-1"
             />
-            <span className="w-9 shrink-0 text-right text-sm text-muted tabular-nums">
-              {program.progress}%
+            <span className="w-11 shrink-0 text-right text-sm text-muted tabular-nums">
+              {formatProgressPercent(program.progress)}
             </span>
           </div>
         </Link>
@@ -60,7 +61,7 @@ export function DashboardProgramCard({
           <h3 className="text-sm leading-snug font-normal text-foreground">
             {program.label}
           </h3>
-          <p className="mt-1.5 text-[0.8rem] leading-[1.55] text-muted">
+          <p className="mt-1.5 line-clamp-2 text-[0.8rem] leading-[1.55] text-muted">
             {program.description}
           </p>
           <div className="mt-auto pt-3.5">

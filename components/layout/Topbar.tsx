@@ -13,8 +13,12 @@ type TopbarProps = {
 
 export function Topbar({ user, onOpenNavigation }: TopbarProps) {
   return (
-    <header className="flex h-[72px] shrink-0 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-      <IconButton label="Odpri navigacijo" onClick={onOpenNavigation}>
+    <header className="flex h-16 shrink-0 items-center justify-between gap-4 px-4 sm:h-[72px] sm:px-6 lg:px-8">
+      <IconButton
+        label="Odpri navigacijo"
+        onClick={onOpenNavigation}
+        className="lg:hidden"
+      >
         <Menu className="h-5 w-5" strokeWidth={1.6} />
       </IconButton>
 

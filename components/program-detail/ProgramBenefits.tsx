@@ -27,7 +27,7 @@ export function ProgramBenefits({
               aria-hidden
             />
             <h2 className="text-[0.95rem] font-semibold tracking-tight text-foreground">
-              Kaj boste pridobili?
+              Kaj pridobiš?
             </h2>
           </div>
 

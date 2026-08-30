@@ -33,13 +33,13 @@ export function PublicHeader({ currentPath = "/programi" }: PublicHeaderProps) {
           <ButtonLink
             href={getLoginPath(currentPath)}
             variant="outline"
-            className="h-9 px-3 text-xs sm:h-10 sm:px-4 sm:text-sm"
+            className="h-11 px-3.5 text-sm sm:px-4"
           >
             Prijava
           </ButtonLink>
           <ButtonLink
             href={getRegisterPath(currentPath)}
-            className="h-9 px-3 text-xs sm:h-10 sm:px-4 sm:text-sm"
+            className="h-11 px-3.5 text-sm sm:px-4"
           >
             Ustvari račun
           </ButtonLink>

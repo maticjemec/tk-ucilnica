@@ -63,7 +63,7 @@ export function CategoryPills({ value, onChange }: CategoryPillsProps) {
                 aria-checked={selected}
                 onClick={() => onChange(filter.id)}
                 className={cn(
-                  "inline-flex min-h-9 shrink-0 items-center rounded-full border px-3 py-1.5 text-[0.8125rem] whitespace-nowrap transition-colors",
+                  "inline-flex min-h-11 shrink-0 items-center rounded-full border px-3.5 py-2 text-[0.8125rem] whitespace-nowrap transition-colors",
                   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
                   selected
                     ? "border-accent bg-accent text-accent-foreground"

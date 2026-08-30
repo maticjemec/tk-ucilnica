@@ -35,7 +35,7 @@ export function ButtonLink({
       prefetch={prefetch ?? (isOwnedLessonPath(href) ? false : undefined)}
       className={cn(
         "inline-flex items-center justify-center gap-2 rounded-sm border font-medium whitespace-nowrap transition-colors",
-        "h-10 px-4 text-sm",
+        "h-11 min-h-11 px-4 text-sm",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
         variantClasses[variant],
         className,

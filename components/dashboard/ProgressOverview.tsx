@@ -1,6 +1,7 @@
 import type { DashboardProgress } from "@/types/dashboard";
 import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { Card } from "@/components/ui/Card";
+import { formatProgressPercent } from "@/lib/progress/helpers";
 
 type ProgressOverviewProps = {
   progress: DashboardProgress;
@@ -51,7 +52,7 @@ function CircularProgress({ value }: { value: number }) {
       className="relative shrink-0"
       style={{ width: size, height: size }}
       role="img"
-      aria-label={`${Math.round(clamped)} odstotkov`}
+      aria-label={`${formatProgressPercent(clamped)} opravljenih`}
     >
       <svg
         width={size}
@@ -84,7 +85,7 @@ function CircularProgress({ value }: { value: number }) {
         className="absolute inset-0 flex items-center justify-center font-serif text-[1.2rem] tracking-tight text-foreground"
         aria-hidden
       >
-        {Math.round(clamped)}%
+        {formatProgressPercent(clamped)}
       </span>
     </div>
   );

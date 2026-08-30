@@ -30,7 +30,8 @@ export function CurriculumLessonRow({
     dripLabel ? "items-start" : "items-center",
     size === "compact" ? "py-[0.4rem]" : "gap-x-2.5 px-2 py-2 sm:px-2.5",
     dripLabel && size === "compact" && "py-1.5",
-    lesson.accessState === "current" && "bg-warning-soft",
+    lesson.accessState === "current" &&
+      "bg-warning-soft ring-1 ring-inset ring-accent/25",
     interactive &&
       "transition-colors hover:bg-warning-soft/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
   );
@@ -49,6 +50,10 @@ export function CurriculumLessonRow({
         {dripLabel ? (
           <span className="mt-0.5 block text-[0.72rem] leading-snug text-muted">
             {dripLabel}
+          </span>
+        ) : size === "comfortable" && lesson.accessState === "current" ? (
+          <span className="mt-0.5 block text-[0.72rem] font-medium leading-snug text-warning-foreground">
+            Trenutna lekcija
           </span>
         ) : null}
       </span>

@@ -15,7 +15,7 @@ export function ProgramIncludesCard({
   return (
     <Card padding="none" className={cn("px-5 py-5", className)}>
       <h2 className="text-[1.05rem] font-semibold tracking-tight text-foreground">
-        V programu dobite
+        V programu dobiš
       </h2>
       <ul className="mt-3.5 flex flex-col gap-2.5">
         {items.map((item) => {

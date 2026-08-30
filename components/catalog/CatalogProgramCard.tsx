@@ -140,7 +140,7 @@ export function CatalogProgramCard({
             </div>
           </div>
         ) : (
-          <div className="flex min-w-0 flex-1 flex-col px-3.5 pt-2.5 pb-3">
+          <div className="flex min-w-0 flex-1 flex-col px-4 pt-3 pb-3.5">
             <h3
               id={titleId}
               className="program-title line-clamp-2 text-[0.92rem]"

@@ -17,7 +17,7 @@ export function IconButton({
       type={type}
       aria-label={label}
       className={cn(
-        "relative inline-flex h-10 w-10 items-center justify-center rounded-sm text-foreground/80 transition-colors",
+        "relative inline-flex h-11 w-11 items-center justify-center rounded-sm text-foreground/80 transition-colors",
         "hover:bg-border/70 hover:text-foreground",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
         "disabled:pointer-events-none disabled:opacity-50",

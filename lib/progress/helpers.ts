@@ -40,6 +40,10 @@ export function getProgramProgressPercent(
   );
 }
 
+export function formatProgressPercent(value: number) {
+  return `${Math.round(Math.min(100, Math.max(0, value)))} %`;
+}
+
 export function getAverageOwnedProgressPercent(percents: readonly number[]) {
   if (percents.length === 0) {
     return 0;

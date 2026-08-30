@@ -11,10 +11,10 @@ export function ProgramSupportCard({ className }: ProgramSupportCardProps) {
   return (
     <Card padding="none" className={cn("px-5 py-5", className)}>
       <h2 className="text-[1.05rem] font-semibold tracking-tight text-foreground">
-        Niste sami
+        Nisi sam/a
       </h2>
       <p className="mt-1.5 text-sm leading-relaxed text-muted">
-        Na voljo smo vam na vsakem koraku vaše poti.
+        Na voljo smo ti na vsakem koraku tvoje poti.
       </p>
       <Button
         variant="outline"

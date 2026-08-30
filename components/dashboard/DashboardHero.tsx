@@ -5,9 +5,15 @@ import { HeroPlaceholder } from "@/components/dashboard/visuals";
 
 type DashboardHeroProps = {
   content: DashboardHeroContent;
+  action?: {
+    href: string;
+    label: string;
+  };
 };
 
-export function DashboardHero({ content }: DashboardHeroProps) {
+export function DashboardHero({ content, action }: DashboardHeroProps) {
+  const ctaHref = action?.href ?? content.ctaHref;
+  const ctaLabel = action?.label ?? content.ctaLabel;
   return (
     <section className="overflow-hidden rounded-md border border-border bg-surface shadow-[var(--shadow-card)]">
       <div className="relative min-h-[18.5rem] sm:min-h-[20rem]">
@@ -36,7 +42,9 @@ export function DashboardHero({ content }: DashboardHeroProps) {
             {content.body}
           </p>
           <div className="mt-7">
-            <ButtonLink href={content.ctaHref}>{content.ctaLabel}</ButtonLink>
+            <ButtonLink href={ctaHref} prefetch={false}>
+              {ctaLabel}
+            </ButtonLink>
           </div>
         </div>
       </div>
