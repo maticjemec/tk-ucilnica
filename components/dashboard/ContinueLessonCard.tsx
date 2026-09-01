@@ -13,7 +13,7 @@ export function ContinueLessonCard({ lesson }: ContinueLessonCardProps) {
   return (
     <Card padding="none" className="px-5 py-4">
       <h2 className="font-serif text-lg tracking-tight text-foreground">
-        Nadaljuj z lekcijo
+        {lesson.heading}
       </h2>
 
       <div className="mt-3 flex items-center gap-3">
@@ -48,7 +48,7 @@ export function ContinueLessonCard({ lesson }: ContinueLessonCardProps) {
       ) : null}
 
       <ButtonLink href={lesson.href} prefetch={false} className="mt-4 w-full">
-        Nadaljuj lekcijo
+        {lesson.ctaLabel}
       </ButtonLink>
     </Card>
   );

@@ -12,8 +12,23 @@ import {
   getVisibleLessonCount,
   resolveOwnedLessons,
 } from "@/lib/owned-program/access";
+import {
+  formatFirstLessonUnlockMessage,
+  formatUnlockDate,
+  parseTimestamp,
+} from "@/lib/owned-program/datetime";
+import {
+  FIRST_TIME_GUIDANCE,
+  formatOnboardingLessonCount,
+  formatOnboardingSectionCount,
+  getHowItWorksHint,
+  getHowItWorksSteps,
+} from "@/lib/owned-program/onboarding";
 import { getOwnedProgramOverviewPath } from "@/lib/owned-program/paths";
-import type { ProgramProgressView } from "@/lib/progress/helpers";
+import {
+  isFirstTimeProgramUser,
+  type ProgramProgressView,
+} from "@/lib/progress/helpers";
 import type { Program } from "@/lib/programs/types";
 import type {
   LessonAccessOptions,
@@ -83,17 +98,53 @@ export function getOwnedOverviewModel(
   const materials = getOwnedProgramMaterials(program);
   const hasCurriculum = program.lessons.length > 0;
   const focusLesson = currentLesson ?? waitingLesson ?? program.lessons[0];
+  const isFirstTime = hasCurriculum && isFirstTimeProgramUser(progress);
+  const firstLesson = currentLesson ?? waitingLesson;
+  const firstLessonSectionTitle = firstLesson
+    ? program.sections.find((section) =>
+        section.lessonIds.includes(firstLesson.id),
+      )?.title
+    : undefined;
+  const now = access?.now ?? new Date();
   const waitingMessage = waitingLesson
     ? progress.nextUnlockLabel
       ? `Naslednja lekcija bo na voljo ${progress.nextUnlockLabel}.`
       : "Naslednja lekcija še ni na voljo."
     : null;
+  const firstLessonUnlockAt = parseTimestamp(progress.nextUnlockAt);
+  const firstLessonUnlockMessage =
+    isFirstTime && waitingLesson
+      ? firstLessonUnlockAt
+        ? formatFirstLessonUnlockMessage(firstLessonUnlockAt, now)
+        : "Prva lekcija še ni na voljo."
+      : null;
+  const accessExpiresAt = parseTimestamp(access?.entitlement?.accessExpiresAt);
+  const accessExpiresLabel = accessExpiresAt
+    ? formatUnlockDate(accessExpiresAt, now)
+    : "";
+  const accessNote =
+    accessExpiresAt &&
+    accessExpiresLabel &&
+    accessExpiresAt.getTime() > now.getTime()
+      ? `Dostop imaš do ${accessExpiresLabel}.`
+      : null;
 
   return {
     program,
     currentLesson,
     waitingLesson,
+    firstLesson,
+    firstLessonSectionTitle,
     waitingMessage,
+    firstLessonUnlockMessage,
+    isFirstTime,
+    howItWorksSteps: getHowItWorksSteps(program.unlockMode),
+    howItWorksHint: getHowItWorksHint(program.unlockMode),
+    guidanceLines: [...FIRST_TIME_GUIDANCE],
+    lessonCountLabelExact: formatOnboardingLessonCount(visibleLessonCount),
+    sectionCountLabel: formatOnboardingSectionCount(program.sections.length),
+    accessNote,
+    startHereCtaLabel: "Začni prvo lekcijo",
     lessons,
     hasCurriculum,
     progressPercent: progress.progressPercent,

@@ -10,4 +10,5 @@ export type PurchasedProgram = DashboardProgram & {
   duration: string;
   continueHref: string;
   continueAvailable: boolean;
+  ctaLabel: string;
 };

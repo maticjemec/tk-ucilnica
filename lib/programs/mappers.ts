@@ -1,5 +1,9 @@
 import { formatCatalogLessons } from "@/lib/content/catalog";
-import { getFallbackContinueHref } from "@/lib/progress/helpers";
+import {
+  getFallbackContinueHref,
+  getOwnedEntryCtaLabel,
+  getOwnedEntryHref,
+} from "@/lib/progress/helpers";
 import type { ProgramProgressView } from "@/lib/progress/helpers";
 import type { ProgramRow } from "@/lib/content/db-types";
 import { getProgramVisual } from "@/lib/programs/visuals";
@@ -206,9 +210,13 @@ export function toPurchasedProgram(
     status: isCompleted ? "completed" : "in-progress",
     lessons: formatCatalogLessons(program.lessonCount),
     duration: program.duration,
-    continueHref:
-      progress?.continueHref ?? getFallbackContinueHref(program.slug),
+    continueHref: progress
+      ? getOwnedEntryHref(program.slug, progress)
+      : getFallbackContinueHref(program.slug),
     continueAvailable: progress?.continueAvailable ?? false,
+    ctaLabel: progress
+      ? getOwnedEntryCtaLabel(progress, "program")
+      : "Začni program",
   };
 }
 

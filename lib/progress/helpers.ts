@@ -139,6 +139,67 @@ export type ProgramProgressView = {
   isCompleted: boolean;
 };
 
+/**
+ * First-time owner: valid curriculum exists and no lesson is completed.
+ * last_opened_at is ignored — opening a lesson without completing it is
+ * not meaningful progress, and TASK 024 should flip after first completion.
+ */
+export function isFirstTimeProgramUser(
+  progress: Pick<
+    ProgramProgressView,
+    "completedCount" | "progressPercent" | "isCompleted" | "totalLessons"
+  >,
+) {
+  return (
+    progress.totalLessons > 0 &&
+    progress.completedCount === 0 &&
+    progress.progressPercent === 0 &&
+    !progress.isCompleted
+  );
+}
+
+type OwnedEntryProgress = Pick<
+  ProgramProgressView,
+  | "completedCount"
+  | "progressPercent"
+  | "isCompleted"
+  | "totalLessons"
+  | "continueHref"
+>;
+
+/**
+ * List/dashboard entry target. First-time owners go to the program
+ * overview (onboarding). Active and completed users keep the lesson href.
+ */
+export function getOwnedEntryHref(
+  programSlug: string,
+  progress: OwnedEntryProgress,
+) {
+  if (isFirstTimeProgramUser(progress)) {
+    return getFallbackContinueHref(programSlug);
+  }
+
+  return progress.continueHref || getFallbackContinueHref(programSlug);
+}
+
+export function getOwnedEntryCtaLabel(
+  progress: Pick<
+    ProgramProgressView,
+    "completedCount" | "progressPercent" | "isCompleted" | "totalLessons"
+  >,
+  kind: "program" | "lesson",
+) {
+  if (progress.isCompleted) {
+    return "Ponovi program";
+  }
+
+  if (isFirstTimeProgramUser(progress)) {
+    return "Začni program";
+  }
+
+  return kind === "lesson" ? "Nadaljuj lekcijo" : "Nadaljuj program";
+}
+
 export function buildProgramProgressView(
   program: OwnedProgram,
   rows: readonly UserLessonProgressRow[],

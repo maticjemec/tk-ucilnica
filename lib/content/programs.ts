@@ -1,5 +1,9 @@
 import { dashboardPrograms } from "@/lib/content/dashboard";
-import { getFallbackContinueHref } from "@/lib/progress/helpers";
+import {
+  getFallbackContinueHref,
+  getOwnedEntryCtaLabel,
+  getOwnedEntryHref,
+} from "@/lib/progress/helpers";
 import type { ProgramProgressView } from "@/lib/progress/helpers";
 import type {
   ProgramFilter,
@@ -17,7 +21,7 @@ type PurchasedFields = {
 
 type PurchasedProgramSeed = Omit<
   PurchasedProgram,
-  "continueHref" | "continueAvailable"
+  "continueHref" | "continueAvailable" | "ctaLabel"
 >;
 
 function toPurchasedProgram(
@@ -90,9 +94,13 @@ export function getPurchasedProgramsForSlugs(
         ...program,
         progress: progressPercent,
         status: (isCompleted ? "completed" : "in-progress") as ProgramStatus,
-        continueHref:
-          progress?.continueHref ?? getFallbackContinueHref(program.slug),
+        continueHref: progress
+          ? getOwnedEntryHref(program.slug, progress)
+          : getFallbackContinueHref(program.slug),
         continueAvailable: progress?.continueAvailable ?? true,
+        ctaLabel: progress
+          ? getOwnedEntryCtaLabel(progress, "program")
+          : "Začni program",
       };
     });
 }

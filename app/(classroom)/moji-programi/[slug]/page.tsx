@@ -8,6 +8,7 @@ import { OwnedCurriculumUnavailable } from "@/components/owned-overview/OwnedCur
 import { OwnedMaterials } from "@/components/owned-overview/OwnedMaterials";
 import { OwnedProgramHero } from "@/components/owned-overview/OwnedProgramHero";
 import { OwnedProgramHighlights } from "@/components/owned-overview/OwnedProgramHighlights";
+import { OwnedProgramOnboarding } from "@/components/owned-overview/OwnedProgramOnboarding";
 import { SupportCard } from "@/components/my-programs/SupportCard";
 import { QueryRecovery } from "@/components/ui/QueryRecovery";
 import {
@@ -87,16 +88,20 @@ export default async function OwnedProgramOverviewPage({
 
       <OwnedProgramHero model={model} />
 
-      {model.hasCurriculum && (model.currentLesson || model.waitingLesson) ? (
+      {model.isFirstTime ? (
+        <div className="mt-5 lg:mt-6">
+          <OwnedProgramOnboarding model={model} />
+        </div>
+      ) : model.hasCurriculum && (model.currentLesson || model.waitingLesson) ? (
         <div className="mt-5 grid grid-cols-1 gap-5 lg:mt-6 lg:grid-cols-[minmax(0,1fr)_21.5rem] lg:items-stretch lg:gap-6">
           <OwnedContinueCard model={model} />
           <OwnedProgramHighlights highlights={model.highlights} />
         </div>
-      ) : (
+      ) : model.hasCurriculum ? (
         <div className="mt-5 lg:mt-6">
           <OwnedProgramHighlights highlights={model.highlights} />
         </div>
-      )}
+      ) : null}
 
       <div className="mt-5 lg:mt-6">
         {model.hasCurriculum ? (

@@ -1,5 +1,8 @@
 import {
   getAverageOwnedProgressPercent,
+  getOwnedEntryCtaLabel,
+  getOwnedEntryHref,
+  isFirstTimeProgramUser,
   type ProgramProgressView,
 } from "@/lib/progress/helpers";
 import type {
@@ -87,6 +90,9 @@ export const continueLesson: ContinueLesson = {
   program: "Najdi sebe",
   duration: "15 min",
   href: "/programi/najdi-sebe",
+  heading: "Nadaljuj z lekcijo",
+  ctaLabel: "Nadaljuj lekcijo",
+  programCtaLabel: "Nadaljuj program",
   visual: "path",
   imageAlt: "Najdi sebe — predogled lekcije",
 };
@@ -183,11 +189,16 @@ export function getBestOwnedContinueLesson(
       continue;
     }
 
+    const firstTime = isFirstTimeProgramUser(progress);
+
     return {
       title: progress.continueLesson.title,
       program: program.label,
       duration: progress.continueLesson.duration,
-      href: progress.continueHref,
+      href: getOwnedEntryHref(program.slug, progress),
+      heading: firstTime ? "Začni program" : "Nadaljuj z lekcijo",
+      ctaLabel: getOwnedEntryCtaLabel(progress, "lesson"),
+      programCtaLabel: getOwnedEntryCtaLabel(progress, "program"),
       visual: program.visual,
       imageSrc: program.imageSrc,
       imageAlt: program.imageAlt,

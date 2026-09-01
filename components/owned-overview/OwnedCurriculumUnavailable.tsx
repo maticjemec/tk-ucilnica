@@ -7,8 +7,8 @@ export function OwnedCurriculumUnavailable() {
         Vsebina programa
       </h2>
       <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">
-        Vsebina tega programa še ni na voljo. Ko bodo lekcije pripravljene,
-        jih boš videl/a tukaj.
+        Vsebina programa še ni na voljo. Ko bodo lekcije pripravljene, jih
+        boš videl/a tukaj.
       </p>
     </Card>
   );

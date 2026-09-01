@@ -21,6 +21,7 @@ export function OwnedContinueCard({ model }: OwnedContinueCardProps) {
     continueAvailable,
     isCompleted,
     primaryCtaLabel,
+    howItWorksHint,
   } = model;
   const displayLesson = currentLesson ?? waitingLesson;
 
@@ -79,7 +80,7 @@ export function OwnedContinueCard({ model }: OwnedContinueCardProps) {
       </div>
 
       {waiting ? (
-        <Button disabled className="mt-5 w-full sm:w-auto">
+        <Button disabled className="mt-5 min-h-11 w-full sm:w-auto">
           Naslednja lekcija še ni na voljo
         </Button>
       ) : (
@@ -92,6 +93,10 @@ export function OwnedContinueCard({ model }: OwnedContinueCardProps) {
           {ctaLabel}
         </ButtonLink>
       )}
+
+      {!isCompleted && howItWorksHint ? (
+        <p className="mt-4 text-sm leading-relaxed text-muted">{howItWorksHint}</p>
+      ) : null}
     </Card>
   );
 }

@@ -101,7 +101,7 @@ export default async function PregledPage() {
               ownedContinueLesson
                 ? {
                     href: ownedContinueLesson.href,
-                    label: "Nadaljuj program",
+                    label: ownedContinueLesson.programCtaLabel,
                   }
                 : undefined
             }

@@ -30,6 +30,9 @@ export type ContinueLesson = {
   program: string;
   duration: string;
   href: string;
+  heading: string;
+  ctaLabel: string;
+  programCtaLabel: string;
   visual: ProgramVisualId;
   imageSrc?: string;
   imageAlt?: string;

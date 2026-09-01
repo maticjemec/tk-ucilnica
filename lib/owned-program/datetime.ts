@@ -99,3 +99,10 @@ export function formatNextLessonUnlockMessage(date: Date, now?: Date) {
     ? `Naslednja lekcija bo na voljo ${formatted}.`
     : "Naslednja lekcija še ni na voljo.";
 }
+
+export function formatFirstLessonUnlockMessage(date: Date, now?: Date) {
+  const formatted = formatUnlockDate(date, now);
+  return formatted
+    ? `Prva lekcija bo na voljo ${formatted}.`
+    : "Prva lekcija še ni na voljo.";
+}
