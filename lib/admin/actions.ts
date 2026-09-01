@@ -14,6 +14,7 @@ import {
   detachAdminLessonVideo,
   prepareAdminAudioUpload,
   prepareAdminWorksheetUpload,
+  refreshAdminLessonVideoStatus,
   removeAdminLessonAudio,
   removeAdminLessonWorksheet,
 } from "@/lib/admin/mutations/media";
@@ -123,6 +124,13 @@ export async function confirmLessonWorksheetUploadAction(input: {
   path: string;
 }) {
   return confirmAdminWorksheetUpload(input);
+}
+
+export async function refreshLessonVideoStatusAction(input: {
+  programSlug: string;
+  lessonSlug: string;
+}) {
+  return refreshAdminLessonVideoStatus(input);
 }
 
 export async function detachLessonVideoAction(input: {

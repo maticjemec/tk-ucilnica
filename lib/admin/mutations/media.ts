@@ -18,6 +18,7 @@ import {
   LESSON_MATERIALS_BUCKET,
 } from "@/lib/media/server/constants";
 import { isAuthorizedLessonObjectPath } from "@/lib/media/server/paths";
+import { reconcileLessonMuxVideo } from "@/lib/media/server/mux-reconcile";
 import { createLessonVideoDirectUpload } from "@/lib/media/server/upload";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -36,7 +37,7 @@ async function loadLesson(programSlug: string, lessonSlug: string) {
   const { data, error } = await supabase
     .from("lessons")
     .select(
-      "id, slug, audio_path, worksheet_path, programs!inner ( slug )",
+      "id, slug, audio_path, worksheet_path, video_asset_id, programs!inner ( slug )",
     )
     .eq("slug", lessonSlug)
     .eq("programs.slug", programSlug)
@@ -52,6 +53,7 @@ async function loadLesson(programSlug: string, lessonSlug: string) {
     lessonSlug,
     audioPath: readOptionalPath(data.audio_path),
     worksheetPath: readOptionalPath(data.worksheet_path),
+    videoAssetId: readOptionalPath(data.video_asset_id),
   };
 }
 
@@ -282,6 +284,45 @@ export async function confirmAdminWorksheetUpload(input: {
 
   revalidateAdminLesson(input.programSlug, input.lessonSlug);
   return adminOk();
+}
+
+const VIDEO_REFRESH_COPY = {
+  ready: "Video je pripravljen",
+  preparing: "Video se še pripravlja v Muxu.",
+  errored: "Mux je javil napako pri videu.",
+  missing: "Video se še pripravlja v Muxu.",
+} as const;
+
+export async function refreshAdminLessonVideoStatus(input: {
+  programSlug: string;
+  lessonSlug: string;
+}) {
+  const auth = await requireAdminMutation();
+
+  if (!auth.ok) {
+    return auth;
+  }
+
+  const lesson = await loadLesson(input.programSlug, input.lessonSlug);
+
+  if (!lesson) {
+    return adminFail(ADMIN_ERRORS.notFound);
+  }
+
+  try {
+    const status = await reconcileLessonMuxVideo({
+      lessonId: lesson.id,
+      storedAssetId: lesson.videoAssetId,
+    });
+    revalidateAdminLesson(input.programSlug, input.lessonSlug);
+    return adminOk({
+      status,
+      message: VIDEO_REFRESH_COPY[status],
+    });
+  } catch {
+    console.error("[admin] Failed to refresh lesson video status.");
+    return adminFail(ADMIN_ERRORS.refreshVideo);
+  }
 }
 
 export async function detachAdminLessonVideo(input: {

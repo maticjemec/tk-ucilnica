@@ -13,6 +13,7 @@ import {
   detachLessonVideoAction,
   prepareLessonAudioUploadAction,
   prepareLessonWorksheetUploadAction,
+  refreshLessonVideoStatusAction,
   removeLessonAudioAction,
   removeLessonWorksheetAction,
 } from "@/lib/admin/actions";
@@ -240,6 +241,24 @@ export function LessonMediaPanel({
     router.refresh();
   }
 
+  async function refreshVideoStatus() {
+    resetNotes();
+    setPending("refresh-video");
+    const result = await refreshLessonVideoStatusAction({
+      programSlug,
+      lessonSlug: lesson.slug,
+    });
+    setPending(null);
+
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+
+    setMessage(result.data.message);
+    router.refresh();
+  }
+
   async function removeAudio() {
     if (!window.confirm("Trajno odstraniti zvočno datoteko s te lekcije?")) {
       return;
@@ -306,7 +325,7 @@ export function LessonMediaPanel({
             size="sm"
             variant="secondary"
             disabled={pending !== null}
-            onClick={() => router.refresh()}
+            onClick={() => void refreshVideoStatus()}
           >
             Osveži status
           </Button>
@@ -330,7 +349,13 @@ export function LessonMediaPanel({
               ) : null}
               {lesson.video_status === "preparing" ? (
                 <p className="mt-1 text-[0.75rem] text-muted">
-                  Datoteka gre neposredno na Mux. Osveži stran po obdelavi.
+                  Datoteka gre neposredno na Mux. Če je v Muxu že Ready, klikni
+                  Osveži status.
+                </p>
+              ) : null}
+              {lesson.video_status === "errored" ? (
+                <p className="mt-1 text-[0.75rem] text-muted">
+                  Mux ni uspel obdelati videa. Poskusi naložiti znova.
                 </p>
               ) : null}
             </div>

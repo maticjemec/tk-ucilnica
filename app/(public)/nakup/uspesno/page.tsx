@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
+import { CheckPurchaseAccessButton } from "@/components/billing/CheckPurchaseAccessButton";
 import { PurchaseAccessPoller } from "@/components/billing/PurchaseAccessPoller";
 import { ButtonLink } from "@/components/dashboard/ButtonLink";
 import { Card } from "@/components/ui/Card";
@@ -57,12 +58,7 @@ export default async function PurchaseSuccessPage({
         title="Plačilo smo prejeli"
         subtitle="Dostop do programa se pripravlja. To običajno traja le nekaj trenutkov."
       >
-        <ButtonLink
-          href={`/nakup/uspesno?session_id=${encodeURIComponent(view.sessionId)}`}
-          className="w-full sm:w-auto"
-        >
-          Preveri dostop
-        </ButtonLink>
+        <CheckPurchaseAccessButton sessionId={view.sessionId} />
         <PurchaseAccessPoller />
       </PurchaseStatus>
     );

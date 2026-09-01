@@ -6,6 +6,8 @@ export function revalidateAdminProgram(slug: string) {
   revalidatePath("/admin");
   revalidatePath("/admin/programi");
   revalidatePath(`/admin/programi/${slug}`);
+  revalidatePath(`/admin/programi/${slug}`, "layout");
+  revalidatePath(`/admin/programi/${slug}/lekcije/nova`);
   revalidatePath("/programi");
   revalidatePath(`/programi/${slug}`);
   revalidatePath("/moji-programi");

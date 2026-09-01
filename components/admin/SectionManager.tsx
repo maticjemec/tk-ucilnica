@@ -38,10 +38,11 @@ export function SectionManager({
 
     if (!result.ok) {
       setError(result.error);
-      return;
+      return false;
     }
 
     router.refresh();
+    return true;
   }
 
   return (
@@ -134,10 +135,12 @@ export function SectionManager({
       <Card padding="sm">
         <p className="mb-3 text-sm font-medium text-foreground">Nov razdelek</p>
         <form
+          key={nextOrder}
           className="grid gap-3 sm:grid-cols-[1fr_6rem]"
           onSubmit={(event) => {
             event.preventDefault();
-            const form = new FormData(event.currentTarget);
+            const formElement = event.currentTarget;
+            const form = new FormData(formElement);
             void refreshAfter("create", () =>
               createSectionAction({
                 programSlug,
@@ -145,8 +148,10 @@ export function SectionManager({
                 description: String(form.get("description") ?? ""),
                 sectionOrder: String(form.get("sectionOrder") ?? nextOrder),
               }),
-            ).then(() => {
-              event.currentTarget.reset();
+            ).then((created) => {
+              if (created) {
+                formElement.reset();
+              }
             });
           }}
         >

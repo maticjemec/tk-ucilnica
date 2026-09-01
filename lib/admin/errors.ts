@@ -16,6 +16,7 @@ export const ADMIN_ERRORS = {
   removeVideo: "Videoposnetka ni bilo mogoče odstraniti.",
   removeAudio: "Zvočne datoteke ni bilo mogoče odstraniti.",
   removeWorksheet: "PDF datoteke ni bilo mogoče odstraniti.",
+  refreshVideo: "Status videa ni bilo mogoče osvežiti.",
   invalidInput: "Preveri vnesene podatke.",
   slugTaken: "Ta slug je že zaseden.",
   orderTaken: "Ta vrstni red je že zaseden.",
